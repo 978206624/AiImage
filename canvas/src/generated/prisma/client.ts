@@ -95,6 +95,11 @@ export type EmailToken = Prisma.EmailTokenModel
  */
 export type RegistrationAttempt = Prisma.RegistrationAttemptModel
 /**
+ * Model ImageTask
+ * 
+ */
+export type ImageTask = Prisma.ImageTaskModel
+/**
  * Model AdminUserAuditLog
  * 
  */

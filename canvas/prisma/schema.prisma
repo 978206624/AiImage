@@ -123,6 +123,7 @@ model User {
   redeemedKeys      ApiKey[]
   usageRecords      UsageRecord[]
   emailTokens       EmailToken[]
+  imageTasks        ImageTask[]
 
   @@map("users")
 }
@@ -148,6 +149,36 @@ model RegistrationAttempt {
 
   @@index([ip, createdAt])
   @@map("registration_attempts")
+}
+
+model ImageTask {
+  id                   Int       @id @default(autoincrement())
+  userId               Int       @map("user_id")
+  groupId              String    @map("group_id") @db.VarChar(40)
+  status               String    @default("pending") @db.VarChar(20)
+  externalTaskId       String?   @map("external_task_id") @db.VarChar(120)
+  failReason           String?   @map("fail_reason") @db.Text
+  prompt               String    @db.Text
+  promptSummary        String    @map("prompt_summary") @db.VarChar(200)
+  aspectRatio          String    @map("aspect_ratio") @db.VarChar(20)
+  quality              String    @db.VarChar(20)
+  size                 String    @db.VarChar(20)
+  referenceImagesJson  String?   @map("reference_images_json") @db.Text
+  stylePresetId        Int?      @map("style_preset_id")
+  creditsLocked        Decimal   @map("credits_locked") @db.Decimal(10, 2)
+  refunded             Boolean   @default(false)
+  progress             Int       @default(0)
+  imageUrl             String?   @map("image_url") @db.Text
+  isPersisted          Boolean   @default(false) @map("is_persisted")
+  usageRecordId        Int?      @map("usage_record_id")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  user                 User      @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([groupId])
+  @@index([status])
+  @@map("image_tasks")
 }
 
 model AdminUserAuditLog {

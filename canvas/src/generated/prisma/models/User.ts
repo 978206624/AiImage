@@ -271,6 +271,7 @@ export type UserWhereInput = {
   redeemedKeys?: Prisma.ApiKeyListRelationFilter
   usageRecords?: Prisma.UsageRecordListRelationFilter
   emailTokens?: Prisma.EmailTokenListRelationFilter
+  imageTasks?: Prisma.ImageTaskListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -288,6 +289,7 @@ export type UserOrderByWithRelationInput = {
   redeemedKeys?: Prisma.ApiKeyOrderByRelationAggregateInput
   usageRecords?: Prisma.UsageRecordOrderByRelationAggregateInput
   emailTokens?: Prisma.EmailTokenOrderByRelationAggregateInput
+  imageTasks?: Prisma.ImageTaskOrderByRelationAggregateInput
   _relevance?: Prisma.UserOrderByRelevanceInput
 }
 
@@ -309,6 +311,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   redeemedKeys?: Prisma.ApiKeyListRelationFilter
   usageRecords?: Prisma.UsageRecordListRelationFilter
   emailTokens?: Prisma.EmailTokenListRelationFilter
+  imageTasks?: Prisma.ImageTaskListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -361,6 +364,7 @@ export type UserCreateInput = {
   redeemedKeys?: Prisma.ApiKeyCreateNestedManyWithoutRedeemedUserInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutUserInput
   emailTokens?: Prisma.EmailTokenCreateNestedManyWithoutUserInput
+  imageTasks?: Prisma.ImageTaskCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -378,6 +382,7 @@ export type UserUncheckedCreateInput = {
   redeemedKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutRedeemedUserInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutUserInput
   emailTokens?: Prisma.EmailTokenUncheckedCreateNestedManyWithoutUserInput
+  imageTasks?: Prisma.ImageTaskUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -394,6 +399,7 @@ export type UserUpdateInput = {
   redeemedKeys?: Prisma.ApiKeyUpdateManyWithoutRedeemedUserNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutUserNestedInput
   emailTokens?: Prisma.EmailTokenUpdateManyWithoutUserNestedInput
+  imageTasks?: Prisma.ImageTaskUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -411,6 +417,7 @@ export type UserUncheckedUpdateInput = {
   redeemedKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutRedeemedUserNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutUserNestedInput
   emailTokens?: Prisma.EmailTokenUncheckedUpdateManyWithoutUserNestedInput
+  imageTasks?: Prisma.ImageTaskUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -568,6 +575,20 @@ export type UserUpdateOneRequiredWithoutEmailTokensNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEmailTokensInput, Prisma.UserUpdateWithoutEmailTokensInput>, Prisma.UserUncheckedUpdateWithoutEmailTokensInput>
 }
 
+export type UserCreateNestedOneWithoutImageTasksInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutImageTasksInput, Prisma.UserUncheckedCreateWithoutImageTasksInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutImageTasksInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutImageTasksNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutImageTasksInput, Prisma.UserUncheckedCreateWithoutImageTasksInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutImageTasksInput
+  upsert?: Prisma.UserUpsertWithoutImageTasksInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutImageTasksInput, Prisma.UserUpdateWithoutImageTasksInput>, Prisma.UserUncheckedUpdateWithoutImageTasksInput>
+}
+
 export type UserCreateWithoutRedeemedKeysInput = {
   email: string
   passwordHash: string
@@ -581,6 +602,7 @@ export type UserCreateWithoutRedeemedKeysInput = {
   updatedAt?: Date | string
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutUserInput
   emailTokens?: Prisma.EmailTokenCreateNestedManyWithoutUserInput
+  imageTasks?: Prisma.ImageTaskCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRedeemedKeysInput = {
@@ -597,6 +619,7 @@ export type UserUncheckedCreateWithoutRedeemedKeysInput = {
   updatedAt?: Date | string
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutUserInput
   emailTokens?: Prisma.EmailTokenUncheckedCreateNestedManyWithoutUserInput
+  imageTasks?: Prisma.ImageTaskUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRedeemedKeysInput = {
@@ -628,6 +651,7 @@ export type UserUpdateWithoutRedeemedKeysInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutUserNestedInput
   emailTokens?: Prisma.EmailTokenUpdateManyWithoutUserNestedInput
+  imageTasks?: Prisma.ImageTaskUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRedeemedKeysInput = {
@@ -644,6 +668,7 @@ export type UserUncheckedUpdateWithoutRedeemedKeysInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutUserNestedInput
   emailTokens?: Prisma.EmailTokenUncheckedUpdateManyWithoutUserNestedInput
+  imageTasks?: Prisma.ImageTaskUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUsageRecordsInput = {
@@ -659,6 +684,7 @@ export type UserCreateWithoutUsageRecordsInput = {
   updatedAt?: Date | string
   redeemedKeys?: Prisma.ApiKeyCreateNestedManyWithoutRedeemedUserInput
   emailTokens?: Prisma.EmailTokenCreateNestedManyWithoutUserInput
+  imageTasks?: Prisma.ImageTaskCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUsageRecordsInput = {
@@ -675,6 +701,7 @@ export type UserUncheckedCreateWithoutUsageRecordsInput = {
   updatedAt?: Date | string
   redeemedKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutRedeemedUserInput
   emailTokens?: Prisma.EmailTokenUncheckedCreateNestedManyWithoutUserInput
+  imageTasks?: Prisma.ImageTaskUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUsageRecordsInput = {
@@ -706,6 +733,7 @@ export type UserUpdateWithoutUsageRecordsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   redeemedKeys?: Prisma.ApiKeyUpdateManyWithoutRedeemedUserNestedInput
   emailTokens?: Prisma.EmailTokenUpdateManyWithoutUserNestedInput
+  imageTasks?: Prisma.ImageTaskUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUsageRecordsInput = {
@@ -722,6 +750,7 @@ export type UserUncheckedUpdateWithoutUsageRecordsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   redeemedKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutRedeemedUserNestedInput
   emailTokens?: Prisma.EmailTokenUncheckedUpdateManyWithoutUserNestedInput
+  imageTasks?: Prisma.ImageTaskUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEmailTokensInput = {
@@ -737,6 +766,7 @@ export type UserCreateWithoutEmailTokensInput = {
   updatedAt?: Date | string
   redeemedKeys?: Prisma.ApiKeyCreateNestedManyWithoutRedeemedUserInput
   usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutUserInput
+  imageTasks?: Prisma.ImageTaskCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmailTokensInput = {
@@ -753,6 +783,7 @@ export type UserUncheckedCreateWithoutEmailTokensInput = {
   updatedAt?: Date | string
   redeemedKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutRedeemedUserInput
   usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutUserInput
+  imageTasks?: Prisma.ImageTaskUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmailTokensInput = {
@@ -784,6 +815,7 @@ export type UserUpdateWithoutEmailTokensInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   redeemedKeys?: Prisma.ApiKeyUpdateManyWithoutRedeemedUserNestedInput
   usageRecords?: Prisma.UsageRecordUpdateManyWithoutUserNestedInput
+  imageTasks?: Prisma.ImageTaskUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmailTokensInput = {
@@ -800,6 +832,89 @@ export type UserUncheckedUpdateWithoutEmailTokensInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   redeemedKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutRedeemedUserNestedInput
   usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutUserNestedInput
+  imageTasks?: Prisma.ImageTaskUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutImageTasksInput = {
+  email: string
+  passwordHash: string
+  balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  emailVerified?: boolean
+  hasReceivedBonus?: boolean
+  registerIp?: string | null
+  status?: string
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  redeemedKeys?: Prisma.ApiKeyCreateNestedManyWithoutRedeemedUserInput
+  usageRecords?: Prisma.UsageRecordCreateNestedManyWithoutUserInput
+  emailTokens?: Prisma.EmailTokenCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutImageTasksInput = {
+  id?: number
+  email: string
+  passwordHash: string
+  balance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  emailVerified?: boolean
+  hasReceivedBonus?: boolean
+  registerIp?: string | null
+  status?: string
+  lastLoginAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  redeemedKeys?: Prisma.ApiKeyUncheckedCreateNestedManyWithoutRedeemedUserInput
+  usageRecords?: Prisma.UsageRecordUncheckedCreateNestedManyWithoutUserInput
+  emailTokens?: Prisma.EmailTokenUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutImageTasksInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutImageTasksInput, Prisma.UserUncheckedCreateWithoutImageTasksInput>
+}
+
+export type UserUpsertWithoutImageTasksInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutImageTasksInput, Prisma.UserUncheckedUpdateWithoutImageTasksInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutImageTasksInput, Prisma.UserUncheckedCreateWithoutImageTasksInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutImageTasksInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutImageTasksInput, Prisma.UserUncheckedUpdateWithoutImageTasksInput>
+}
+
+export type UserUpdateWithoutImageTasksInput = {
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasReceivedBonus?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  redeemedKeys?: Prisma.ApiKeyUpdateManyWithoutRedeemedUserNestedInput
+  usageRecords?: Prisma.UsageRecordUpdateManyWithoutUserNestedInput
+  emailTokens?: Prisma.EmailTokenUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutImageTasksInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  balance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  hasReceivedBonus?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  registerIp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  redeemedKeys?: Prisma.ApiKeyUncheckedUpdateManyWithoutRedeemedUserNestedInput
+  usageRecords?: Prisma.UsageRecordUncheckedUpdateManyWithoutUserNestedInput
+  emailTokens?: Prisma.EmailTokenUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -811,12 +926,14 @@ export type UserCountOutputType = {
   redeemedKeys: number
   usageRecords: number
   emailTokens: number
+  imageTasks: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   redeemedKeys?: boolean | UserCountOutputTypeCountRedeemedKeysArgs
   usageRecords?: boolean | UserCountOutputTypeCountUsageRecordsArgs
   emailTokens?: boolean | UserCountOutputTypeCountEmailTokensArgs
+  imageTasks?: boolean | UserCountOutputTypeCountImageTasksArgs
 }
 
 /**
@@ -850,6 +967,13 @@ export type UserCountOutputTypeCountEmailTokensArgs<ExtArgs extends runtime.Type
   where?: Prisma.EmailTokenWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountImageTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ImageTaskWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -866,6 +990,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   redeemedKeys?: boolean | Prisma.User$redeemedKeysArgs<ExtArgs>
   usageRecords?: boolean | Prisma.User$usageRecordsArgs<ExtArgs>
   emailTokens?: boolean | Prisma.User$emailTokensArgs<ExtArgs>
+  imageTasks?: boolean | Prisma.User$imageTasksArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -890,6 +1015,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   redeemedKeys?: boolean | Prisma.User$redeemedKeysArgs<ExtArgs>
   usageRecords?: boolean | Prisma.User$usageRecordsArgs<ExtArgs>
   emailTokens?: boolean | Prisma.User$emailTokensArgs<ExtArgs>
+  imageTasks?: boolean | Prisma.User$imageTasksArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -899,6 +1025,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     redeemedKeys: Prisma.$ApiKeyPayload<ExtArgs>[]
     usageRecords: Prisma.$UsageRecordPayload<ExtArgs>[]
     emailTokens: Prisma.$EmailTokenPayload<ExtArgs>[]
+    imageTasks: Prisma.$ImageTaskPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1255,6 +1382,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   redeemedKeys<T extends Prisma.User$redeemedKeysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$redeemedKeysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   usageRecords<T extends Prisma.User$usageRecordsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$usageRecordsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UsageRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   emailTokens<T extends Prisma.User$emailTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$emailTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  imageTasks<T extends Prisma.User$imageTasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$imageTasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ImageTaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1707,6 +1835,30 @@ export type User$emailTokensArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.EmailTokenScalarFieldEnum | Prisma.EmailTokenScalarFieldEnum[]
+}
+
+/**
+ * User.imageTasks
+ */
+export type User$imageTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ImageTask
+   */
+  select?: Prisma.ImageTaskSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ImageTask
+   */
+  omit?: Prisma.ImageTaskOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ImageTaskInclude<ExtArgs> | null
+  where?: Prisma.ImageTaskWhereInput
+  orderBy?: Prisma.ImageTaskOrderByWithRelationInput | Prisma.ImageTaskOrderByWithRelationInput[]
+  cursor?: Prisma.ImageTaskWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ImageTaskScalarFieldEnum | Prisma.ImageTaskScalarFieldEnum[]
 }
 
 /**

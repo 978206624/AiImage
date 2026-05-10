@@ -400,6 +400,7 @@ export const ModelName = {
   User: 'User',
   EmailToken: 'EmailToken',
   RegistrationAttempt: 'RegistrationAttempt',
+  ImageTask: 'ImageTask',
   AdminUserAuditLog: 'AdminUserAuditLog'
 } as const
 
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "systemSetting" | "apiKey" | "usageRecord" | "galleryImage" | "category" | "promptTemplate" | "stylePreset" | "user" | "emailToken" | "registrationAttempt" | "adminUserAuditLog"
+    modelProps: "systemSetting" | "apiKey" | "usageRecord" | "galleryImage" | "category" | "promptTemplate" | "stylePreset" | "user" | "emailToken" | "registrationAttempt" | "imageTask" | "adminUserAuditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1080,6 +1081,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ImageTask: {
+      payload: Prisma.$ImageTaskPayload<ExtArgs>
+      fields: Prisma.ImageTaskFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ImageTaskFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageTaskPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ImageTaskFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageTaskPayload>
+        }
+        findFirst: {
+          args: Prisma.ImageTaskFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageTaskPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ImageTaskFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageTaskPayload>
+        }
+        findMany: {
+          args: Prisma.ImageTaskFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageTaskPayload>[]
+        }
+        create: {
+          args: Prisma.ImageTaskCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageTaskPayload>
+        }
+        createMany: {
+          args: Prisma.ImageTaskCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.ImageTaskDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageTaskPayload>
+        }
+        update: {
+          args: Prisma.ImageTaskUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageTaskPayload>
+        }
+        deleteMany: {
+          args: Prisma.ImageTaskDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ImageTaskUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.ImageTaskUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ImageTaskPayload>
+        }
+        aggregate: {
+          args: Prisma.ImageTaskAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateImageTask>
+        }
+        groupBy: {
+          args: Prisma.ImageTaskGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImageTaskGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ImageTaskCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ImageTaskCountAggregateOutputType> | number
+        }
+      }
+    }
     AdminUserAuditLog: {
       payload: Prisma.$AdminUserAuditLogPayload<ExtArgs>
       fields: Prisma.AdminUserAuditLogFieldRefs
@@ -1321,6 +1388,33 @@ export const RegistrationAttemptScalarFieldEnum = {
 export type RegistrationAttemptScalarFieldEnum = (typeof RegistrationAttemptScalarFieldEnum)[keyof typeof RegistrationAttemptScalarFieldEnum]
 
 
+export const ImageTaskScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  groupId: 'groupId',
+  status: 'status',
+  externalTaskId: 'externalTaskId',
+  failReason: 'failReason',
+  prompt: 'prompt',
+  promptSummary: 'promptSummary',
+  aspectRatio: 'aspectRatio',
+  quality: 'quality',
+  size: 'size',
+  referenceImagesJson: 'referenceImagesJson',
+  stylePresetId: 'stylePresetId',
+  creditsLocked: 'creditsLocked',
+  refunded: 'refunded',
+  progress: 'progress',
+  imageUrl: 'imageUrl',
+  isPersisted: 'isPersisted',
+  usageRecordId: 'usageRecordId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ImageTaskScalarFieldEnum = (typeof ImageTaskScalarFieldEnum)[keyof typeof ImageTaskScalarFieldEnum]
+
+
 export const AdminUserAuditLogScalarFieldEnum = {
   id: 'id',
   adminId: 'adminId',
@@ -1433,6 +1527,23 @@ export const RegistrationAttemptOrderByRelevanceFieldEnum = {
 } as const
 
 export type RegistrationAttemptOrderByRelevanceFieldEnum = (typeof RegistrationAttemptOrderByRelevanceFieldEnum)[keyof typeof RegistrationAttemptOrderByRelevanceFieldEnum]
+
+
+export const ImageTaskOrderByRelevanceFieldEnum = {
+  groupId: 'groupId',
+  status: 'status',
+  externalTaskId: 'externalTaskId',
+  failReason: 'failReason',
+  prompt: 'prompt',
+  promptSummary: 'promptSummary',
+  aspectRatio: 'aspectRatio',
+  quality: 'quality',
+  size: 'size',
+  referenceImagesJson: 'referenceImagesJson',
+  imageUrl: 'imageUrl'
+} as const
+
+export type ImageTaskOrderByRelevanceFieldEnum = (typeof ImageTaskOrderByRelevanceFieldEnum)[keyof typeof ImageTaskOrderByRelevanceFieldEnum]
 
 
 export const AdminUserAuditLogOrderByRelevanceFieldEnum = {
@@ -1587,6 +1698,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   emailToken?: Prisma.EmailTokenOmit
   registrationAttempt?: Prisma.RegistrationAttemptOmit
+  imageTask?: Prisma.ImageTaskOmit
   adminUserAuditLog?: Prisma.AdminUserAuditLogOmit
 }
 

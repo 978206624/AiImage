@@ -59,6 +59,7 @@ export const ModelName = {
   User: 'User',
   EmailToken: 'EmailToken',
   RegistrationAttempt: 'RegistrationAttempt',
+  ImageTask: 'ImageTask',
   AdminUserAuditLog: 'AdminUserAuditLog'
 } as const
 
@@ -214,6 +215,33 @@ export const RegistrationAttemptScalarFieldEnum = {
 export type RegistrationAttemptScalarFieldEnum = (typeof RegistrationAttemptScalarFieldEnum)[keyof typeof RegistrationAttemptScalarFieldEnum]
 
 
+export const ImageTaskScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  groupId: 'groupId',
+  status: 'status',
+  externalTaskId: 'externalTaskId',
+  failReason: 'failReason',
+  prompt: 'prompt',
+  promptSummary: 'promptSummary',
+  aspectRatio: 'aspectRatio',
+  quality: 'quality',
+  size: 'size',
+  referenceImagesJson: 'referenceImagesJson',
+  stylePresetId: 'stylePresetId',
+  creditsLocked: 'creditsLocked',
+  refunded: 'refunded',
+  progress: 'progress',
+  imageUrl: 'imageUrl',
+  isPersisted: 'isPersisted',
+  usageRecordId: 'usageRecordId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ImageTaskScalarFieldEnum = (typeof ImageTaskScalarFieldEnum)[keyof typeof ImageTaskScalarFieldEnum]
+
+
 export const AdminUserAuditLogScalarFieldEnum = {
   id: 'id',
   adminId: 'adminId',
@@ -326,6 +354,23 @@ export const RegistrationAttemptOrderByRelevanceFieldEnum = {
 } as const
 
 export type RegistrationAttemptOrderByRelevanceFieldEnum = (typeof RegistrationAttemptOrderByRelevanceFieldEnum)[keyof typeof RegistrationAttemptOrderByRelevanceFieldEnum]
+
+
+export const ImageTaskOrderByRelevanceFieldEnum = {
+  groupId: 'groupId',
+  status: 'status',
+  externalTaskId: 'externalTaskId',
+  failReason: 'failReason',
+  prompt: 'prompt',
+  promptSummary: 'promptSummary',
+  aspectRatio: 'aspectRatio',
+  quality: 'quality',
+  size: 'size',
+  referenceImagesJson: 'referenceImagesJson',
+  imageUrl: 'imageUrl'
+} as const
+
+export type ImageTaskOrderByRelevanceFieldEnum = (typeof ImageTaskOrderByRelevanceFieldEnum)[keyof typeof ImageTaskOrderByRelevanceFieldEnum]
 
 
 export const AdminUserAuditLogOrderByRelevanceFieldEnum = {
