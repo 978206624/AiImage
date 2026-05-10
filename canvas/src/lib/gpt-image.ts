@@ -1,16 +1,22 @@
 import { getRequiredSetting } from "./system-settings";
 
-interface GenerateParams {
+export type Quality = "low" | "medium" | "high" | "auto";
+
+export interface SubmitParams {
   prompt: string;
   size: string;
+  quality?: Quality;
   referenceImages?: string[];
 }
 
-interface TaskResult {
-  status: "pending" | "processing" | "completed" | "failed";
-  imageUrl?: string;
-  error?: string;
-}
+export type SubmitResult =
+  | { async: true; taskId: string }
+  | { async: false; imageUrl: string };
+
+export type QueryResult =
+  | { status: "processing"; progress?: number }
+  | { status: "completed"; imageUrl: string }
+  | { status: "failed"; failReason: string };
 
 async function getConfig() {
   const baseUrl = await getRequiredSetting(
@@ -26,99 +32,190 @@ async function getConfig() {
   return { baseUrl: baseUrl.replace(/\/$/, ""), apiKey };
 }
 
-export async function submitTask(params: GenerateParams): Promise<string> {
+export async function submitTask(params: SubmitParams): Promise<SubmitResult> {
   const { baseUrl, apiKey } = await getConfig();
 
   const body: Record<string, unknown> = {
     model: "gpt-image-1",
     prompt: params.prompt,
     size: params.size,
+    response_format: "url",
+    quality: params.quality ?? "auto",
     n: 1,
   };
-
   if (params.referenceImages && params.referenceImages.length > 0) {
     body.image = params.referenceImages;
   }
 
-  const res = await fetch(`${baseUrl}/v1/images/generations`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(body),
-  });
+  const url = `${baseUrl}/v1/images/generations?async=true`;
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    throw new Error("中转站连接失败，请检查节点地址或稍后重试");
+  }
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`生图请求失败 (${res.status}): ${text}`);
+    const text = await res.text().catch(() => "");
+    throw new Error(`生图请求失败 (${res.status}): ${text || "Unknown error"}`);
   }
 
-  const data = await res.json();
-
-  if (data.data?.[0]?.url) {
-    return data.data[0].url;
-  }
-
-  if (data.id || data.task_id) {
-    return data.id || data.task_id;
-  }
-
-  throw new Error("生图响应格式异常");
+  const data: unknown = await res.json();
+  return parseSubmitResponse(data);
 }
 
-export async function pollTask(taskId: string): Promise<TaskResult> {
+function parseSubmitResponse(data: unknown): SubmitResult {
+  const obj = (data ?? {}) as Record<string, unknown>;
+
+  // Async 形式：{ code:"success", data:{ task_id } }
+  if (
+    obj.code === "success" &&
+    typeof obj.data === "object" &&
+    obj.data !== null
+  ) {
+    const tid = (obj.data as Record<string, unknown>).task_id;
+    if (typeof tid === "string" && tid) return { async: true, taskId: tid };
+  }
+
+  // Sync 形式：{ data: [{ url }] }
+  if (Array.isArray(obj.data) && obj.data.length > 0) {
+    const first = obj.data[0] as Record<string, unknown>;
+    if (typeof first.url === "string" && first.url) {
+      return { async: false, imageUrl: first.url };
+    }
+  }
+
+  // Async 兜底：顶层 id / task_id
+  if (typeof obj.id === "string" && obj.id) {
+    return { async: true, taskId: obj.id };
+  }
+  if (typeof obj.task_id === "string" && obj.task_id) {
+    return { async: true, taskId: obj.task_id };
+  }
+
+  throw new Error(
+    `生图响应格式异常: ${JSON.stringify(data).slice(0, 200)}`
+  );
+}
+
+const SUCCESS_STATUSES = ["SUCCESS", "COMPLETED", "SUCCEEDED"];
+const FAIL_TERMINAL_STATUSES = [
+  "FAILURE",
+  "FAILED",
+  "CANCELED",
+  "CANCELLED",
+  "EXPIRED",
+  "ERROR",
+  "TIMEOUT",
+];
+
+export async function queryTask(taskId: string): Promise<QueryResult> {
   const { baseUrl, apiKey } = await getConfig();
+  const url = `${baseUrl}/v1/images/tasks/${encodeURIComponent(taskId)}`;
 
-  const res = await fetch(`${baseUrl}/v1/images/generations/${taskId}`, {
-    headers: { Authorization: `Bearer ${apiKey}` },
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+  } catch {
+    throw new Error("任务查询失败：节点暂时不可达，请稍后重试");
+  }
 
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`轮询任务失败 (${res.status}): ${text}`);
+    const text = await res.text().catch(() => "");
+    throw new Error(`任务查询失败 (${res.status}): ${text || "Unknown error"}`);
   }
 
-  const data = await res.json();
+  const json = (await res.json()) as Record<string, unknown>;
+  const taskData = (json.data ?? json) as Record<string, unknown>;
 
-  if (data.status === "completed" || data.data?.[0]?.url) {
-    return {
-      status: "completed",
-      imageUrl: data.data?.[0]?.url || data.output?.url || data.url,
-    };
+  const statusRaw = String(taskData.status ?? "").toUpperCase();
+  const progress = parseProgress(taskData.progress);
+
+  if (SUCCESS_STATUSES.includes(statusRaw)) {
+    const imageUrl = pickImageUrl(taskData);
+    if (!imageUrl) {
+      return { status: "failed", failReason: "任务成功但未返回图片 URL" };
+    }
+    return { status: "completed", imageUrl };
   }
 
-  if (data.status === "failed" || data.error) {
-    return {
-      status: "failed",
-      error: data.error?.message || data.error || "生图失败",
-    };
+  if (FAIL_TERMINAL_STATUSES.includes(statusRaw)) {
+    const reason =
+      pickString(taskData.fail_reason) ||
+      pickString(taskData.error) ||
+      `任务终止: ${statusRaw}`;
+    return { status: "failed", failReason: reason };
   }
 
-  return { status: data.status || "processing" };
+  if (taskData.error) {
+    return { status: "failed", failReason: pickString(taskData.error) || "生成失败" };
+  }
+
+  return { status: "processing", progress };
 }
 
-export async function generateImage(params: GenerateParams): Promise<string> {
-  const result = await submitTask(params);
-
-  if (result.startsWith("http")) {
-    return result;
+function parseProgress(value: unknown): number | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const n = parseInt(value, 10);
+    if (Number.isFinite(n)) return n;
   }
+  return undefined;
+}
+
+function pickString(value: unknown): string | null {
+  if (typeof value === "string" && value) return value;
+  if (typeof value === "object" && value !== null) {
+    const msg = (value as Record<string, unknown>).message;
+    if (typeof msg === "string" && msg) return msg;
+  }
+  return null;
+}
+
+/**
+ * @deprecated 仅供 T-B 阶段的旧 /api/generate 兼容使用，T-E 完成后删除。
+ */
+export async function generateImage(params: SubmitParams): Promise<string> {
+  const submitted = await submitTask(params);
+  if (submitted.async === false) return submitted.imageUrl;
 
   const maxAttempts = 60;
   for (let i = 0; i < maxAttempts; i++) {
-    await new Promise((r) => setTimeout(r, 3000));
-    const poll = await pollTask(result);
-
-    if (poll.status === "completed" && poll.imageUrl) {
-      return poll.imageUrl;
-    }
-    if (poll.status === "failed") {
-      throw new Error(poll.error || "生图失败");
-    }
+    await new Promise((r) => setTimeout(r, 6000));
+    const q = await queryTask(submitted.taskId);
+    if (q.status === "completed") return q.imageUrl;
+    if (q.status === "failed") throw new Error(q.failReason);
   }
-
   throw new Error("生图超时，请稍后重试");
 }
 
-export type { GenerateParams, TaskResult };
+function pickImageUrl(taskData: Record<string, unknown>): string | null {
+  // 中转协议：data.data.data[0].url
+  const inner = taskData.data;
+  if (typeof inner === "object" && inner !== null) {
+    const innerData = (inner as Record<string, unknown>).data;
+    if (Array.isArray(innerData) && innerData.length > 0) {
+      const first = innerData[0] as Record<string, unknown>;
+      if (typeof first.url === "string" && first.url) return first.url;
+    }
+  }
+  // 兜底：output.url / url
+  const output = taskData.output;
+  if (typeof output === "object" && output !== null) {
+    const u = (output as Record<string, unknown>).url;
+    if (typeof u === "string" && u) return u;
+  }
+  if (typeof taskData.url === "string" && taskData.url) return taskData.url;
+  return null;
+}
