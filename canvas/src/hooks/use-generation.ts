@@ -46,9 +46,29 @@ const initialState: GenerationState = {
 };
 
 const POLL_INTERVAL_MS = 2_000;
+const ACTIVE_GROUP_KEY = "canvas_active_group";
 
 function isTerminal(status: TaskStatus): boolean {
   return status === "completed" || status === "failed";
+}
+
+function readActiveGroup(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.sessionStorage.getItem(ACTIVE_GROUP_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeActiveGroup(groupId: string | null) {
+  if (typeof window === "undefined") return;
+  try {
+    if (groupId) window.sessionStorage.setItem(ACTIVE_GROUP_KEY, groupId);
+    else window.sessionStorage.removeItem(ACTIVE_GROUP_KEY);
+  } catch {
+    // ignore
+  }
 }
 
 export function useGeneration() {
@@ -107,6 +127,7 @@ export function useGeneration() {
       }
 
       if (allTerminal) {
+        writeActiveGroup(null);
         stopPolling();
       }
     },
@@ -116,6 +137,43 @@ export function useGeneration() {
   useEffect(() => {
     return () => stopPolling();
   }, [stopPolling]);
+
+  // 刷新页面后恢复 active group 并继续轮询
+  useEffect(() => {
+    const savedGroupId = readActiveGroup();
+    if (!savedGroupId) return;
+    let cancelled = false;
+    (async () => {
+      const tasks = await fetchTasks(savedGroupId);
+      if (cancelled || !tasks || tasks.length === 0) {
+        if (tasks && tasks.length === 0) writeActiveGroup(null);
+        return;
+      }
+      const allTerminal = tasks.every((t) => isTerminal(t.status));
+      pollGroupIdRef.current = savedGroupId;
+      setState({
+        loading: !allTerminal,
+        groupId: savedGroupId,
+        tasks,
+        error: null,
+        errorCode: null,
+      });
+      if (allTerminal) {
+        writeActiveGroup(null);
+        return;
+      }
+      if (!pollTimerRef.current) {
+        pollTimerRef.current = setInterval(
+          () => void tickPoll(savedGroupId),
+          POLL_INTERVAL_MS
+        );
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const generate = useCallback(
     async (params: {
@@ -183,6 +241,7 @@ export function useGeneration() {
           failReason: null,
         }));
 
+        writeActiveGroup(groupId);
         pollGroupIdRef.current = groupId;
         setState({
           loading: true,
@@ -215,6 +274,7 @@ export function useGeneration() {
   );
 
   const clearResults = useCallback(() => {
+    writeActiveGroup(null);
     stopPolling();
     setState(initialState);
   }, [stopPolling]);
