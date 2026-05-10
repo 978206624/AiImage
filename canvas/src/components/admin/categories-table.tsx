@@ -9,7 +9,7 @@ interface Category {
   createdAt: string;
 }
 
-export default function CategoriesPage() {
+export function CategoriesTable() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -77,8 +77,7 @@ export default function CategoriesPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-medium text-fg">分类管理</h1>
+      <div className="flex items-center justify-end mb-4">
         <button
           onClick={() => setAdding(true)}
           className="px-4 py-2 bg-accent text-white text-sm rounded-lg hover:bg-accent/90"
@@ -138,7 +137,7 @@ export default function CategoriesPage() {
               {categories.length === 0 && !adding ? (
                 <tr>
                   <td colSpan={3} className="px-4 py-8 text-center text-muted text-sm">
-                    暂无分类，点击"新增分类"添加
+                    暂无分类，点击&ldquo;新增分类&rdquo;添加
                   </td>
                 </tr>
               ) : (

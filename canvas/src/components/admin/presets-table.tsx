@@ -21,7 +21,7 @@ interface PresetFormData {
   sortOrder: number;
 }
 
-export default function PresetsPage() {
+export function PresetsTable() {
   const [presets, setPresets] = useState<Preset[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -79,8 +79,7 @@ export default function PresetsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-medium text-fg">风格预设管理</h1>
+      <div className="flex items-center justify-end mb-4">
         <button
           onClick={() => {
             setEditing(null);
@@ -97,7 +96,7 @@ export default function PresetsPage() {
       ) : presets.length === 0 ? (
         <div className="text-center py-16 text-muted">
           <p className="text-sm">暂无风格预设</p>
-          <p className="text-xs mt-1">点击"添加预设"创建第一个</p>
+          <p className="text-xs mt-1">点击&ldquo;添加预设&rdquo;创建第一个</p>
         </div>
       ) : (
         <div className="border border-border rounded-lg overflow-hidden">
