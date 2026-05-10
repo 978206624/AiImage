@@ -96,7 +96,7 @@ export default function TemplatesPage() {
   return (
     <div className="min-h-screen pt-[var(--nav)]">
       {/* Header */}
-      <div className="px-8 pt-12 pb-8 max-w-6xl mx-auto">
+      <div className="px-8 pt-12 pb-8">
         <h1
           className="text-3xl font-light tracking-tight mb-2"
           style={{ fontFamily: "var(--font-d)" }}
@@ -135,7 +135,7 @@ export default function TemplatesPage() {
       </div>
 
       {/* Content */}
-      <div className="px-8 pb-24 max-w-6xl mx-auto">
+      <div className="px-8 pb-24">
         {tab === "templates" && (
           <>
             <div className="mb-6">
@@ -196,7 +196,7 @@ export default function TemplatesPage() {
       {/* Preset action bar */}
       {tab === "presets" && selectedPresets.size > 0 && (
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-surface/90 backdrop-blur-md border-t border-border px-8 py-4">
-          <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <span className="text-sm text-muted">
               已选择 <span className="text-fg font-medium">{selectedPresets.size}</span> 个预设
             </span>

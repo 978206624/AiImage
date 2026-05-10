@@ -31,7 +31,7 @@ export function GalleryFilters({
 }: GalleryFiltersProps) {
   return (
     <div className="sticky top-[var(--nav)] z-30 bg-bg/80 backdrop-blur-md border-b border-border py-3 px-8">
-      <div className="max-w-7xl mx-auto flex items-center gap-3 flex-wrap">
+      <div className="flex items-center gap-3 flex-wrap">
         {MODEL_FILTERS.map((f) => (
     <button
             key={f.label}

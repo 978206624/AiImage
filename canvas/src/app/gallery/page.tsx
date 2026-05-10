@@ -50,7 +50,7 @@ export default function GalleryPage() {
         onModelChange={setSelectedModel}
         onStyleChange={setSelectedStyle}
       />
-      <div className="px-8 py-8 max-w-7xl mx-auto">
+      <div className="px-8 py-8">
         <GalleryGrid images={images} loading={loading} />
       </div>
     </div>
