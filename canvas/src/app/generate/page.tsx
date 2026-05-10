@@ -184,7 +184,7 @@ function GenerateContent() {
               className="text-[28px] font-normal tracking-[-0.015em]"
               style={{ fontFamily: "var(--font-d)" }}
             >
-              创作提示词
+              生图工作台
             </h2>
             <span className="px-3 py-1 rounded-[3px] border border-accent-b bg-accent-d font-mono text-[10px] text-accent tracking-[.07em] uppercase">
               {modelBadge}
