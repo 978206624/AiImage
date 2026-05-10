@@ -52,3 +52,18 @@ export type PromptTemplate = Prisma.PromptTemplateModel
  * 
  */
 export type StylePreset = Prisma.StylePresetModel
+/**
+ * Model User
+ * 
+ */
+export type User = Prisma.UserModel
+/**
+ * Model EmailToken
+ * 
+ */
+export type EmailToken = Prisma.EmailTokenModel
+/**
+ * Model RegistrationAttempt
+ * 
+ */
+export type RegistrationAttempt = Prisma.RegistrationAttemptModel

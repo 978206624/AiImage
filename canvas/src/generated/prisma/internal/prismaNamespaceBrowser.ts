@@ -55,7 +55,10 @@ export const ModelName = {
   GalleryImage: 'GalleryImage',
   Category: 'Category',
   PromptTemplate: 'PromptTemplate',
-  StylePreset: 'StylePreset'
+  StylePreset: 'StylePreset',
+  User: 'User',
+  EmailToken: 'EmailToken',
+  RegistrationAttempt: 'RegistrationAttempt'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -92,6 +95,8 @@ export const ApiKeyScalarFieldEnum = {
   usedCredits: 'usedCredits',
   status: 'status',
   lastUsedAt: 'lastUsedAt',
+  redeemedBy: 'redeemedBy',
+  redeemedAt: 'redeemedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -102,9 +107,12 @@ export type ApiKeyScalarFieldEnum = (typeof ApiKeyScalarFieldEnum)[keyof typeof 
 export const UsageRecordScalarFieldEnum = {
   id: 'id',
   apiKeyId: 'apiKeyId',
+  userId: 'userId',
   creditsUsed: 'creditsUsed',
   promptSummary: 'promptSummary',
   imageUrl: 'imageUrl',
+  paramsJson: 'paramsJson',
+  isPersisted: 'isPersisted',
   createdAt: 'createdAt'
 } as const
 
@@ -166,6 +174,45 @@ export const StylePresetScalarFieldEnum = {
 export type StylePresetScalarFieldEnum = (typeof StylePresetScalarFieldEnum)[keyof typeof StylePresetScalarFieldEnum]
 
 
+export const UserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  passwordHash: 'passwordHash',
+  balance: 'balance',
+  emailVerified: 'emailVerified',
+  hasReceivedBonus: 'hasReceivedBonus',
+  registerIp: 'registerIp',
+  status: 'status',
+  lastLoginAt: 'lastLoginAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const EmailTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  token: 'token',
+  type: 'type',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EmailTokenScalarFieldEnum = (typeof EmailTokenScalarFieldEnum)[keyof typeof EmailTokenScalarFieldEnum]
+
+
+export const RegistrationAttemptScalarFieldEnum = {
+  id: 'id',
+  ip: 'ip',
+  createdAt: 'createdAt'
+} as const
+
+export type RegistrationAttemptScalarFieldEnum = (typeof RegistrationAttemptScalarFieldEnum)[keyof typeof RegistrationAttemptScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -200,7 +247,8 @@ export type ApiKeyOrderByRelevanceFieldEnum = (typeof ApiKeyOrderByRelevanceFiel
 
 export const UsageRecordOrderByRelevanceFieldEnum = {
   promptSummary: 'promptSummary',
-  imageUrl: 'imageUrl'
+  imageUrl: 'imageUrl',
+  paramsJson: 'paramsJson'
 } as const
 
 export type UsageRecordOrderByRelevanceFieldEnum = (typeof UsageRecordOrderByRelevanceFieldEnum)[keyof typeof UsageRecordOrderByRelevanceFieldEnum]
@@ -240,4 +288,29 @@ export const StylePresetOrderByRelevanceFieldEnum = {
 } as const
 
 export type StylePresetOrderByRelevanceFieldEnum = (typeof StylePresetOrderByRelevanceFieldEnum)[keyof typeof StylePresetOrderByRelevanceFieldEnum]
+
+
+export const UserOrderByRelevanceFieldEnum = {
+  email: 'email',
+  passwordHash: 'passwordHash',
+  registerIp: 'registerIp',
+  status: 'status'
+} as const
+
+export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
+
+
+export const EmailTokenOrderByRelevanceFieldEnum = {
+  token: 'token',
+  type: 'type'
+} as const
+
+export type EmailTokenOrderByRelevanceFieldEnum = (typeof EmailTokenOrderByRelevanceFieldEnum)[keyof typeof EmailTokenOrderByRelevanceFieldEnum]
+
+
+export const RegistrationAttemptOrderByRelevanceFieldEnum = {
+  ip: 'ip'
+} as const
+
+export type RegistrationAttemptOrderByRelevanceFieldEnum = (typeof RegistrationAttemptOrderByRelevanceFieldEnum)[keyof typeof RegistrationAttemptOrderByRelevanceFieldEnum]
 

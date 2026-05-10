@@ -396,7 +396,10 @@ export const ModelName = {
   GalleryImage: 'GalleryImage',
   Category: 'Category',
   PromptTemplate: 'PromptTemplate',
-  StylePreset: 'StylePreset'
+  StylePreset: 'StylePreset',
+  User: 'User',
+  EmailToken: 'EmailToken',
+  RegistrationAttempt: 'RegistrationAttempt'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -412,7 +415,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "systemSetting" | "apiKey" | "usageRecord" | "galleryImage" | "category" | "promptTemplate" | "stylePreset"
+    modelProps: "systemSetting" | "apiKey" | "usageRecord" | "galleryImage" | "category" | "promptTemplate" | "stylePreset" | "user" | "emailToken" | "registrationAttempt"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -878,6 +881,204 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    User: {
+      payload: Prisma.$UserPayload<ExtArgs>
+      fields: Prisma.UserFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>
+        }
+        findFirst: {
+          args: Prisma.UserFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>
+        }
+        findMany: {
+          args: Prisma.UserFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>[]
+        }
+        create: {
+          args: Prisma.UserCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>
+        }
+        createMany: {
+          args: Prisma.UserCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.UserDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>
+        }
+        update: {
+          args: Prisma.UserUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.UserUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserPayload>
+        }
+        aggregate: {
+          args: Prisma.UserAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUser>
+        }
+        groupBy: {
+          args: Prisma.UserGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    EmailToken: {
+      payload: Prisma.$EmailTokenPayload<ExtArgs>
+      fields: Prisma.EmailTokenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.EmailTokenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailTokenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.EmailTokenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailTokenPayload>
+        }
+        findFirst: {
+          args: Prisma.EmailTokenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailTokenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.EmailTokenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailTokenPayload>
+        }
+        findMany: {
+          args: Prisma.EmailTokenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailTokenPayload>[]
+        }
+        create: {
+          args: Prisma.EmailTokenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailTokenPayload>
+        }
+        createMany: {
+          args: Prisma.EmailTokenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.EmailTokenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailTokenPayload>
+        }
+        update: {
+          args: Prisma.EmailTokenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailTokenPayload>
+        }
+        deleteMany: {
+          args: Prisma.EmailTokenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.EmailTokenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.EmailTokenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EmailTokenPayload>
+        }
+        aggregate: {
+          args: Prisma.EmailTokenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEmailToken>
+        }
+        groupBy: {
+          args: Prisma.EmailTokenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmailTokenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.EmailTokenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EmailTokenCountAggregateOutputType> | number
+        }
+      }
+    }
+    RegistrationAttempt: {
+      payload: Prisma.$RegistrationAttemptPayload<ExtArgs>
+      fields: Prisma.RegistrationAttemptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.RegistrationAttemptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistrationAttemptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.RegistrationAttemptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistrationAttemptPayload>
+        }
+        findFirst: {
+          args: Prisma.RegistrationAttemptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistrationAttemptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.RegistrationAttemptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistrationAttemptPayload>
+        }
+        findMany: {
+          args: Prisma.RegistrationAttemptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistrationAttemptPayload>[]
+        }
+        create: {
+          args: Prisma.RegistrationAttemptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistrationAttemptPayload>
+        }
+        createMany: {
+          args: Prisma.RegistrationAttemptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.RegistrationAttemptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistrationAttemptPayload>
+        }
+        update: {
+          args: Prisma.RegistrationAttemptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistrationAttemptPayload>
+        }
+        deleteMany: {
+          args: Prisma.RegistrationAttemptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.RegistrationAttemptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.RegistrationAttemptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$RegistrationAttemptPayload>
+        }
+        aggregate: {
+          args: Prisma.RegistrationAttemptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateRegistrationAttempt>
+        }
+        groupBy: {
+          args: Prisma.RegistrationAttemptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RegistrationAttemptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.RegistrationAttemptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.RegistrationAttemptCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -935,6 +1136,8 @@ export const ApiKeyScalarFieldEnum = {
   usedCredits: 'usedCredits',
   status: 'status',
   lastUsedAt: 'lastUsedAt',
+  redeemedBy: 'redeemedBy',
+  redeemedAt: 'redeemedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -945,9 +1148,12 @@ export type ApiKeyScalarFieldEnum = (typeof ApiKeyScalarFieldEnum)[keyof typeof 
 export const UsageRecordScalarFieldEnum = {
   id: 'id',
   apiKeyId: 'apiKeyId',
+  userId: 'userId',
   creditsUsed: 'creditsUsed',
   promptSummary: 'promptSummary',
   imageUrl: 'imageUrl',
+  paramsJson: 'paramsJson',
+  isPersisted: 'isPersisted',
   createdAt: 'createdAt'
 } as const
 
@@ -1009,6 +1215,45 @@ export const StylePresetScalarFieldEnum = {
 export type StylePresetScalarFieldEnum = (typeof StylePresetScalarFieldEnum)[keyof typeof StylePresetScalarFieldEnum]
 
 
+export const UserScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  passwordHash: 'passwordHash',
+  balance: 'balance',
+  emailVerified: 'emailVerified',
+  hasReceivedBonus: 'hasReceivedBonus',
+  registerIp: 'registerIp',
+  status: 'status',
+  lastLoginAt: 'lastLoginAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const EmailTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  token: 'token',
+  type: 'type',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type EmailTokenScalarFieldEnum = (typeof EmailTokenScalarFieldEnum)[keyof typeof EmailTokenScalarFieldEnum]
+
+
+export const RegistrationAttemptScalarFieldEnum = {
+  id: 'id',
+  ip: 'ip',
+  createdAt: 'createdAt'
+} as const
+
+export type RegistrationAttemptScalarFieldEnum = (typeof RegistrationAttemptScalarFieldEnum)[keyof typeof RegistrationAttemptScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1043,7 +1288,8 @@ export type ApiKeyOrderByRelevanceFieldEnum = (typeof ApiKeyOrderByRelevanceFiel
 
 export const UsageRecordOrderByRelevanceFieldEnum = {
   promptSummary: 'promptSummary',
-  imageUrl: 'imageUrl'
+  imageUrl: 'imageUrl',
+  paramsJson: 'paramsJson'
 } as const
 
 export type UsageRecordOrderByRelevanceFieldEnum = (typeof UsageRecordOrderByRelevanceFieldEnum)[keyof typeof UsageRecordOrderByRelevanceFieldEnum]
@@ -1083,6 +1329,31 @@ export const StylePresetOrderByRelevanceFieldEnum = {
 } as const
 
 export type StylePresetOrderByRelevanceFieldEnum = (typeof StylePresetOrderByRelevanceFieldEnum)[keyof typeof StylePresetOrderByRelevanceFieldEnum]
+
+
+export const UserOrderByRelevanceFieldEnum = {
+  email: 'email',
+  passwordHash: 'passwordHash',
+  registerIp: 'registerIp',
+  status: 'status'
+} as const
+
+export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
+
+
+export const EmailTokenOrderByRelevanceFieldEnum = {
+  token: 'token',
+  type: 'type'
+} as const
+
+export type EmailTokenOrderByRelevanceFieldEnum = (typeof EmailTokenOrderByRelevanceFieldEnum)[keyof typeof EmailTokenOrderByRelevanceFieldEnum]
+
+
+export const RegistrationAttemptOrderByRelevanceFieldEnum = {
+  ip: 'ip'
+} as const
+
+export type RegistrationAttemptOrderByRelevanceFieldEnum = (typeof RegistrationAttemptOrderByRelevanceFieldEnum)[keyof typeof RegistrationAttemptOrderByRelevanceFieldEnum]
 
 
 
@@ -1226,6 +1497,9 @@ export type GlobalOmitConfig = {
   category?: Prisma.CategoryOmit
   promptTemplate?: Prisma.PromptTemplateOmit
   stylePreset?: Prisma.StylePresetOmit
+  user?: Prisma.UserOmit
+  emailToken?: Prisma.EmailTokenOmit
+  registrationAttempt?: Prisma.RegistrationAttemptOmit
 }
 
 /* Types for Logging */

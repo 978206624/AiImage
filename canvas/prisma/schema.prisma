@@ -25,23 +25,32 @@ model ApiKey {
   usedCredits   Decimal       @default(0) @map("used_credits") @db.Decimal(10, 2)
   status        String        @default("active") @db.VarChar(20)
   lastUsedAt    DateTime?     @map("last_used_at")
+  redeemedBy    Int?          @map("redeemed_by")
+  redeemedAt    DateTime?     @map("redeemed_at")
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
+  redeemedUser  User?         @relation(fields: [redeemedBy], references: [id])
   usageRecords  UsageRecord[]
 
+  @@index([redeemedBy])
   @@map("api_keys")
 }
 
 model UsageRecord {
   id             Int      @id @default(autoincrement())
-  apiKeyId       Int      @map("api_key_id")
+  apiKeyId       Int?     @map("api_key_id")
+  userId         Int?     @map("user_id")
   creditsUsed    Decimal  @map("credits_used") @db.Decimal(10, 2)
   promptSummary  String?  @map("prompt_summary") @db.VarChar(200)
   imageUrl       String?  @map("image_url") @db.Text
+  paramsJson     String?  @map("params_json") @db.Text
+  isPersisted    Boolean  @default(true) @map("is_persisted")
   createdAt      DateTime @default(now()) @map("created_at")
-  apiKey         ApiKey   @relation(fields: [apiKeyId], references: [id])
+  apiKey         ApiKey?  @relation(fields: [apiKeyId], references: [id])
+  user           User?    @relation(fields: [userId], references: [id])
 
   @@index([apiKeyId])
+  @@index([userId])
   @@map("usage_records")
 }
 
@@ -97,4 +106,46 @@ model StylePreset {
   updatedAt     DateTime @updatedAt @map("updated_at")
 
   @@map("style_presets")
+}
+
+model User {
+  id                Int           @id @default(autoincrement())
+  email             String        @unique @db.VarChar(190)
+  passwordHash      String        @map("password_hash") @db.VarChar(100)
+  balance           Decimal       @default(0) @db.Decimal(10, 2)
+  emailVerified     Boolean       @default(false) @map("email_verified")
+  hasReceivedBonus  Boolean       @default(false) @map("has_received_bonus")
+  registerIp        String?       @map("register_ip") @db.VarChar(45)
+  status            String        @default("active") @db.VarChar(20)
+  lastLoginAt       DateTime?     @map("last_login_at")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+  redeemedKeys      ApiKey[]
+  usageRecords      UsageRecord[]
+  emailTokens       EmailToken[]
+
+  @@map("users")
+}
+
+model EmailToken {
+  id         Int       @id @default(autoincrement())
+  userId     Int       @map("user_id")
+  token      String    @unique @db.VarChar(100)
+  type       String    @db.VarChar(20)
+  expiresAt  DateTime  @map("expires_at")
+  usedAt     DateTime? @map("used_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("email_tokens")
+}
+
+model RegistrationAttempt {
+  id        Int      @id @default(autoincrement())
+  ip        String   @db.VarChar(45)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([ip, createdAt])
+  @@map("registration_attempts")
 }

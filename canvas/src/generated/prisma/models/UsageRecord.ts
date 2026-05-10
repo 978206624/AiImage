@@ -29,39 +29,50 @@ export type AggregateUsageRecord = {
 export type UsageRecordAvgAggregateOutputType = {
   id: number | null
   apiKeyId: number | null
+  userId: number | null
   creditsUsed: runtime.Decimal | null
 }
 
 export type UsageRecordSumAggregateOutputType = {
   id: number | null
   apiKeyId: number | null
+  userId: number | null
   creditsUsed: runtime.Decimal | null
 }
 
 export type UsageRecordMinAggregateOutputType = {
   id: number | null
   apiKeyId: number | null
+  userId: number | null
   creditsUsed: runtime.Decimal | null
   promptSummary: string | null
   imageUrl: string | null
+  paramsJson: string | null
+  isPersisted: boolean | null
   createdAt: Date | null
 }
 
 export type UsageRecordMaxAggregateOutputType = {
   id: number | null
   apiKeyId: number | null
+  userId: number | null
   creditsUsed: runtime.Decimal | null
   promptSummary: string | null
   imageUrl: string | null
+  paramsJson: string | null
+  isPersisted: boolean | null
   createdAt: Date | null
 }
 
 export type UsageRecordCountAggregateOutputType = {
   id: number
   apiKeyId: number
+  userId: number
   creditsUsed: number
   promptSummary: number
   imageUrl: number
+  paramsJson: number
+  isPersisted: number
   createdAt: number
   _all: number
 }
@@ -70,39 +81,50 @@ export type UsageRecordCountAggregateOutputType = {
 export type UsageRecordAvgAggregateInputType = {
   id?: true
   apiKeyId?: true
+  userId?: true
   creditsUsed?: true
 }
 
 export type UsageRecordSumAggregateInputType = {
   id?: true
   apiKeyId?: true
+  userId?: true
   creditsUsed?: true
 }
 
 export type UsageRecordMinAggregateInputType = {
   id?: true
   apiKeyId?: true
+  userId?: true
   creditsUsed?: true
   promptSummary?: true
   imageUrl?: true
+  paramsJson?: true
+  isPersisted?: true
   createdAt?: true
 }
 
 export type UsageRecordMaxAggregateInputType = {
   id?: true
   apiKeyId?: true
+  userId?: true
   creditsUsed?: true
   promptSummary?: true
   imageUrl?: true
+  paramsJson?: true
+  isPersisted?: true
   createdAt?: true
 }
 
 export type UsageRecordCountAggregateInputType = {
   id?: true
   apiKeyId?: true
+  userId?: true
   creditsUsed?: true
   promptSummary?: true
   imageUrl?: true
+  paramsJson?: true
+  isPersisted?: true
   createdAt?: true
   _all?: true
 }
@@ -195,10 +217,13 @@ export type UsageRecordGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 
 export type UsageRecordGroupByOutputType = {
   id: number
-  apiKeyId: number
+  apiKeyId: number | null
+  userId: number | null
   creditsUsed: runtime.Decimal
   promptSummary: string | null
   imageUrl: string | null
+  paramsJson: string | null
+  isPersisted: boolean
   createdAt: Date
   _count: UsageRecordCountAggregateOutputType | null
   _avg: UsageRecordAvgAggregateOutputType | null
@@ -227,22 +252,30 @@ export type UsageRecordWhereInput = {
   OR?: Prisma.UsageRecordWhereInput[]
   NOT?: Prisma.UsageRecordWhereInput | Prisma.UsageRecordWhereInput[]
   id?: Prisma.IntFilter<"UsageRecord"> | number
-  apiKeyId?: Prisma.IntFilter<"UsageRecord"> | number
+  apiKeyId?: Prisma.IntNullableFilter<"UsageRecord"> | number | null
+  userId?: Prisma.IntNullableFilter<"UsageRecord"> | number | null
   creditsUsed?: Prisma.DecimalFilter<"UsageRecord"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: Prisma.StringNullableFilter<"UsageRecord"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"UsageRecord"> | string | null
+  paramsJson?: Prisma.StringNullableFilter<"UsageRecord"> | string | null
+  isPersisted?: Prisma.BoolFilter<"UsageRecord"> | boolean
   createdAt?: Prisma.DateTimeFilter<"UsageRecord"> | Date | string
-  apiKey?: Prisma.XOR<Prisma.ApiKeyScalarRelationFilter, Prisma.ApiKeyWhereInput>
+  apiKey?: Prisma.XOR<Prisma.ApiKeyNullableScalarRelationFilter, Prisma.ApiKeyWhereInput> | null
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type UsageRecordOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  apiKeyId?: Prisma.SortOrder
+  apiKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
   creditsUsed?: Prisma.SortOrder
   promptSummary?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  paramsJson?: Prisma.SortOrderInput | Prisma.SortOrder
+  isPersisted?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   apiKey?: Prisma.ApiKeyOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
   _relevance?: Prisma.UsageRecordOrderByRelevanceInput
 }
 
@@ -251,20 +284,27 @@ export type UsageRecordWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.UsageRecordWhereInput | Prisma.UsageRecordWhereInput[]
   OR?: Prisma.UsageRecordWhereInput[]
   NOT?: Prisma.UsageRecordWhereInput | Prisma.UsageRecordWhereInput[]
-  apiKeyId?: Prisma.IntFilter<"UsageRecord"> | number
+  apiKeyId?: Prisma.IntNullableFilter<"UsageRecord"> | number | null
+  userId?: Prisma.IntNullableFilter<"UsageRecord"> | number | null
   creditsUsed?: Prisma.DecimalFilter<"UsageRecord"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: Prisma.StringNullableFilter<"UsageRecord"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"UsageRecord"> | string | null
+  paramsJson?: Prisma.StringNullableFilter<"UsageRecord"> | string | null
+  isPersisted?: Prisma.BoolFilter<"UsageRecord"> | boolean
   createdAt?: Prisma.DateTimeFilter<"UsageRecord"> | Date | string
-  apiKey?: Prisma.XOR<Prisma.ApiKeyScalarRelationFilter, Prisma.ApiKeyWhereInput>
+  apiKey?: Prisma.XOR<Prisma.ApiKeyNullableScalarRelationFilter, Prisma.ApiKeyWhereInput> | null
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id">
 
 export type UsageRecordOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  apiKeyId?: Prisma.SortOrder
+  apiKeyId?: Prisma.SortOrderInput | Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
   creditsUsed?: Prisma.SortOrder
   promptSummary?: Prisma.SortOrderInput | Prisma.SortOrder
   imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  paramsJson?: Prisma.SortOrderInput | Prisma.SortOrder
+  isPersisted?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.UsageRecordCountOrderByAggregateInput
   _avg?: Prisma.UsageRecordAvgOrderByAggregateInput
@@ -278,10 +318,13 @@ export type UsageRecordScalarWhereWithAggregatesInput = {
   OR?: Prisma.UsageRecordScalarWhereWithAggregatesInput[]
   NOT?: Prisma.UsageRecordScalarWhereWithAggregatesInput | Prisma.UsageRecordScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"UsageRecord"> | number
-  apiKeyId?: Prisma.IntWithAggregatesFilter<"UsageRecord"> | number
+  apiKeyId?: Prisma.IntNullableWithAggregatesFilter<"UsageRecord"> | number | null
+  userId?: Prisma.IntNullableWithAggregatesFilter<"UsageRecord"> | number | null
   creditsUsed?: Prisma.DecimalWithAggregatesFilter<"UsageRecord"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: Prisma.StringNullableWithAggregatesFilter<"UsageRecord"> | string | null
   imageUrl?: Prisma.StringNullableWithAggregatesFilter<"UsageRecord"> | string | null
+  paramsJson?: Prisma.StringNullableWithAggregatesFilter<"UsageRecord"> | string | null
+  isPersisted?: Prisma.BoolWithAggregatesFilter<"UsageRecord"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UsageRecord"> | Date | string
 }
 
@@ -289,16 +332,22 @@ export type UsageRecordCreateInput = {
   creditsUsed: runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: string | null
   imageUrl?: string | null
+  paramsJson?: string | null
+  isPersisted?: boolean
   createdAt?: Date | string
-  apiKey: Prisma.ApiKeyCreateNestedOneWithoutUsageRecordsInput
+  apiKey?: Prisma.ApiKeyCreateNestedOneWithoutUsageRecordsInput
+  user?: Prisma.UserCreateNestedOneWithoutUsageRecordsInput
 }
 
 export type UsageRecordUncheckedCreateInput = {
   id?: number
-  apiKeyId: number
+  apiKeyId?: number | null
+  userId?: number | null
   creditsUsed: runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: string | null
   imageUrl?: string | null
+  paramsJson?: string | null
+  isPersisted?: boolean
   createdAt?: Date | string
 }
 
@@ -306,25 +355,34 @@ export type UsageRecordUpdateInput = {
   creditsUsed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paramsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPersisted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  apiKey?: Prisma.ApiKeyUpdateOneRequiredWithoutUsageRecordsNestedInput
+  apiKey?: Prisma.ApiKeyUpdateOneWithoutUsageRecordsNestedInput
+  user?: Prisma.UserUpdateOneWithoutUsageRecordsNestedInput
 }
 
 export type UsageRecordUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  apiKeyId?: Prisma.IntFieldUpdateOperationsInput | number
+  apiKeyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  userId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   creditsUsed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paramsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPersisted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UsageRecordCreateManyInput = {
   id?: number
-  apiKeyId: number
+  apiKeyId?: number | null
+  userId?: number | null
   creditsUsed: runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: string | null
   imageUrl?: string | null
+  paramsJson?: string | null
+  isPersisted?: boolean
   createdAt?: Date | string
 }
 
@@ -332,15 +390,20 @@ export type UsageRecordUpdateManyMutationInput = {
   creditsUsed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paramsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPersisted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UsageRecordUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  apiKeyId?: Prisma.IntFieldUpdateOperationsInput | number
+  apiKeyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  userId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   creditsUsed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paramsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPersisted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -363,39 +426,50 @@ export type UsageRecordOrderByRelevanceInput = {
 export type UsageRecordCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   apiKeyId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   creditsUsed?: Prisma.SortOrder
   promptSummary?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  paramsJson?: Prisma.SortOrder
+  isPersisted?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type UsageRecordAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   apiKeyId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   creditsUsed?: Prisma.SortOrder
 }
 
 export type UsageRecordMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   apiKeyId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   creditsUsed?: Prisma.SortOrder
   promptSummary?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  paramsJson?: Prisma.SortOrder
+  isPersisted?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type UsageRecordMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   apiKeyId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   creditsUsed?: Prisma.SortOrder
   promptSummary?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
+  paramsJson?: Prisma.SortOrder
+  isPersisted?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
 export type UsageRecordSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   apiKeyId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   creditsUsed?: Prisma.SortOrder
 }
 
@@ -445,18 +519,70 @@ export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
+export type UsageRecordCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.UsageRecordCreateWithoutUserInput, Prisma.UsageRecordUncheckedCreateWithoutUserInput> | Prisma.UsageRecordCreateWithoutUserInput[] | Prisma.UsageRecordUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.UsageRecordCreateOrConnectWithoutUserInput | Prisma.UsageRecordCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.UsageRecordCreateManyUserInputEnvelope
+  connect?: Prisma.UsageRecordWhereUniqueInput | Prisma.UsageRecordWhereUniqueInput[]
+}
+
+export type UsageRecordUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.UsageRecordCreateWithoutUserInput, Prisma.UsageRecordUncheckedCreateWithoutUserInput> | Prisma.UsageRecordCreateWithoutUserInput[] | Prisma.UsageRecordUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.UsageRecordCreateOrConnectWithoutUserInput | Prisma.UsageRecordCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.UsageRecordCreateManyUserInputEnvelope
+  connect?: Prisma.UsageRecordWhereUniqueInput | Prisma.UsageRecordWhereUniqueInput[]
+}
+
+export type UsageRecordUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.UsageRecordCreateWithoutUserInput, Prisma.UsageRecordUncheckedCreateWithoutUserInput> | Prisma.UsageRecordCreateWithoutUserInput[] | Prisma.UsageRecordUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.UsageRecordCreateOrConnectWithoutUserInput | Prisma.UsageRecordCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.UsageRecordUpsertWithWhereUniqueWithoutUserInput | Prisma.UsageRecordUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.UsageRecordCreateManyUserInputEnvelope
+  set?: Prisma.UsageRecordWhereUniqueInput | Prisma.UsageRecordWhereUniqueInput[]
+  disconnect?: Prisma.UsageRecordWhereUniqueInput | Prisma.UsageRecordWhereUniqueInput[]
+  delete?: Prisma.UsageRecordWhereUniqueInput | Prisma.UsageRecordWhereUniqueInput[]
+  connect?: Prisma.UsageRecordWhereUniqueInput | Prisma.UsageRecordWhereUniqueInput[]
+  update?: Prisma.UsageRecordUpdateWithWhereUniqueWithoutUserInput | Prisma.UsageRecordUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.UsageRecordUpdateManyWithWhereWithoutUserInput | Prisma.UsageRecordUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.UsageRecordScalarWhereInput | Prisma.UsageRecordScalarWhereInput[]
+}
+
+export type UsageRecordUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.UsageRecordCreateWithoutUserInput, Prisma.UsageRecordUncheckedCreateWithoutUserInput> | Prisma.UsageRecordCreateWithoutUserInput[] | Prisma.UsageRecordUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.UsageRecordCreateOrConnectWithoutUserInput | Prisma.UsageRecordCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.UsageRecordUpsertWithWhereUniqueWithoutUserInput | Prisma.UsageRecordUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.UsageRecordCreateManyUserInputEnvelope
+  set?: Prisma.UsageRecordWhereUniqueInput | Prisma.UsageRecordWhereUniqueInput[]
+  disconnect?: Prisma.UsageRecordWhereUniqueInput | Prisma.UsageRecordWhereUniqueInput[]
+  delete?: Prisma.UsageRecordWhereUniqueInput | Prisma.UsageRecordWhereUniqueInput[]
+  connect?: Prisma.UsageRecordWhereUniqueInput | Prisma.UsageRecordWhereUniqueInput[]
+  update?: Prisma.UsageRecordUpdateWithWhereUniqueWithoutUserInput | Prisma.UsageRecordUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.UsageRecordUpdateManyWithWhereWithoutUserInput | Prisma.UsageRecordUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.UsageRecordScalarWhereInput | Prisma.UsageRecordScalarWhereInput[]
+}
+
 export type UsageRecordCreateWithoutApiKeyInput = {
   creditsUsed: runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: string | null
   imageUrl?: string | null
+  paramsJson?: string | null
+  isPersisted?: boolean
   createdAt?: Date | string
+  user?: Prisma.UserCreateNestedOneWithoutUsageRecordsInput
 }
 
 export type UsageRecordUncheckedCreateWithoutApiKeyInput = {
   id?: number
+  userId?: number | null
   creditsUsed: runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: string | null
   imageUrl?: string | null
+  paramsJson?: string | null
+  isPersisted?: boolean
   createdAt?: Date | string
 }
 
@@ -491,18 +617,71 @@ export type UsageRecordScalarWhereInput = {
   OR?: Prisma.UsageRecordScalarWhereInput[]
   NOT?: Prisma.UsageRecordScalarWhereInput | Prisma.UsageRecordScalarWhereInput[]
   id?: Prisma.IntFilter<"UsageRecord"> | number
-  apiKeyId?: Prisma.IntFilter<"UsageRecord"> | number
+  apiKeyId?: Prisma.IntNullableFilter<"UsageRecord"> | number | null
+  userId?: Prisma.IntNullableFilter<"UsageRecord"> | number | null
   creditsUsed?: Prisma.DecimalFilter<"UsageRecord"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: Prisma.StringNullableFilter<"UsageRecord"> | string | null
   imageUrl?: Prisma.StringNullableFilter<"UsageRecord"> | string | null
+  paramsJson?: Prisma.StringNullableFilter<"UsageRecord"> | string | null
+  isPersisted?: Prisma.BoolFilter<"UsageRecord"> | boolean
   createdAt?: Prisma.DateTimeFilter<"UsageRecord"> | Date | string
+}
+
+export type UsageRecordCreateWithoutUserInput = {
+  creditsUsed: runtime.Decimal | runtime.DecimalJsLike | number | string
+  promptSummary?: string | null
+  imageUrl?: string | null
+  paramsJson?: string | null
+  isPersisted?: boolean
+  createdAt?: Date | string
+  apiKey?: Prisma.ApiKeyCreateNestedOneWithoutUsageRecordsInput
+}
+
+export type UsageRecordUncheckedCreateWithoutUserInput = {
+  id?: number
+  apiKeyId?: number | null
+  creditsUsed: runtime.Decimal | runtime.DecimalJsLike | number | string
+  promptSummary?: string | null
+  imageUrl?: string | null
+  paramsJson?: string | null
+  isPersisted?: boolean
+  createdAt?: Date | string
+}
+
+export type UsageRecordCreateOrConnectWithoutUserInput = {
+  where: Prisma.UsageRecordWhereUniqueInput
+  create: Prisma.XOR<Prisma.UsageRecordCreateWithoutUserInput, Prisma.UsageRecordUncheckedCreateWithoutUserInput>
+}
+
+export type UsageRecordCreateManyUserInputEnvelope = {
+  data: Prisma.UsageRecordCreateManyUserInput | Prisma.UsageRecordCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type UsageRecordUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.UsageRecordWhereUniqueInput
+  update: Prisma.XOR<Prisma.UsageRecordUpdateWithoutUserInput, Prisma.UsageRecordUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.UsageRecordCreateWithoutUserInput, Prisma.UsageRecordUncheckedCreateWithoutUserInput>
+}
+
+export type UsageRecordUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.UsageRecordWhereUniqueInput
+  data: Prisma.XOR<Prisma.UsageRecordUpdateWithoutUserInput, Prisma.UsageRecordUncheckedUpdateWithoutUserInput>
+}
+
+export type UsageRecordUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.UsageRecordScalarWhereInput
+  data: Prisma.XOR<Prisma.UsageRecordUpdateManyMutationInput, Prisma.UsageRecordUncheckedUpdateManyWithoutUserInput>
 }
 
 export type UsageRecordCreateManyApiKeyInput = {
   id?: number
+  userId?: number | null
   creditsUsed: runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: string | null
   imageUrl?: string | null
+  paramsJson?: string | null
+  isPersisted?: boolean
   createdAt?: Date | string
 }
 
@@ -510,22 +689,74 @@ export type UsageRecordUpdateWithoutApiKeyInput = {
   creditsUsed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paramsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPersisted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneWithoutUsageRecordsNestedInput
 }
 
 export type UsageRecordUncheckedUpdateWithoutApiKeyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   creditsUsed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paramsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPersisted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UsageRecordUncheckedUpdateManyWithoutApiKeyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   creditsUsed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   promptSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paramsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPersisted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type UsageRecordCreateManyUserInput = {
+  id?: number
+  apiKeyId?: number | null
+  creditsUsed: runtime.Decimal | runtime.DecimalJsLike | number | string
+  promptSummary?: string | null
+  imageUrl?: string | null
+  paramsJson?: string | null
+  isPersisted?: boolean
+  createdAt?: Date | string
+}
+
+export type UsageRecordUpdateWithoutUserInput = {
+  creditsUsed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  promptSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paramsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPersisted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  apiKey?: Prisma.ApiKeyUpdateOneWithoutUsageRecordsNestedInput
+}
+
+export type UsageRecordUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  apiKeyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  creditsUsed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  promptSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paramsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPersisted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type UsageRecordUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  apiKeyId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  creditsUsed?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  promptSummary?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paramsJson?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isPersisted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -534,11 +765,15 @@ export type UsageRecordUncheckedUpdateManyWithoutApiKeyInput = {
 export type UsageRecordSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   apiKeyId?: boolean
+  userId?: boolean
   creditsUsed?: boolean
   promptSummary?: boolean
   imageUrl?: boolean
+  paramsJson?: boolean
+  isPersisted?: boolean
   createdAt?: boolean
-  apiKey?: boolean | Prisma.ApiKeyDefaultArgs<ExtArgs>
+  apiKey?: boolean | Prisma.UsageRecord$apiKeyArgs<ExtArgs>
+  user?: boolean | Prisma.UsageRecord$userArgs<ExtArgs>
 }, ExtArgs["result"]["usageRecord"]>
 
 
@@ -546,28 +781,36 @@ export type UsageRecordSelect<ExtArgs extends runtime.Types.Extensions.InternalA
 export type UsageRecordSelectScalar = {
   id?: boolean
   apiKeyId?: boolean
+  userId?: boolean
   creditsUsed?: boolean
   promptSummary?: boolean
   imageUrl?: boolean
+  paramsJson?: boolean
+  isPersisted?: boolean
   createdAt?: boolean
 }
 
-export type UsageRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "apiKeyId" | "creditsUsed" | "promptSummary" | "imageUrl" | "createdAt", ExtArgs["result"]["usageRecord"]>
+export type UsageRecordOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "apiKeyId" | "userId" | "creditsUsed" | "promptSummary" | "imageUrl" | "paramsJson" | "isPersisted" | "createdAt", ExtArgs["result"]["usageRecord"]>
 export type UsageRecordInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  apiKey?: boolean | Prisma.ApiKeyDefaultArgs<ExtArgs>
+  apiKey?: boolean | Prisma.UsageRecord$apiKeyArgs<ExtArgs>
+  user?: boolean | Prisma.UsageRecord$userArgs<ExtArgs>
 }
 
 export type $UsageRecordPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "UsageRecord"
   objects: {
-    apiKey: Prisma.$ApiKeyPayload<ExtArgs>
+    apiKey: Prisma.$ApiKeyPayload<ExtArgs> | null
+    user: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
-    apiKeyId: number
+    apiKeyId: number | null
+    userId: number | null
     creditsUsed: runtime.Decimal
     promptSummary: string | null
     imageUrl: string | null
+    paramsJson: string | null
+    isPersisted: boolean
     createdAt: Date
   }, ExtArgs["result"]["usageRecord"]>
   composites: {}
@@ -909,7 +1152,8 @@ readonly fields: UsageRecordFieldRefs;
  */
 export interface Prisma__UsageRecordClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  apiKey<T extends Prisma.ApiKeyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ApiKeyDefaultArgs<ExtArgs>>): Prisma.Prisma__ApiKeyClient<runtime.Types.Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  apiKey<T extends Prisma.UsageRecord$apiKeyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UsageRecord$apiKeyArgs<ExtArgs>>): Prisma.Prisma__ApiKeyClient<runtime.Types.Result.GetResult<Prisma.$ApiKeyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UsageRecord$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UsageRecord$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -941,9 +1185,12 @@ export interface Prisma__UsageRecordClient<T, Null = never, ExtArgs extends runt
 export interface UsageRecordFieldRefs {
   readonly id: Prisma.FieldRef<"UsageRecord", 'Int'>
   readonly apiKeyId: Prisma.FieldRef<"UsageRecord", 'Int'>
+  readonly userId: Prisma.FieldRef<"UsageRecord", 'Int'>
   readonly creditsUsed: Prisma.FieldRef<"UsageRecord", 'Decimal'>
   readonly promptSummary: Prisma.FieldRef<"UsageRecord", 'String'>
   readonly imageUrl: Prisma.FieldRef<"UsageRecord", 'String'>
+  readonly paramsJson: Prisma.FieldRef<"UsageRecord", 'String'>
+  readonly isPersisted: Prisma.FieldRef<"UsageRecord", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"UsageRecord", 'DateTime'>
 }
     
@@ -1285,6 +1532,44 @@ export type UsageRecordDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many UsageRecords to delete.
    */
   limit?: number
+}
+
+/**
+ * UsageRecord.apiKey
+ */
+export type UsageRecord$apiKeyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApiKey
+   */
+  select?: Prisma.ApiKeySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ApiKey
+   */
+  omit?: Prisma.ApiKeyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ApiKeyInclude<ExtArgs> | null
+  where?: Prisma.ApiKeyWhereInput
+}
+
+/**
+ * UsageRecord.user
+ */
+export type UsageRecord$userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**
