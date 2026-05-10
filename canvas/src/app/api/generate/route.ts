@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import { generateImage } from "@/lib/gpt-image";
+import { submitTask } from "@/lib/gpt-image";
+import { pollManager } from "@/lib/poll-manager";
 import { getSize } from "@/lib/size-map";
 import type { AspectRatio, Quality } from "@/lib/size-map";
 import { getSetting } from "@/lib/system-settings";
 import { requireUser, AuthError } from "@/lib/c-auth";
-import { persistImage } from "@/lib/image-persist";
 
 interface GenerateRequest {
   prompt: string;
@@ -31,156 +32,157 @@ export async function POST(request: Request) {
     throw e;
   }
 
+  let body: GenerateRequest;
   try {
-    const body: GenerateRequest = await request.json();
-    const { prompt, aspectRatio, quality, count, referenceImages, stylePresetId } = body;
-
-    if (!prompt || !aspectRatio || !quality || !count) {
-      return NextResponse.json(
-        { success: false, error: "参数不完整" },
-        { status: 400 }
-      );
-    }
-
-    if (![1, 2, 4].includes(count)) {
-      return NextResponse.json(
-        { success: false, error: "生成数量只能是 1、2 或 4" },
-        { status: 400 }
-      );
-    }
-
-    const creditsRaw = await getSetting(
-      "credits_per_image",
-      "CREDITS_PER_IMAGE",
-      "0.07"
+    body = (await request.json()) as GenerateRequest;
+  } catch {
+    return NextResponse.json(
+      { success: false, error: "请求体解析失败" },
+      { status: 400 }
     );
-    const parsed = parseFloat(creditsRaw ?? "0.07");
-    const creditsPerImage =
-      Number.isFinite(parsed) && parsed >= 0.01 ? parsed : 0.07;
-    const totalCost = creditsPerImage * count;
+  }
 
-    if (user.balance < totalCost) {
+  const { prompt, aspectRatio, quality, count, referenceImages, stylePresetId } =
+    body;
+
+  if (!prompt || !aspectRatio || !quality || !count) {
+    return NextResponse.json(
+      { success: false, error: "参数不完整" },
+      { status: 400 }
+    );
+  }
+  if (![1, 2, 4].includes(count)) {
+    return NextResponse.json(
+      { success: false, error: "生成数量只能是 1、2 或 4" },
+      { status: 400 }
+    );
+  }
+
+  const creditsRaw = await getSetting(
+    "credits_per_image",
+    "CREDITS_PER_IMAGE",
+    "0.07"
+  );
+  const parsed = parseFloat(creditsRaw ?? "0.07");
+  const creditsPerImage =
+    Number.isFinite(parsed) && parsed >= 0.01 ? parsed : 0.07;
+  const totalCost = creditsPerImage * count;
+
+  if (user.balance < totalCost) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "积分不足",
+        code: "INSUFFICIENT_BALANCE",
+        remaining: user.balance,
+        required: totalCost,
+      },
+      { status: 402 }
+    );
+  }
+
+  let finalPrompt = prompt;
+  if (stylePresetId) {
+    const preset = await prisma.stylePreset.findUnique({
+      where: { id: stylePresetId },
+      select: { promptPrefix: true },
+    });
+    if (preset?.promptPrefix) {
+      finalPrompt = `${preset.promptPrefix} ${prompt}`;
+    }
+  }
+
+  const sizeConfig = getSize(aspectRatio, quality);
+  const promptSummary = prompt.slice(0, 200);
+  const groupId = randomUUID();
+  const refImagesJson =
+    referenceImages && referenceImages.length > 0
+      ? JSON.stringify(referenceImages)
+      : null;
+
+  let tasks: { id: number }[];
+  try {
+    tasks = await prisma.$transaction(async (tx) => {
+      const updated = await tx.user.update({
+        where: { id: user.id },
+        data: { balance: { decrement: new Prisma.Decimal(totalCost) } },
+        select: { balance: true },
+      });
+      if (Number(updated.balance) < 0) {
+        throw new Error("BALANCE_RACE");
+      }
+      const created: { id: number }[] = [];
+      for (let i = 0; i < count; i++) {
+        const t = await tx.imageTask.create({
+          data: {
+            userId: user.id,
+            groupId,
+            status: "pending",
+            prompt: finalPrompt,
+            promptSummary,
+            aspectRatio,
+            quality,
+            size: sizeConfig.size,
+            referenceImagesJson: refImagesJson,
+            stylePresetId: stylePresetId ?? null,
+            creditsLocked: new Prisma.Decimal(creditsPerImage),
+          },
+          select: { id: true },
+        });
+        created.push(t);
+      }
+      return created;
+    });
+  } catch (err) {
+    if (err instanceof Error && err.message === "BALANCE_RACE") {
       return NextResponse.json(
         {
           success: false,
           error: "积分不足",
           code: "INSUFFICIENT_BALANCE",
-          remaining: user.balance,
-          required: totalCost,
         },
         { status: 402 }
       );
     }
-
-    let finalPrompt = prompt;
-    if (stylePresetId) {
-      const preset = await prisma.stylePreset.findUnique({
-        where: { id: stylePresetId },
-        select: { promptPrefix: true },
-      });
-      if (preset?.promptPrefix) {
-        finalPrompt = `${preset.promptPrefix} ${prompt}`;
-      }
-    }
-
-    const sizeConfig = getSize(aspectRatio, quality);
-
-    const tasks = Array.from({ length: count }, () =>
-      generateImage({
-        prompt: finalPrompt,
-        size: sizeConfig.size,
-        referenceImages,
-      })
-    );
-    const results = await Promise.allSettled(tasks);
-
-    const images: string[] = [];
-    const errors: string[] = [];
-    for (const result of results) {
-      if (result.status === "fulfilled") {
-        images.push(result.value);
-      } else {
-        errors.push(result.reason?.message || "生成失败");
-      }
-    }
-
-    if (images.length === 0) {
-      return NextResponse.json(
-        { success: false, error: errors[0] || "所有图片生成失败" },
-        { status: 500 }
-      );
-    }
-
-    const persisted = await Promise.all(
-      images.map((src) => persistImage(src, user.id))
-    );
-    const finalImages = persisted.map((p) => p.url);
-
-    const actualCost = creditsPerImage * images.length;
-    const promptSummary = prompt.slice(0, 200);
-    const paramsJson = JSON.stringify({
-      prompt,
-      aspectRatio,
-      quality,
-      count,
-      stylePresetId: stylePresetId ?? null,
-      referenceImages: referenceImages ?? [],
-    });
-
-    let billingSuccess = true;
-    let newBalance = user.balance;
-
-    const runBillingTx = () =>
-      prisma.$transaction(async (tx) => {
-        const updated = await tx.user.update({
-          where: { id: user.id },
-          data: { balance: { decrement: new Prisma.Decimal(actualCost) } },
-          select: { balance: true },
-        });
-        await tx.usageRecord.createMany({
-          data: persisted.map((p) => ({
-            userId: user.id,
-            apiKeyId: null,
-            creditsUsed: new Prisma.Decimal(creditsPerImage),
-            promptSummary,
-            imageUrl: p.url,
-            isPersisted: p.isPersisted,
-            paramsJson,
-          })),
-        });
-        return Number(updated.balance);
-      });
-
-    try {
-      newBalance = await runBillingTx();
-    } catch (firstErr) {
-      try {
-        newBalance = await runBillingTx();
-      } catch (retryErr) {
-        console.error("billing transaction failed after retry:", {
-          userId: user.id,
-          actualCost,
-          imageCount: images.length,
-          error: retryErr instanceof Error ? retryErr.message : retryErr,
-        });
-        billingSuccess = false;
-      }
-    }
-
-    return NextResponse.json({
-      success: true,
-      images: finalImages,
-      errors: errors.length > 0 ? errors : undefined,
-      creditsUsed: billingSuccess ? actualCost : 0,
-      remainingCredits: newBalance,
-      billingError: billingSuccess ? undefined : "扣费异常，请联系管理员",
-    });
-  } catch (error) {
-    console.error("generate error:", error);
-    const message = error instanceof Error ? error.message : "生图失败";
+    console.error("generate billing failed:", err);
     return NextResponse.json(
-      { success: false, error: message },
+      { success: false, error: "扣费异常，请稍后重试" },
       { status: 500 }
     );
   }
+
+  await Promise.all(
+    tasks.map(async ({ id: taskId }) => {
+      try {
+        const result = await submitTask({
+          prompt: finalPrompt,
+          size: sizeConfig.size,
+          quality,
+          referenceImages,
+        });
+        if (result.async) {
+          await prisma.imageTask.update({
+            where: { id: taskId },
+            data: {
+              status: "submitted",
+              externalTaskId: result.taskId,
+            },
+          });
+          pollManager.startPolling(taskId);
+        } else {
+          await pollManager.completeTask(taskId, user.id, result.imageUrl);
+        }
+      } catch (err) {
+        const reason =
+          err instanceof Error ? err.message : "提交失败";
+        await pollManager.failTask(taskId, reason);
+      }
+    })
+  );
+
+  return NextResponse.json({
+    success: true,
+    groupId,
+    tasks: tasks.map((t) => ({ id: t.id })),
+  });
 }
