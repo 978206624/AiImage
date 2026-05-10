@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { generateImage } from "@/lib/gpt-image";
 import { getSize } from "@/lib/size-map";
 import type { AspectRatio, Quality } from "@/lib/size-map";
 import { getSetting } from "@/lib/system-settings";
+import { requireUser, AuthError } from "@/lib/c-auth";
 
 interface GenerateRequest {
-  key: string;
   prompt: string;
   aspectRatio: AspectRatio;
   quality: Quality;
@@ -16,11 +17,24 @@ interface GenerateRequest {
 }
 
 export async function POST(request: Request) {
+  let user;
+  try {
+    user = await requireUser();
+  } catch (e) {
+    if (e instanceof AuthError) {
+      return NextResponse.json(
+        { success: false, error: e.message, code: e.code },
+        { status: e.statusCode }
+      );
+    }
+    throw e;
+  }
+
   try {
     const body: GenerateRequest = await request.json();
-    const { key, prompt, aspectRatio, quality, count, referenceImages, stylePresetId } = body;
+    const { prompt, aspectRatio, quality, count, referenceImages, stylePresetId } = body;
 
-    if (!key || !prompt || !aspectRatio || !quality || !count) {
+    if (!prompt || !aspectRatio || !quality || !count) {
       return NextResponse.json(
         { success: false, error: "参数不完整" },
         { status: 400 }
@@ -34,30 +48,25 @@ export async function POST(request: Request) {
       );
     }
 
-    const apiKey = await prisma.apiKey.findUnique({
-      where: { key: key.trim() },
-    });
-
-    if (!apiKey || apiKey.status !== "active") {
-      return NextResponse.json(
-        { success: false, error: apiKey ? "Key 已禁用" : "Key 无效" },
-        { status: 403 }
-      );
-    }
-
     const creditsRaw = await getSetting(
       "credits_per_image",
       "CREDITS_PER_IMAGE",
       "0.07"
     );
     const parsed = parseFloat(creditsRaw ?? "0.07");
-    const creditsPerImage = Number.isFinite(parsed) && parsed >= 0.01 ? parsed : 0.07;
+    const creditsPerImage =
+      Number.isFinite(parsed) && parsed >= 0.01 ? parsed : 0.07;
     const totalCost = creditsPerImage * count;
-    const remaining = Number(apiKey.totalCredits) - Number(apiKey.usedCredits);
 
-    if (remaining < totalCost) {
+    if (user.balance < totalCost) {
       return NextResponse.json(
-        { success: false, error: "积分不足", remaining, required: totalCost },
+        {
+          success: false,
+          error: "积分不足",
+          code: "INSUFFICIENT_BALANCE",
+          remaining: user.balance,
+          required: totalCost,
+        },
         { status: 402 }
       );
     }
@@ -75,20 +84,17 @@ export async function POST(request: Request) {
 
     const sizeConfig = getSize(aspectRatio, quality);
 
-    const generateSingle = async (): Promise<string> => {
-      return generateImage({
+    const tasks = Array.from({ length: count }, () =>
+      generateImage({
         prompt: finalPrompt,
         size: sizeConfig.size,
         referenceImages,
-      });
-    };
-
-    const tasks = Array.from({ length: count }, () => generateSingle());
+      })
+    );
     const results = await Promise.allSettled(tasks);
 
     const images: string[] = [];
     const errors: string[] = [];
-
     for (const result of results) {
       if (result.status === "fulfilled") {
         images.push(result.value);
@@ -106,37 +112,46 @@ export async function POST(request: Request) {
 
     const actualCost = creditsPerImage * images.length;
     const promptSummary = prompt.slice(0, 200);
+    const paramsJson = JSON.stringify({
+      prompt,
+      aspectRatio,
+      quality,
+      count,
+      stylePresetId: stylePresetId ?? null,
+      referenceImages: referenceImages ?? [],
+    });
 
     let billingSuccess = true;
+    let newBalance = user.balance;
+
     const runBillingTx = () =>
-      prisma.$transaction([
-        prisma.apiKey.update({
-          where: { id: apiKey.id },
-          data: {
-            usedCredits: { increment: actualCost },
-            lastUsedAt: new Date(),
-          },
-        }),
-        ...images.map((imageUrl) =>
-          prisma.usageRecord.create({
-            data: {
-              apiKeyId: apiKey.id,
-              creditsUsed: creditsPerImage,
-              promptSummary,
-              imageUrl,
-            },
-          })
-        ),
-      ]);
+      prisma.$transaction(async (tx) => {
+        const updated = await tx.user.update({
+          where: { id: user.id },
+          data: { balance: { decrement: new Prisma.Decimal(actualCost) } },
+          select: { balance: true },
+        });
+        await tx.usageRecord.createMany({
+          data: images.map((imageUrl) => ({
+            userId: user.id,
+            apiKeyId: null,
+            creditsUsed: new Prisma.Decimal(creditsPerImage),
+            promptSummary,
+            imageUrl,
+            paramsJson,
+          })),
+        });
+        return Number(updated.balance);
+      });
 
     try {
-      await runBillingTx();
+      newBalance = await runBillingTx();
     } catch (firstErr) {
       try {
-        await runBillingTx();
+        newBalance = await runBillingTx();
       } catch (retryErr) {
         console.error("billing transaction failed after retry:", {
-          apiKeyId: apiKey.id,
+          userId: user.id,
           actualCost,
           imageCount: images.length,
           error: retryErr instanceof Error ? retryErr.message : retryErr,
@@ -145,14 +160,12 @@ export async function POST(request: Request) {
       }
     }
 
-    const newRemaining = billingSuccess ? remaining - actualCost : remaining;
-
     return NextResponse.json({
       success: true,
       images,
       errors: errors.length > 0 ? errors : undefined,
       creditsUsed: billingSuccess ? actualCost : 0,
-      remainingCredits: newRemaining,
+      remainingCredits: newBalance,
       billingError: billingSuccess ? undefined : "扣费异常，请联系管理员",
     });
   } catch (error) {

@@ -1,27 +1,27 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { generateUploadCredentials } from "@/lib/oss";
+import { requireUser, AuthError } from "@/lib/c-auth";
 
 export async function POST(request: Request) {
   try {
-    const { key, filename } = await request.json();
-
-    if (!key || !filename) {
+    await requireUser();
+  } catch (e) {
+    if (e instanceof AuthError) {
       return NextResponse.json(
-        { success: false, error: "缺少参数" },
-        { status: 400 }
+        { success: false, error: e.message, code: e.code },
+        { status: e.statusCode }
       );
     }
+    throw e;
+  }
 
-    const apiKey = await prisma.apiKey.findUnique({
-      where: { key: key.trim() },
-      select: { status: true },
-    });
+  try {
+    const { filename } = await request.json();
 
-    if (!apiKey || apiKey.status !== "active") {
+    if (!filename) {
       return NextResponse.json(
-        { success: false, error: "Key 无效" },
-        { status: 403 }
+        { success: false, error: "缺少文件名" },
+        { status: 400 }
       );
     }
 

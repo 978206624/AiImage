@@ -9,16 +9,28 @@ import type { ReferenceImage } from "@/components/generate/reference-images";
 import { QuickTemplates } from "@/components/generate/quick-templates";
 import { ParamPanel } from "@/components/generate/param-panel";
 import { GenerationResult } from "@/components/generate/generation-result";
+import { LoginPromptModal } from "@/components/generate/login-prompt-modal";
+import { InsufficientBalanceModal } from "@/components/generate/insufficient-balance-modal";
 import { useGeneration } from "@/hooks/use-generation";
-import { useApiKey } from "@/hooks/use-api-key";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { useToast } from "@/components/ui/toast";
 import type { AspectRatio, Quality } from "@/lib/size-map";
 
+const CREDITS_PER_IMAGE = 0.07;
+
 function GenerateContent() {
   const searchParams = useSearchParams();
-  const { isConfigured } = useApiKey();
+  const { user } = useCurrentUser();
   const { toast } = useToast();
-  const { loading, images, error, generate, clearResults } = useGeneration();
+  const {
+    loading,
+    images,
+    error,
+    errorCode,
+    remainingCredits,
+    generate,
+    clearResults,
+  } = useGeneration();
 
   const [model, setModel] = useState("gpt-4o-image");
   const [prompt, setPrompt] = useState("");
@@ -27,6 +39,9 @@ function GenerateContent() {
   const [quality, setQuality] = useState<Quality>("medium");
   const [count, setCount] = useState(1);
   const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
+
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [balanceModalOpen, setBalanceModalOpen] = useState(false);
 
   useEffect(() => {
     const p = searchParams.get("prompt");
@@ -40,12 +55,24 @@ function GenerateContent() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (error) toast(error, "error");
-  }, [error, toast]);
+    if (!error) return;
+    if (errorCode === "UNAUTHENTICATED") {
+      setLoginModalOpen(true);
+    } else if (errorCode === "INSUFFICIENT_BALANCE") {
+      setBalanceModalOpen(true);
+    } else {
+      toast(error, "error");
+    }
+  }, [error, errorCode, toast]);
 
   const handleGenerate = () => {
-    if (!isConfigured) {
-      toast("请先在设置中配置 API Key", "error");
+    if (!user) {
+      setLoginModalOpen(true);
+      return;
+    }
+    const required = CREDITS_PER_IMAGE * count;
+    if (user.balance < required) {
+      setBalanceModalOpen(true);
       return;
     }
     clearResults();
@@ -66,68 +93,85 @@ function GenerateContent() {
         ? "GOOGLE IMAGEN 3"
         : "MIDJOURNEY V6";
 
+  const requiredCredits = CREDITS_PER_IMAGE * count;
+  const displayBalance =
+    remainingCredits !== null ? remainingCredits : (user?.balance ?? 0);
+
   return (
-    <div
-      className="grid grid-cols-[256px_1fr_272px]"
-      style={{
-        marginTop: "var(--nav)",
-        minHeight: "calc(100vh - var(--nav))",
-      }}
-    >
-      {/* Left Panel - Model Selector */}
-      <aside className="border-r border-border overflow-y-auto px-[18px] py-[28px]">
-        <ModelSelector selected={model} onSelect={setModel} />
-      </aside>
+    <>
+      <div
+        className="grid grid-cols-[256px_1fr_272px]"
+        style={{
+          marginTop: "var(--nav)",
+          minHeight: "calc(100vh - var(--nav))",
+        }}
+      >
+        {/* Left Panel - Model Selector */}
+        <aside className="border-r border-border overflow-y-auto px-[18px] py-[28px]">
+          <ModelSelector selected={model} onSelect={setModel} />
+        </aside>
 
-      {/* Center - Creation Area */}
-      <main className="overflow-y-auto px-[32px] py-[24px]">
-        <div className="flex items-center justify-between mb-4">
-          <h2
-            className="text-[28px] font-normal tracking-[-0.015em]"
-            style={{ fontFamily: "var(--font-d)" }}
+        {/* Center - Creation Area */}
+        <main className="overflow-y-auto px-[32px] py-[24px]">
+          <div className="flex items-center justify-between mb-4">
+            <h2
+              className="text-[28px] font-normal tracking-[-0.015em]"
+              style={{ fontFamily: "var(--font-d)" }}
+            >
+              创作提示词
+            </h2>
+            <span className="px-3 py-1 rounded-[3px] border border-accent-b bg-accent-d font-mono text-[10px] text-accent tracking-[.07em] uppercase">
+              {modelBadge}
+            </span>
+          </div>
+
+          <PromptInput value={prompt} onChange={setPrompt} disabled={loading} />
+
+          <ReferenceImages
+            images={referenceImages}
+            onChange={setReferenceImages}
+            disabled={loading}
+          />
+
+          <QuickTemplates onApply={(p) => setPrompt(p)} />
+
+          <button
+            onClick={handleGenerate}
+            disabled={loading || !prompt.trim()}
+            className="w-full py-[15px] mt-1.5 bg-accent text-[oklch(11%_.01_55)] text-base font-medium tracking-[.025em] rounded-[var(--r)] hover:opacity-[.86] transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            创作提示词
-          </h2>
-          <span className="px-3 py-1 rounded-[3px] border border-accent-b bg-accent-d font-mono text-[10px] text-accent tracking-[.07em] uppercase">
-            {modelBadge}
-          </span>
-        </div>
+            {loading ? "◎ 生成中..." : "✦ 开始生图"}
+          </button>
 
-        <PromptInput value={prompt} onChange={setPrompt} disabled={loading} />
+          <GenerationResult images={images} loading={loading} count={count} />
+        </main>
 
-        <ReferenceImages
-          images={referenceImages}
-          onChange={setReferenceImages}
-          disabled={loading}
-        />
+        {/* Right Panel - Parameters */}
+        <aside className="border-l border-border overflow-y-auto px-[18px] py-[28px]">
+          <ParamPanel
+            aspectRatio={aspectRatio}
+            quality={quality}
+            count={count}
+            selectedPresetId={selectedPresetId}
+            onAspectRatioChange={setAspectRatio}
+            onQualityChange={setQuality}
+            onCountChange={setCount}
+            onPresetChange={setSelectedPresetId}
+          />
+        </aside>
+      </div>
 
-        <QuickTemplates onApply={(p) => setPrompt(p)} />
-
-        <button
-          onClick={handleGenerate}
-          disabled={loading || !prompt.trim()}
-          className="w-full py-[15px] mt-1.5 bg-accent text-[oklch(11%_.01_55)] text-base font-medium tracking-[.025em] rounded-[var(--r)] hover:opacity-[.86] transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? "◎ 生成中..." : "✦ 开始生图"}
-        </button>
-
-        <GenerationResult images={images} loading={loading} count={count} />
-      </main>
-
-      {/* Right Panel - Parameters */}
-      <aside className="border-l border-border overflow-y-auto px-[18px] py-[28px]">
-        <ParamPanel
-          aspectRatio={aspectRatio}
-          quality={quality}
-          count={count}
-          selectedPresetId={selectedPresetId}
-          onAspectRatioChange={setAspectRatio}
-          onQualityChange={setQuality}
-          onCountChange={setCount}
-          onPresetChange={setSelectedPresetId}
-        />
-      </aside>
-    </div>
+      <LoginPromptModal
+        open={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+      />
+      <InsufficientBalanceModal
+        open={balanceModalOpen}
+        balance={displayBalance}
+        required={requiredCredits}
+        onClose={() => setBalanceModalOpen(false)}
+      />
+    </>
   );
 }
 
