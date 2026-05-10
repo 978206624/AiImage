@@ -19,7 +19,7 @@ export default function Home() {
 
   useEffect(() => {
     setLoading(true);
-    fetch("/api/gallery?featured=true&limit=5")
+    fetch("/api/gallery?featured=true&pageSize=5")
       .then((r) => r.json())
       .then((res) => {
         if (res.success) setFeatured(res.data?.images || []);
