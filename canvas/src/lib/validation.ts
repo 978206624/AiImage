@@ -38,9 +38,3 @@ export async function checkRegistrationRateLimit(ip: string): Promise<boolean> {
   });
   return count < REGISTRATION_LIMIT;
 }
-
-export async function recordRegistrationAttempt(ip: string): Promise<void> {
-  await prisma.registrationAttempt.create({
-    data: { ip },
-  });
-}
