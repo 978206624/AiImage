@@ -18,6 +18,13 @@ export async function PUT(request: Request, { params }: RouteParams) {
   const { id } = await params;
   const presetId = parseInt(id);
 
+  if (isNaN(presetId)) {
+    return NextResponse.json(
+      { success: false, error: "无效 ID" },
+      { status: 400 }
+    );
+  }
+
   try {
     const { name, description, coverImageUrl, promptPrefix, sortOrder } =
       await request.json();
@@ -60,6 +67,13 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
   const { id } = await params;
   const presetId = parseInt(id);
+
+  if (isNaN(presetId)) {
+    return NextResponse.json(
+      { success: false, error: "无效 ID" },
+      { status: 400 }
+    );
+  }
 
   try {
     await prisma.stylePreset.delete({ where: { id: presetId } });

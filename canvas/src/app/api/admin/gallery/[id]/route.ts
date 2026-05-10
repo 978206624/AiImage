@@ -18,6 +18,13 @@ export async function PUT(request: Request, { params }: RouteParams) {
   const { id } = await params;
   const imageId = parseInt(id);
 
+  if (isNaN(imageId)) {
+    return NextResponse.json(
+      { success: false, error: "无效 ID" },
+      { status: 400 }
+    );
+  }
+
   try {
     const { imageUrl, prompt, modelTag, styleTag } = await request.json();
 
@@ -47,6 +54,13 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
   const { id } = await params;
   const imageId = parseInt(id);
 
+  if (isNaN(imageId)) {
+    return NextResponse.json(
+      { success: false, error: "无效 ID" },
+      { status: 400 }
+    );
+  }
+
   try {
     await prisma.galleryImage.delete({ where: { id: imageId } });
     return NextResponse.json({ success: true });
@@ -69,6 +83,13 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
   const { id } = await params;
   const imageId = parseInt(id);
+
+  if (isNaN(imageId)) {
+    return NextResponse.json(
+      { success: false, error: "无效 ID" },
+      { status: 400 }
+    );
+  }
 
   try {
     const body = await request.json();

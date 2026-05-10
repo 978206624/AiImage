@@ -18,6 +18,13 @@ export async function PUT(request: Request, { params }: RouteParams) {
   const { id } = await params;
   const templateId = parseInt(id);
 
+  if (isNaN(templateId)) {
+    return NextResponse.json(
+      { success: false, error: "无效 ID" },
+      { status: 400 }
+    );
+  }
+
   try {
     const { name, prompt, categoryId, coverImageUrl, sortOrder } =
       await request.json();
@@ -60,6 +67,13 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
   const { id } = await params;
   const templateId = parseInt(id);
+
+  if (isNaN(templateId)) {
+    return NextResponse.json(
+      { success: false, error: "无效 ID" },
+      { status: 400 }
+    );
+  }
 
   try {
     await prisma.promptTemplate.delete({ where: { id: templateId } });

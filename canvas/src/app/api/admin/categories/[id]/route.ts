@@ -18,6 +18,13 @@ export async function PUT(request: Request, { params }: RouteParams) {
   const { id } = await params;
   const categoryId = parseInt(id);
 
+  if (isNaN(categoryId)) {
+    return NextResponse.json(
+      { success: false, error: "无效 ID" },
+      { status: 400 }
+    );
+  }
+
   try {
     const { name, sortOrder } = await request.json();
 
@@ -53,6 +60,13 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
   const { id } = await params;
   const categoryId = parseInt(id);
+
+  if (isNaN(categoryId)) {
+    return NextResponse.json(
+      { success: false, error: "无效 ID" },
+      { status: 400 }
+    );
+  }
 
   try {
     const templatesCount = await prisma.promptTemplate.count({
