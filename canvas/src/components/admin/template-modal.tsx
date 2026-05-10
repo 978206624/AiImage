@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import ImageUploader from "@/components/admin/image-uploader";
+import { Select } from "@/components/ui/select";
 
 interface Category {
   id: number;
@@ -115,16 +116,21 @@ export default function TemplateModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-muted mb-1.5">分类</label>
-              <select
-                value={form.categoryId}
-                onChange={(e) => setForm((f) => ({ ...f, categoryId: parseInt(e.target.value) }))}
-                className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-fg text-sm focus:outline-none focus:border-accent"
-              >
-                {categories.length === 0 && <option value={0}>无分类</option>}
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>{cat.name}</option>
-                ))}
-              </select>
+              <Select
+                value={String(form.categoryId)}
+                onChange={(v) =>
+                  setForm((f) => ({ ...f, categoryId: parseInt(v) || 0 }))
+                }
+                options={
+                  categories.length === 0
+                    ? [{ value: "0", label: "无分类" }]
+                    : categories.map((cat) => ({
+                        value: String(cat.id),
+                        label: cat.name,
+                      }))
+                }
+                ariaLabel="分类"
+              />
             </div>
             <div>
               <label className="block text-sm text-muted mb-1.5">排序</label>

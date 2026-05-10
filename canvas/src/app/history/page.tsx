@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useToast } from "@/components/ui/toast";
 import { Lightbox } from "@/components/ui/lightbox";
+import { Select } from "@/components/ui/select";
 import type { HistoryItem } from "@/components/generate/recent-history";
 import { ASPECT_RATIOS } from "@/lib/constants";
 
@@ -176,17 +177,16 @@ export default function HistoryPage() {
                   })),
                 ]}
               />
-              <select
+              <Select
                 value={timeRange}
-                onChange={(e) => setTimeRange(e.target.value as TimeRange)}
-                className="px-3 py-1.5 bg-surface border border-border rounded text-fg text-sm focus:outline-none focus:border-accent"
-              >
-                {TIME_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
+                onChange={(v) => setTimeRange(v as TimeRange)}
+                options={TIME_OPTIONS.map((o) => ({
+                  value: o.value,
+                  label: o.label,
+                }))}
+                className="px-3 py-1.5 min-w-[7rem]"
+                ariaLabel="时间范围"
+              />
             </div>
           </div>
         </div>

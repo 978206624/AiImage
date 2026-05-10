@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import ImageUploader from "@/components/admin/image-uploader";
+import { Select } from "@/components/ui/select";
 
 const MODEL_TAGS = ["GPT-4o Image", "Google Imagen 3"];
 const STYLE_TAGS = ["写实", "动漫", "油画", "赛博朋克", "水墨", "极简"];
@@ -81,27 +82,21 @@ export default function GalleryModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm text-muted mb-1.5">模型标签</label>
-              <select
+              <Select
                 value={form.modelTag}
-                onChange={(e) => setForm((f) => ({ ...f, modelTag: e.target.value }))}
-                className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-fg text-sm focus:outline-none focus:border-accent"
-              >
-                {MODEL_TAGS.map((tag) => (
-                  <option key={tag} value={tag}>{tag}</option>
-                ))}
-              </select>
+                onChange={(v) => setForm((f) => ({ ...f, modelTag: v }))}
+                options={MODEL_TAGS.map((tag) => ({ value: tag, label: tag }))}
+                ariaLabel="模型标签"
+              />
             </div>
             <div>
               <label className="block text-sm text-muted mb-1.5">风格标签</label>
-              <select
+              <Select
                 value={form.styleTag}
-                onChange={(e) => setForm((f) => ({ ...f, styleTag: e.target.value }))}
-                className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-fg text-sm focus:outline-none focus:border-accent"
-              >
-                {STYLE_TAGS.map((tag) => (
-                  <option key={tag} value={tag}>{tag}</option>
-                ))}
-              </select>
+                onChange={(v) => setForm((f) => ({ ...f, styleTag: v }))}
+                options={STYLE_TAGS.map((tag) => ({ value: tag, label: tag }))}
+                ariaLabel="风格标签"
+              />
             </div>
           </div>
 
