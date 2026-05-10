@@ -15,15 +15,19 @@ interface GalleryGridProps {
   loading: boolean;
 }
 
+const SKELETON_HEIGHTS = [
+  220, 320, 240, 280, 200, 340, 260, 300, 230, 290, 250, 310,
+];
+
 export function GalleryGrid({ images, loading }: GalleryGridProps) {
   if (loading) {
     return (
       <div className="columns-2 md:columns-3 lg:columns-4 gap-3">
-        {Array.from({ length: 12 }).map((_, i) => (
+        {SKELETON_HEIGHTS.map((h, i) => (
           <div
             key={i}
             className="mb-3 rounded-lg bg-surface2 animate-pulse break-inside-avoid"
-            style={{ height: `${200 + Math.random() * 160}px` }}
+            style={{ height: `${h}px` }}
           />
         ))}
       </div>
