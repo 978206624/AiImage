@@ -48,7 +48,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
     });
 
     return NextResponse.json({ success: true, data: template });
-  } catch {
+  } catch (error) {
+    console.error("[PUT /api/admin/templates/[id]]", error);
     return NextResponse.json(
       { success: false, error: "更新失败" },
       { status: 500 }
@@ -78,7 +79,8 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
   try {
     await prisma.promptTemplate.delete({ where: { id: templateId } });
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error("[DELETE /api/admin/templates/[id]]", error);
     return NextResponse.json(
       { success: false, error: "删除失败" },
       { status: 500 }

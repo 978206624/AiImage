@@ -32,7 +32,8 @@ export async function POST(request: Request) {
     await createSession();
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error("[POST /api/admin/auth]", error);
     return NextResponse.json(
       { success: false, error: "服务器错误" },
       { status: 500 }

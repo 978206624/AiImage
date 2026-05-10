@@ -41,7 +41,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
     });
 
     return NextResponse.json({ success: true, data: category });
-  } catch {
+  } catch (error) {
+    console.error("[PUT /api/admin/categories/[id]]", error);
     return NextResponse.json(
       { success: false, error: "更新失败" },
       { status: 500 }
@@ -82,7 +83,8 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
     await prisma.category.delete({ where: { id: categoryId } });
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error("[DELETE /api/admin/categories/[id]]", error);
     return NextResponse.json(
       { success: false, error: "删除失败" },
       { status: 500 }

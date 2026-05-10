@@ -85,7 +85,8 @@ export async function POST(request: Request) {
         })),
       },
     });
-  } catch {
+  } catch (error) {
+    console.error("[POST /api/admin/keys]", error);
     return NextResponse.json(
       { success: false, error: "生成失败" },
       { status: 500 }

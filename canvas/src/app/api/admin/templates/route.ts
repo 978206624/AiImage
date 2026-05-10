@@ -67,7 +67,8 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ success: true, data: template });
-  } catch {
+  } catch (error) {
+    console.error("[POST /api/admin/templates]", error);
     return NextResponse.json(
       { success: false, error: "创建失败" },
       { status: 500 }

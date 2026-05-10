@@ -43,7 +43,8 @@ export async function PUT(request: Request) {
     await prisma.$transaction(operations);
 
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    console.error("[PUT /api/admin/settings]", error);
     return NextResponse.json(
       { success: false, error: "保存失败" },
       { status: 500 }

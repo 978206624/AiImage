@@ -43,7 +43,8 @@ export async function PATCH(
       success: true,
       data: { id: updated.id, status: updated.status },
     });
-  } catch {
+  } catch (error) {
+    console.error("[PATCH /api/admin/keys/[id]]", error);
     return NextResponse.json(
       { success: false, error: "操作失败" },
       { status: 500 }
