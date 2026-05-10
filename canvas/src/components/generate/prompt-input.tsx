@@ -11,7 +11,7 @@ export function PromptInput({ value, onChange, disabled }: PromptInputProps) {
     <div className="mb-3.5">
       <div className="flex items-center justify-between mb-[9px]">
         <span className="text-[13px] font-medium tracking-[.02em]">
-          正向提示词
+          生图提示词
         </span>
         <span className="font-mono text-[11px] text-muted tracking-[.03em]">
           描述你想要的画面
