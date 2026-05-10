@@ -7,41 +7,78 @@ interface ModelSelectorProps {
   onSelect: (id: string) => void;
 }
 
+const MODEL_DOT: Record<string, string> = {
+  "gpt-4o-image": "oklch(62% .18 255)",
+  "google-imagen-3": "oklch(62% .2 145)",
+  "midjourney-v6": "oklch(62% .16 30)",
+};
+
+const MODEL_TAG_BG: Record<string, string> = {
+  "gpt-4o-image": "oklch(62% .18 255 / .14)",
+  "google-imagen-3": "oklch(62% .2 145 / .14)",
+  "midjourney-v6": "oklch(62% .16 30 / .14)",
+};
+
+const MODEL_TAGS: Record<string, string> = {
+  "gpt-4o-image": "原生多模态",
+  "google-imagen-3": "Imagen 3",
+  "midjourney-v6": "v6",
+};
+
 export function ModelSelector({ selected, onSelect }: ModelSelectorProps) {
   return (
-    <div className="flex flex-col gap-2">
-      <h3 className="text-xs font-medium text-muted uppercase tracking-wider px-1 mb-1">
-        模型选择
-      </h3>
-      {MODELS.map((model) => (
-        <button
-          key={model.id}
-          onClick={() => model.available && onSelect(model.id)}
-          disabled={!model.available}
-          className={`relative w-full text-left p-3 rounded-lg border transition-all ${
-            selected === model.id
-              ? "border-accent bg-accent-d"
-              : model.available
-                ? "border-border hover:border-accent/50 bg-surface"
-                : "border-border/50 bg-surface/50 opacity-60 cursor-not-allowed"
-          }`}
-        >
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-sm font-medium text-fg">{model.name}</span>
-            {!model.available && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface2 text-muted">
-                即将支持
+    <div>
+      <div className="font-mono text-[10px] tracking-[.1em] uppercase text-muted mb-4">
+        选择模型
+      </div>
+      {MODELS.map((model) => {
+        const dot = MODEL_DOT[model.id] || "var(--muted)";
+        const tagBg = MODEL_TAG_BG[model.id];
+        const tagColor = MODEL_DOT[model.id];
+        const tag = MODEL_TAGS[model.id];
+        const isSelected = selected === model.id;
+        return (
+          <button
+            key={model.id}
+            onClick={() => model.available && onSelect(model.id)}
+            disabled={!model.available}
+            className={`w-full text-left p-[14px] rounded-[var(--r)] border mb-2.5 transition-all ${
+              isSelected
+                ? "border-accent bg-accent-d"
+                : model.available
+                  ? "border-border hover:border-accent"
+                  : "border-border/50 opacity-60 cursor-not-allowed"
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-[5px]">
+              <span
+                className="w-[7px] h-[7px] rounded-full shrink-0"
+                style={{ background: dot }}
+              />
+              <span className="text-sm font-medium text-fg">{model.name}</span>
+            </div>
+            <p className="text-[11px] text-muted leading-[1.5]">
+              {model.description}
+            </p>
+            {tag && (
+              <span
+                className="inline-block mt-2 px-2 py-0.5 rounded-[3px] font-mono text-[10px] tracking-[.04em]"
+                style={{
+                  background: tagBg,
+                  color: tagColor,
+                }}
+              >
+                {tag}
               </span>
             )}
-            {selected === model.id && (
-              <span className="w-2 h-2 rounded-full bg-accent" />
-            )}
-          </div>
-          <p className="text-xs text-muted leading-relaxed">
-            {model.description}
-          </p>
-        </button>
-      ))}
+          </button>
+        );
+      })}
+      <div className="h-px bg-border my-5" />
+      <div className="font-mono text-[10px] tracking-[.1em] uppercase text-muted mb-4">
+        历史记录
+      </div>
+      <div className="text-xs text-muted">暂无历史记录</div>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@source "../**/*.{ts,tsx}";
 
 :root {
   --bg: oklch(13% 0.012 60);
@@ -10,9 +11,9 @@
   --accent: oklch(68% 0.16 58);
   --accent-d: oklch(68% 0.16 58 / 0.14);
   --accent-b: oklch(68% 0.16 58 / 0.30);
-  --font-d: 'Iowan Old Style', 'Charter', 'Georgia', serif;
+  --font-d: var(--font-display), 'Iowan Old Style', 'Charter', 'Georgia', serif;
   --font-b: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --font-m: ui-monospace, 'JetBrains Mono', 'IBM Plex Mono', monospace;
+  --font-m: var(--font-mono), ui-monospace, 'IBM Plex Mono', monospace;
   --r: 6px;
   --nav: 60px;
 }
@@ -29,10 +30,12 @@
   --color-accent-b: var(--accent-b);
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  border-width: 0;
+  border-style: solid;
 }
 
 body {
@@ -43,6 +46,10 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+}
+
+input[type="range"] {
+  accent-color: var(--accent);
 }
 
 ::-webkit-scrollbar {

@@ -23,7 +23,7 @@ function GenerateContent() {
   const [model, setModel] = useState("gpt-4o-image");
   const [prompt, setPrompt] = useState("");
   const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
-  const [aspectRatio, setAspectRatio] = useState<AspectRatio>("1:1");
+  const [aspectRatio, setAspectRatio] = useState<AspectRatio>("2:3");
   const [quality, setQuality] = useState<Quality>("medium");
   const [count, setCount] = useState(1);
   const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
@@ -59,47 +59,63 @@ function GenerateContent() {
     });
   };
 
+  const modelBadge =
+    model === "gpt-4o-image"
+      ? "GPT-4O IMAGE"
+      : model === "google-imagen-3"
+        ? "GOOGLE IMAGEN 3"
+        : "MIDJOURNEY V6";
+
   return (
-    <div className="flex h-[calc(100vh-var(--nav))] mt-[var(--nav)]">
+    <div
+      className="grid grid-cols-[256px_1fr_272px]"
+      style={{
+        marginTop: "var(--nav)",
+        minHeight: "calc(100vh - var(--nav))",
+      }}
+    >
       {/* Left Panel - Model Selector */}
-      <aside className="w-64 shrink-0 border-r border-border p-4 overflow-y-auto">
+      <aside className="border-r border-border overflow-y-auto px-[18px] py-[28px]">
         <ModelSelector selected={model} onSelect={setModel} />
       </aside>
 
       {/* Center - Creation Area */}
-      <main className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-2xl mx-auto flex flex-col gap-5">
-          <div className="flex items-center gap-2">
-            <h2 className="text-sm font-medium text-fg">创作提示词</h2>
-            <span className="px-2 py-0.5 text-[10px] rounded bg-accent-d text-accent">
-              GPT-4o Image
-            </span>
-          </div>
-
-          <PromptInput value={prompt} onChange={setPrompt} disabled={loading} />
-
-          <ReferenceImages
-            images={referenceImages}
-            onChange={setReferenceImages}
-            disabled={loading}
-          />
-
-          <QuickTemplates onApply={(p) => setPrompt(p)} />
-
-          <button
-            onClick={handleGenerate}
-            disabled={loading || !prompt.trim()}
-            className="w-full py-3 bg-accent text-bg font-medium rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+      <main className="overflow-y-auto px-[32px] py-[24px]">
+        <div className="flex items-center justify-between mb-4">
+          <h2
+            className="text-[28px] font-normal tracking-[-0.015em]"
+            style={{ fontFamily: "var(--font-d)" }}
           >
-            {loading ? "生成中..." : "开始生图"}
-          </button>
-
-          <GenerationResult images={images} loading={loading} count={count} />
+            创作提示词
+          </h2>
+          <span className="px-3 py-1 rounded-[3px] border border-accent-b bg-accent-d font-mono text-[10px] text-accent tracking-[.07em] uppercase">
+            {modelBadge}
+          </span>
         </div>
+
+        <PromptInput value={prompt} onChange={setPrompt} disabled={loading} />
+
+        <ReferenceImages
+          images={referenceImages}
+          onChange={setReferenceImages}
+          disabled={loading}
+        />
+
+        <QuickTemplates onApply={(p) => setPrompt(p)} />
+
+        <button
+          onClick={handleGenerate}
+          disabled={loading || !prompt.trim()}
+          className="w-full py-[15px] mt-1.5 bg-accent text-[oklch(11%_.01_55)] text-base font-medium tracking-[.025em] rounded-[var(--r)] hover:opacity-[.86] transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "◎ 生成中..." : "✦ 开始生图"}
+        </button>
+
+        <GenerationResult images={images} loading={loading} count={count} />
       </main>
 
       {/* Right Panel - Parameters */}
-      <aside className="w-[272px] shrink-0 border-l border-border p-4 overflow-y-auto">
+      <aside className="border-l border-border overflow-y-auto px-[18px] py-[28px]">
         <ParamPanel
           aspectRatio={aspectRatio}
           quality={quality}

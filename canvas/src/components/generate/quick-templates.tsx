@@ -24,21 +24,29 @@ export function QuickTemplates({ onApply }: QuickTemplatesProps) {
       .catch(() => {});
   }, []);
 
-  if (templates.length === 0) return null;
-
   return (
-    <div>
-      <span className="text-xs text-muted mb-2 block">快速套用模板</span>
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+    <div className="mb-3.5">
+      <div className="flex items-center justify-between mb-[9px]">
+        <span className="text-[13px] font-medium tracking-[.02em]">
+          快速套用模板
+        </span>
+      </div>
+      <div className="flex gap-[7px] flex-nowrap overflow-x-auto pb-1">
         {templates.map((t) => (
           <button
             key={t.id}
             onClick={() => onApply(t.prompt)}
-            className="shrink-0 px-3 py-1.5 text-xs rounded-full border border-border bg-surface text-muted hover:text-fg hover:border-accent/50 transition-all"
+            className="shrink-0 px-3 py-[5px] text-xs rounded-full border border-border text-muted hover:border-accent hover:text-accent hover:bg-accent-d transition-all"
           >
             {t.name}
           </button>
         ))}
+        <a
+          href="/templates"
+          className="shrink-0 px-3 py-[5px] text-xs rounded-full border border-border text-muted hover:border-accent hover:text-accent hover:bg-accent-d transition-all"
+        >
+          更多模板 →
+        </a>
       </div>
     </div>
   );
