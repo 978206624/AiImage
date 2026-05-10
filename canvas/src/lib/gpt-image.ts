@@ -183,23 +183,6 @@ function pickString(value: unknown): string | null {
   return null;
 }
 
-/**
- * @deprecated 仅供 T-B 阶段的旧 /api/generate 兼容使用，T-E 完成后删除。
- */
-export async function generateImage(params: SubmitParams): Promise<string> {
-  const submitted = await submitTask(params);
-  if (submitted.async === false) return submitted.imageUrl;
-
-  const maxAttempts = 60;
-  for (let i = 0; i < maxAttempts; i++) {
-    await new Promise((r) => setTimeout(r, 6000));
-    const q = await queryTask(submitted.taskId);
-    if (q.status === "completed") return q.imageUrl;
-    if (q.status === "failed") throw new Error(q.failReason);
-  }
-  throw new Error("生图超时，请稍后重试");
-}
-
 function pickImageUrl(taskData: Record<string, unknown>): string | null {
   // 中转协议：data.data.data[0].url
   const inner = taskData.data;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import type { AspectRatio, Quality } from "@/lib/size-map";
 import type { ReferenceImage } from "@/components/generate/reference-images";
@@ -13,25 +13,109 @@ export type GenerationErrorCode =
   | "NETWORK"
   | "OTHER";
 
+export type TaskStatus =
+  | "pending"
+  | "submitted"
+  | "processing"
+  | "completed"
+  | "failed";
+
+export interface ImageTaskState {
+  id: number;
+  status: TaskStatus;
+  progress: number;
+  imageUrl: string | null;
+  isPersisted: boolean;
+  failReason: string | null;
+}
+
 interface GenerationState {
   loading: boolean;
-  images: string[];
+  groupId: string | null;
+  tasks: ImageTaskState[];
   error: string | null;
   errorCode: GenerationErrorCode | null;
-  remainingCredits: number | null;
 }
 
 const initialState: GenerationState = {
   loading: false,
-  images: [],
+  groupId: null,
+  tasks: [],
   error: null,
   errorCode: null,
-  remainingCredits: null,
 };
+
+const POLL_INTERVAL_MS = 2_000;
+
+function isTerminal(status: TaskStatus): boolean {
+  return status === "completed" || status === "failed";
+}
 
 export function useGeneration() {
   const { refresh } = useCurrentUser();
   const [state, setState] = useState<GenerationState>(initialState);
+  const pollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pollGroupIdRef = useRef<string | null>(null);
+
+  const stopPolling = useCallback(() => {
+    if (pollTimerRef.current) {
+      clearInterval(pollTimerRef.current);
+      pollTimerRef.current = null;
+    }
+    pollGroupIdRef.current = null;
+  }, []);
+
+  const fetchTasks = useCallback(
+    async (groupId: string): Promise<ImageTaskState[] | null> => {
+      try {
+        const res = await fetch(
+          `/api/generate/tasks?groupId=${encodeURIComponent(groupId)}`,
+          { cache: "no-store" }
+        );
+        const data = await res.json();
+        if (!data.success) return null;
+        return (data.tasks as ImageTaskState[]) ?? [];
+      } catch {
+        return null;
+      }
+    },
+    []
+  );
+
+  const tickPoll = useCallback(
+    async (groupId: string) => {
+      if (pollGroupIdRef.current !== groupId) return;
+      const tasks = await fetchTasks(groupId);
+      if (pollGroupIdRef.current !== groupId) return;
+      if (!tasks) return;
+
+      const allTerminal = tasks.length > 0 && tasks.every((t) => isTerminal(t.status));
+      const anyCompletedNew = tasks.some((t) => t.status === "completed");
+
+      setState((s) =>
+        s.groupId === groupId
+          ? {
+              ...s,
+              tasks,
+              loading: !allTerminal,
+            }
+          : s
+      );
+
+      if (anyCompletedNew) {
+        await refresh();
+      }
+
+      if (allTerminal) {
+        stopPolling();
+      }
+    },
+    [fetchTasks, refresh, stopPolling]
+  );
+
+  useEffect(() => {
+    return () => stopPolling();
+  }, [stopPolling]);
 
   const generate = useCallback(
     async (params: {
@@ -51,6 +135,7 @@ export function useGeneration() {
         return;
       }
 
+      stopPolling();
       setState({ ...initialState, loading: true });
 
       try {
@@ -78,38 +163,61 @@ export function useGeneration() {
           const code = mapErrorCode(res.status, data.code);
           setState({
             loading: false,
-            images: [],
-            error: data.error || "生成失败",
+            groupId: null,
+            tasks: [],
+            error: data.error || "提交失败",
             errorCode: code,
-            remainingCredits: data.remaining ?? null,
           });
           return;
         }
 
+        const groupId = data.groupId as string;
+        const initialTasks: ImageTaskState[] = (
+          data.tasks as Array<{ id: number }>
+        ).map((t) => ({
+          id: t.id,
+          status: "pending" as TaskStatus,
+          progress: 0,
+          imageUrl: null,
+          isPersisted: false,
+          failReason: null,
+        }));
+
+        pollGroupIdRef.current = groupId;
         setState({
-          loading: false,
-          images: data.images,
+          loading: true,
+          groupId,
+          tasks: initialTasks,
           error: null,
           errorCode: null,
-          remainingCredits: data.remainingCredits,
         });
-        await refresh();
+
+        await tickPoll(groupId);
+
+        if (pollGroupIdRef.current === groupId && !pollTimerRef.current) {
+          pollTimerRef.current = setInterval(
+            () => void tickPoll(groupId),
+            POLL_INTERVAL_MS
+          );
+        }
       } catch (err) {
+        stopPolling();
         setState({
           loading: false,
-          images: [],
+          groupId: null,
+          tasks: [],
           error: err instanceof Error ? err.message : "网络错误",
           errorCode: "NETWORK",
-          remainingCredits: null,
         });
       }
     },
-    [refresh]
+    [stopPolling, tickPoll]
   );
 
   const clearResults = useCallback(() => {
+    stopPolling();
     setState(initialState);
-  }, []);
+  }, [stopPolling]);
 
   return { ...state, generate, clearResults };
 }

@@ -44,10 +44,9 @@ function GenerateContent() {
   const { toast } = useToast();
   const {
     loading,
-    images,
+    tasks,
     error,
     errorCode,
-    remainingCredits,
     generate,
     clearResults,
   } = useGeneration();
@@ -110,11 +109,12 @@ function GenerateContent() {
     }
   }, [handleReuse]);
 
+  const completedCount = tasks.filter((t) => t.status === "completed").length;
   useEffect(() => {
-    if (images.length > 0) {
+    if (completedCount > 0) {
       setHistoryRefreshKey((k) => k + 1);
     }
-  }, [images]);
+  }, [completedCount]);
 
   useEffect(() => {
     if (!error) return;
@@ -156,8 +156,7 @@ function GenerateContent() {
         : "MIDJOURNEY V6";
 
   const requiredCredits = CREDITS_PER_IMAGE * count;
-  const displayBalance =
-    remainingCredits !== null ? remainingCredits : (user?.balance ?? 0);
+  const displayBalance = user?.balance ?? 0;
 
   return (
     <>
@@ -210,7 +209,7 @@ function GenerateContent() {
             {loading ? "◎ 生成中..." : "✦ 开始生图"}
           </button>
 
-          <GenerationResult images={images} loading={loading} count={count} />
+          <GenerationResult tasks={tasks} loading={loading} count={count} />
         </main>
 
         {/* Right Panel - Parameters */}
