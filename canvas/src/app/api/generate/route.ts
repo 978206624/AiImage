@@ -44,7 +44,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const creditsPerImage = parseFloat(process.env.CREDITS_PER_IMAGE || "0.07");
+    const parsed = parseFloat(process.env.CREDITS_PER_IMAGE || "0.07");
+    const creditsPerImage = Number.isFinite(parsed) && parsed >= 0.01 ? parsed : 0.07;
     const totalCost = creditsPerImage * count;
     const remaining = Number(apiKey.totalCredits) - Number(apiKey.usedCredits);
 
@@ -100,34 +101,41 @@ export async function POST(request: Request) {
     const actualCost = creditsPerImage * images.length;
     const promptSummary = prompt.slice(0, 200);
 
-    await prisma.$transaction([
-      prisma.apiKey.update({
-        where: { id: apiKey.id },
-        data: {
-          usedCredits: { increment: actualCost },
-          lastUsedAt: new Date(),
-        },
-      }),
-      ...images.map((imageUrl) =>
-        prisma.usageRecord.create({
+    let billingSuccess = true;
+    try {
+      await prisma.$transaction([
+        prisma.apiKey.update({
+          where: { id: apiKey.id },
           data: {
-            apiKeyId: apiKey.id,
-            creditsUsed: creditsPerImage,
-            promptSummary,
-            imageUrl,
+            usedCredits: { increment: actualCost },
+            lastUsedAt: new Date(),
           },
-        })
-      ),
-    ]);
+        }),
+        ...images.map((imageUrl) =>
+          prisma.usageRecord.create({
+            data: {
+              apiKeyId: apiKey.id,
+              creditsUsed: creditsPerImage,
+              promptSummary,
+              imageUrl,
+            },
+          })
+        ),
+      ]);
+    } catch (txError) {
+      console.error("billing transaction failed:", txError);
+      billingSuccess = false;
+    }
 
-    const newRemaining = remaining - actualCost;
+    const newRemaining = billingSuccess ? remaining - actualCost : remaining;
 
     return NextResponse.json({
       success: true,
       images,
       errors: errors.length > 0 ? errors : undefined,
-      creditsUsed: actualCost,
+      creditsUsed: billingSuccess ? actualCost : 0,
       remainingCredits: newRemaining,
+      billingError: billingSuccess ? undefined : "扣费异常，请联系管理员",
     });
   } catch (error) {
     console.error("generate error:", error);
