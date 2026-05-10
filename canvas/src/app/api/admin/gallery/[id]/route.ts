@@ -28,7 +28,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
   }
 
   try {
-    const { imageUrl, prompt, modelTag, styleTag } = await request.json();
+    const { imageUrl, prompt, modelTag, styleTag, title, categoryId } =
+      await request.json();
 
     const existing = await prisma.galleryImage.findUnique({
       where: { id: imageId },
@@ -41,6 +42,15 @@ export async function PUT(request: Request, { params }: RouteParams) {
       modelTag,
       styleTag,
     };
+
+    if (typeof title === "string") {
+      data.title = title.trim() || null;
+    }
+    if (typeof categoryId === "number") {
+      data.category = { connect: { id: categoryId } };
+    } else if (categoryId === null) {
+      data.category = { disconnect: true };
+    }
 
     if (existing && imageUrl && imageUrl !== existing.imageUrl) {
       const dims = await probeImageDimensions(imageUrl);

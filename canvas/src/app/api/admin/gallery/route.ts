@@ -42,7 +42,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { imageUrl, prompt, modelTag, styleTag } = await request.json();
+    const { imageUrl, prompt, modelTag, styleTag, title, categoryId } =
+      await request.json();
 
     if (!imageUrl || !modelTag || !styleTag) {
       return NextResponse.json(
@@ -59,6 +60,8 @@ export async function POST(request: Request) {
         prompt,
         modelTag,
         styleTag,
+        title: typeof title === "string" && title.trim() ? title.trim() : null,
+        categoryId: typeof categoryId === "number" ? categoryId : null,
         width: dims?.width,
         height: dims?.height,
       },
