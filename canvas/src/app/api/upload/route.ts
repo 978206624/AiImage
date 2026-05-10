@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const credentials = generateUploadCredentials("ref-temp", filename);
+    const credentials = await generateUploadCredentials("ref-temp", filename);
 
     return NextResponse.json({ success: true, data: credentials });
   } catch (error) {

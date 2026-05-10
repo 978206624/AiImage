@@ -1,3 +1,5 @@
+import { getRequiredSetting } from "./system-settings";
+
 interface GenerateParams {
   prompt: string;
   size: string;
@@ -10,19 +12,22 @@ interface TaskResult {
   error?: string;
 }
 
-function getConfig() {
-  const baseUrl = process.env.GPT_IMAGE_BASE_URL;
-  const apiKey = process.env.GPT_IMAGE_API_KEY;
-
-  if (!baseUrl || !apiKey) {
-    throw new Error("GPT Image API 配置不完整，请在系统设置中配置");
-  }
-
+async function getConfig() {
+  const baseUrl = await getRequiredSetting(
+    "api_base_url",
+    "GPT_IMAGE_BASE_URL",
+    "GPT Image API 配置不完整，请在系统设置中配置中转站 API 地址"
+  );
+  const apiKey = await getRequiredSetting(
+    "api_key",
+    "GPT_IMAGE_API_KEY",
+    "GPT Image API 配置不完整，请在系统设置中配置中转站 API Key"
+  );
   return { baseUrl: baseUrl.replace(/\/$/, ""), apiKey };
 }
 
 export async function submitTask(params: GenerateParams): Promise<string> {
-  const { baseUrl, apiKey } = getConfig();
+  const { baseUrl, apiKey } = await getConfig();
 
   const body: Record<string, unknown> = {
     model: "gpt-image-1",
@@ -63,7 +68,7 @@ export async function submitTask(params: GenerateParams): Promise<string> {
 }
 
 export async function pollTask(taskId: string): Promise<TaskResult> {
-  const { baseUrl, apiKey } = getConfig();
+  const { baseUrl, apiKey } = await getConfig();
 
   const res = await fetch(`${baseUrl}/v1/images/generations/${taskId}`, {
     headers: { Authorization: `Bearer ${apiKey}` },

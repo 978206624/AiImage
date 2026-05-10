@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { generateImage } from "@/lib/gpt-image";
 import { getSize } from "@/lib/size-map";
 import type { AspectRatio, Quality } from "@/lib/size-map";
+import { getSetting } from "@/lib/system-settings";
 
 interface GenerateRequest {
   key: string;
@@ -44,7 +45,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const parsed = parseFloat(process.env.CREDITS_PER_IMAGE || "0.07");
+    const creditsRaw = await getSetting(
+      "credits_per_image",
+      "CREDITS_PER_IMAGE",
+      "0.07"
+    );
+    const parsed = parseFloat(creditsRaw ?? "0.07");
     const creditsPerImage = Number.isFinite(parsed) && parsed >= 0.01 ? parsed : 0.07;
     const totalCost = creditsPerImage * count;
     const remaining = Number(apiKey.totalCredits) - Number(apiKey.usedCredits);

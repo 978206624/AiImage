@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/auth";
+import { invalidateSettingsCache } from "@/lib/system-settings";
 
 export async function GET() {
   const session = await verifySession();
@@ -32,7 +33,8 @@ export async function PUT(request: Request) {
   try {
     const body: Record<string, string> = await request.json();
 
-    const operations = Object.entries(body).map(([key, value]) =>
+    const entries = Object.entries(body);
+    const operations = entries.map(([key, value]) =>
       prisma.systemSetting.upsert({
         where: { key },
         update: { value },
@@ -41,6 +43,8 @@ export async function PUT(request: Request) {
     );
 
     await prisma.$transaction(operations);
+
+    invalidateSettingsCache(entries.map(([k]) => k));
 
     return NextResponse.json({ success: true });
   } catch (error) {

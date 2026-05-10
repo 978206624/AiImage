@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const credentials = generateUploadCredentials(dir, filename);
+    const credentials = await generateUploadCredentials(dir, filename);
 
     return NextResponse.json({ success: true, data: credentials });
   } catch (error) {

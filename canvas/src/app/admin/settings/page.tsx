@@ -44,7 +44,13 @@ const fields: SettingField[] = [
     key: "oss_region",
     label: "OSS Region",
     type: "text",
-    placeholder: "oss-cn-hangzhou",
+    placeholder: "cn-hangzhou",
+  },
+  {
+    key: "oss_endpoint",
+    label: "OSS Endpoint",
+    type: "text",
+    placeholder: "oss-cn-hangzhou.aliyuncs.com（留空则按 Region 自动推导）",
   },
   {
     key: "credits_per_image",

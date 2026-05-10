@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { getRequiredSetting, getSetting } from "./system-settings";
 
 interface OssConfig {
   accessKeyId: string;
@@ -17,25 +18,45 @@ interface UploadCredentials {
   successActionStatus: string;
 }
 
-function getOssConfig(): OssConfig {
-  const accessKeyId = process.env.OSS_ACCESS_KEY_ID;
-  const accessKeySecret = process.env.OSS_ACCESS_KEY_SECRET;
-  const bucket = process.env.OSS_BUCKET;
-  const region = process.env.OSS_REGION;
-  const endpoint = process.env.OSS_ENDPOINT;
-
-  if (!accessKeyId || !accessKeySecret || !bucket || !region || !endpoint) {
-    throw new Error("OSS 配置不完整，请在系统设置中配置 OSS 参数");
-  }
+async function getOssConfig(): Promise<OssConfig> {
+  const accessKeyId = await getRequiredSetting(
+    "oss_access_key_id",
+    "OSS_ACCESS_KEY_ID",
+    "OSS 配置不完整，请在系统设置中配置 AccessKey ID"
+  );
+  const accessKeySecret = await getRequiredSetting(
+    "oss_access_key_secret",
+    "OSS_ACCESS_KEY_SECRET",
+    "OSS 配置不完整，请在系统设置中配置 AccessKey Secret"
+  );
+  const bucket = await getRequiredSetting(
+    "oss_bucket",
+    "OSS_BUCKET",
+    "OSS 配置不完整，请在系统设置中配置 Bucket"
+  );
+  const region = await getRequiredSetting(
+    "oss_region",
+    "OSS_REGION",
+    "OSS 配置不完整，请在系统设置中配置 Region"
+  );
+  const endpoint =
+    (await getSetting("oss_endpoint", "OSS_ENDPOINT")) ??
+    `${region}.aliyuncs.com`;
 
   return { accessKeyId, accessKeySecret, bucket, region, endpoint };
 }
 
-export function generateUploadCredentials(
+function buildHost(bucket: string, endpoint: string): string {
+  return endpoint.startsWith("http")
+    ? `${endpoint}/${bucket}`
+    : `https://${bucket}.${endpoint}`;
+}
+
+export async function generateUploadCredentials(
   dir: string,
   filename: string
-): UploadCredentials {
-  const config = getOssConfig();
+): Promise<UploadCredentials> {
+  const config = await getOssConfig();
 
   const ext = filename.substring(filename.lastIndexOf("."));
   const key = `${dir}/${Date.now()}_${crypto.randomBytes(4).toString("hex")}${ext}`;
@@ -56,12 +77,8 @@ export function generateUploadCredentials(
     .update(policyBase64)
     .digest("base64");
 
-  const host = config.endpoint.startsWith("http")
-    ? `${config.endpoint}/${config.bucket}`
-    : `https://${config.bucket}.${config.endpoint}`;
-
   return {
-    host,
+    host: buildHost(config.bucket, config.endpoint),
     key,
     policy: policyBase64,
     signature,
@@ -70,10 +87,7 @@ export function generateUploadCredentials(
   };
 }
 
-export function getPublicUrl(key: string): string {
-  const config = getOssConfig();
-  const host = config.endpoint.startsWith("http")
-    ? `${config.endpoint}/${config.bucket}`
-    : `https://${config.bucket}.${config.endpoint}`;
-  return `${host}/${key}`;
+export async function getPublicUrl(key: string): Promise<string> {
+  const config = await getOssConfig();
+  return `${buildHost(config.bucket, config.endpoint)}/${key}`;
 }
