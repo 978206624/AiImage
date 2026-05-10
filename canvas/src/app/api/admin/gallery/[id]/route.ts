@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/auth";
 
@@ -34,7 +35,13 @@ export async function PUT(request: Request, { params }: RouteParams) {
     });
 
     return NextResponse.json({ success: true, data: image });
-  } catch {
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+      return NextResponse.json(
+        { success: false, error: "图片不存在" },
+        { status: 404 }
+      );
+    }
     return NextResponse.json(
       { success: false, error: "更新失败" },
       { status: 500 }
@@ -64,7 +71,13 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
   try {
     await prisma.galleryImage.delete({ where: { id: imageId } });
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+      return NextResponse.json(
+        { success: false, error: "图片不存在" },
+        { status: 404 }
+      );
+    }
     return NextResponse.json(
       { success: false, error: "删除失败" },
       { status: 500 }
@@ -118,7 +131,13 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     });
 
     return NextResponse.json({ success: true, data: image });
-  } catch {
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+      return NextResponse.json(
+        { success: false, error: "图片不存在" },
+        { status: 404 }
+      );
+    }
     return NextResponse.json(
       { success: false, error: "更新失败" },
       { status: 500 }
