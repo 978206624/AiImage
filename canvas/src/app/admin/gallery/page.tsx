@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import GalleryModal from "@/components/admin/gallery-modal";
+import { CategoriesTable } from "@/components/admin/categories-table";
+import { PresetsTable } from "@/components/admin/presets-table";
 
 interface GalleryImage {
   id: number;
@@ -9,12 +11,15 @@ interface GalleryImage {
   prompt: string | null;
   modelTag: string;
   styleTag: string;
+  title: string | null;
+  categoryId: number | null;
   width: number | null;
   height: number | null;
   isFeatured: boolean;
   isPublished: boolean;
   sortOrder: number;
   createdAt: string;
+  category?: { id: number; name: string } | null;
 }
 
 interface GalleryFormData {
@@ -22,9 +27,51 @@ interface GalleryFormData {
   prompt: string;
   modelTag: string;
   styleTag: string;
+  title: string;
+  categoryId: number | null;
 }
 
+type Tab = "images" | "categories" | "presets";
+
+const TABS: { value: Tab; label: string }[] = [
+  { value: "images", label: "图片" },
+  { value: "categories", label: "分类" },
+  { value: "presets", label: "风格预设" },
+];
+
 export default function GalleryPage() {
+  const [tab, setTab] = useState<Tab>("images");
+
+  return (
+    <div>
+      <div className="mb-6">
+        <h1 className="text-xl font-medium text-fg mb-4">画廊管理</h1>
+        <div className="flex gap-1 border-b border-border">
+          {TABS.map((t) => (
+            <button
+              key={t.value}
+              onClick={() => setTab(t.value)}
+              className={`px-4 py-2.5 text-sm transition-colors relative ${
+                tab === t.value ? "text-fg" : "text-muted hover:text-fg"
+              }`}
+            >
+              {t.label}
+              {tab === t.value && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {tab === "images" && <GalleryImagesTab />}
+      {tab === "categories" && <CategoriesTable />}
+      {tab === "presets" && <PresetsTable />}
+    </div>
+  );
+}
+
+function GalleryImagesTab() {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -101,8 +148,7 @@ export default function GalleryPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-medium text-fg">画廊管理</h1>
+      <div className="flex items-center justify-end mb-4">
         <button
           onClick={() => {
             setEditingImage(null);
@@ -119,7 +165,7 @@ export default function GalleryPage() {
       ) : images.length === 0 ? (
         <div className="text-center py-16 text-muted">
           <p className="text-sm">暂无画廊图片</p>
-          <p className="text-xs mt-1">点击"添加图片"上传第一张</p>
+          <p className="text-xs mt-1">点击&ldquo;添加图片&rdquo;上传第一张</p>
         </div>
       ) : (
         <>
@@ -128,9 +174,11 @@ export default function GalleryPage() {
               <thead className="bg-surface2">
                 <tr>
                   <th className="px-4 py-3 text-left text-muted font-medium">图片</th>
+                  <th className="px-4 py-3 text-left text-muted font-medium">标题</th>
                   <th className="px-4 py-3 text-left text-muted font-medium">Prompt</th>
                   <th className="px-4 py-3 text-left text-muted font-medium">模型</th>
                   <th className="px-4 py-3 text-left text-muted font-medium">风格</th>
+                  <th className="px-4 py-3 text-left text-muted font-medium">分类</th>
                   <th className="px-4 py-3 text-center text-muted font-medium">精选</th>
                   <th className="px-4 py-3 text-center text-muted font-medium">上架</th>
                   <th className="px-4 py-3 text-right text-muted font-medium">操作</th>
@@ -146,11 +194,17 @@ export default function GalleryPage() {
                         className="w-16 h-16 object-cover rounded"
                       />
                     </td>
-                    <td className="px-4 py-3 text-fg max-w-[200px] truncate">
+                    <td className="px-4 py-3 text-fg max-w-[140px] truncate">
+                      {img.title || "-"}
+                    </td>
+                    <td className="px-4 py-3 text-fg max-w-[180px] truncate">
                       {img.prompt || "-"}
                     </td>
                     <td className="px-4 py-3 text-muted">{img.modelTag}</td>
                     <td className="px-4 py-3 text-muted">{img.styleTag}</td>
+                    <td className="px-4 py-3 text-muted">
+                      {img.category?.name || "-"}
+                    </td>
                     <td className="px-4 py-3 text-center">
                       <button
                         onClick={() => handleToggle(img.id, "isFeatured", !img.isFeatured)}
@@ -235,6 +289,8 @@ export default function GalleryPage() {
                 prompt: editingImage.prompt || "",
                 modelTag: editingImage.modelTag,
                 styleTag: editingImage.styleTag,
+                title: editingImage.title || "",
+                categoryId: editingImage.categoryId,
               }
             : undefined
         }

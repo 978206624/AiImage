@@ -22,6 +22,7 @@ export async function GET(request: Request) {
       orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
       skip,
       take: pageSize,
+      include: { category: { select: { id: true, name: true } } },
     }),
     prisma.galleryImage.count(),
   ]);
