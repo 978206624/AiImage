@@ -192,3 +192,13 @@ model AdminUserAuditLog {
   @@index([targetUserId, createdAt])
   @@map("admin_user_audit_log")
 }
+
+model AdminLoginAttempt {
+  id          Int      @id @default(autoincrement())
+  ip          String   @db.VarChar(45)
+  attemptedAt DateTime @default(now()) @map("attempted_at")
+  success     Boolean  @default(false)
+
+  @@index([ip, attemptedAt])
+  @@map("admin_login_attempts")
+}

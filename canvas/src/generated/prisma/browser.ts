@@ -77,3 +77,8 @@ export type ImageTask = Prisma.ImageTaskModel
  * 
  */
 export type AdminUserAuditLog = Prisma.AdminUserAuditLogModel
+/**
+ * Model AdminLoginAttempt
+ * 
+ */
+export type AdminLoginAttempt = Prisma.AdminLoginAttemptModel

@@ -127,13 +127,21 @@ const groups: SettingGroup[] = [
   },
   {
     title: "安全",
-    description: "管理员账号",
+    description: "管理员账号 + 密码",
     fields: [
+      {
+        key: "admin_username",
+        label: "管理员账号",
+        type: "text",
+        placeholder: "admin",
+        hint: "4-32 字符，仅字母数字下划线，留空表示不修改",
+      },
       {
         key: "admin_password",
         label: "管理员密码",
         type: "password",
         placeholder: "留空表示不修改",
+        hint: "保存时自动 bcrypt 加密存储；旧明文密码登录后将自动迁移",
       },
     ],
   },
@@ -154,20 +162,22 @@ export default function AdminSettingsPage() {
   } | null>(null);
 
   useEffect(() => {
-    fetchSettings();
-  }, []);
-
-  async function fetchSettings() {
-    try {
-      const res = await fetch("/api/admin/settings");
-      const data = await res.json();
-      if (data.success) {
-        setValues(data.data);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/admin/settings");
+        const data = await res.json();
+        if (!cancelled && data.success) {
+          setValues(data.data);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();

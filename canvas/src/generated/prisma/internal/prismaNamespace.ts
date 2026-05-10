@@ -401,7 +401,8 @@ export const ModelName = {
   EmailToken: 'EmailToken',
   RegistrationAttempt: 'RegistrationAttempt',
   ImageTask: 'ImageTask',
-  AdminUserAuditLog: 'AdminUserAuditLog'
+  AdminUserAuditLog: 'AdminUserAuditLog',
+  AdminLoginAttempt: 'AdminLoginAttempt'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "systemSetting" | "apiKey" | "usageRecord" | "galleryImage" | "category" | "promptTemplate" | "stylePreset" | "user" | "emailToken" | "registrationAttempt" | "imageTask" | "adminUserAuditLog"
+    modelProps: "systemSetting" | "apiKey" | "usageRecord" | "galleryImage" | "category" | "promptTemplate" | "stylePreset" | "user" | "emailToken" | "registrationAttempt" | "imageTask" | "adminUserAuditLog" | "adminLoginAttempt"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1213,6 +1214,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AdminLoginAttempt: {
+      payload: Prisma.$AdminLoginAttemptPayload<ExtArgs>
+      fields: Prisma.AdminLoginAttemptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AdminLoginAttemptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminLoginAttemptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AdminLoginAttemptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminLoginAttemptPayload>
+        }
+        findFirst: {
+          args: Prisma.AdminLoginAttemptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminLoginAttemptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AdminLoginAttemptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminLoginAttemptPayload>
+        }
+        findMany: {
+          args: Prisma.AdminLoginAttemptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminLoginAttemptPayload>[]
+        }
+        create: {
+          args: Prisma.AdminLoginAttemptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminLoginAttemptPayload>
+        }
+        createMany: {
+          args: Prisma.AdminLoginAttemptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.AdminLoginAttemptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminLoginAttemptPayload>
+        }
+        update: {
+          args: Prisma.AdminLoginAttemptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminLoginAttemptPayload>
+        }
+        deleteMany: {
+          args: Prisma.AdminLoginAttemptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AdminLoginAttemptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.AdminLoginAttemptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminLoginAttemptPayload>
+        }
+        aggregate: {
+          args: Prisma.AdminLoginAttemptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAdminLoginAttempt>
+        }
+        groupBy: {
+          args: Prisma.AdminLoginAttemptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminLoginAttemptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AdminLoginAttemptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminLoginAttemptCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1427,6 +1494,16 @@ export const AdminUserAuditLogScalarFieldEnum = {
 export type AdminUserAuditLogScalarFieldEnum = (typeof AdminUserAuditLogScalarFieldEnum)[keyof typeof AdminUserAuditLogScalarFieldEnum]
 
 
+export const AdminLoginAttemptScalarFieldEnum = {
+  id: 'id',
+  ip: 'ip',
+  attemptedAt: 'attemptedAt',
+  success: 'success'
+} as const
+
+export type AdminLoginAttemptScalarFieldEnum = (typeof AdminLoginAttemptScalarFieldEnum)[keyof typeof AdminLoginAttemptScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1552,6 +1629,13 @@ export const AdminUserAuditLogOrderByRelevanceFieldEnum = {
 } as const
 
 export type AdminUserAuditLogOrderByRelevanceFieldEnum = (typeof AdminUserAuditLogOrderByRelevanceFieldEnum)[keyof typeof AdminUserAuditLogOrderByRelevanceFieldEnum]
+
+
+export const AdminLoginAttemptOrderByRelevanceFieldEnum = {
+  ip: 'ip'
+} as const
+
+export type AdminLoginAttemptOrderByRelevanceFieldEnum = (typeof AdminLoginAttemptOrderByRelevanceFieldEnum)[keyof typeof AdminLoginAttemptOrderByRelevanceFieldEnum]
 
 
 
@@ -1700,6 +1784,7 @@ export type GlobalOmitConfig = {
   registrationAttempt?: Prisma.RegistrationAttemptOmit
   imageTask?: Prisma.ImageTaskOmit
   adminUserAuditLog?: Prisma.AdminUserAuditLogOmit
+  adminLoginAttempt?: Prisma.AdminLoginAttemptOmit
 }
 
 /* Types for Logging */

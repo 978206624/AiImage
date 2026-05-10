@@ -60,7 +60,8 @@ export const ModelName = {
   EmailToken: 'EmailToken',
   RegistrationAttempt: 'RegistrationAttempt',
   ImageTask: 'ImageTask',
-  AdminUserAuditLog: 'AdminUserAuditLog'
+  AdminUserAuditLog: 'AdminUserAuditLog',
+  AdminLoginAttempt: 'AdminLoginAttempt'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -254,6 +255,16 @@ export const AdminUserAuditLogScalarFieldEnum = {
 export type AdminUserAuditLogScalarFieldEnum = (typeof AdminUserAuditLogScalarFieldEnum)[keyof typeof AdminUserAuditLogScalarFieldEnum]
 
 
+export const AdminLoginAttemptScalarFieldEnum = {
+  id: 'id',
+  ip: 'ip',
+  attemptedAt: 'attemptedAt',
+  success: 'success'
+} as const
+
+export type AdminLoginAttemptScalarFieldEnum = (typeof AdminLoginAttemptScalarFieldEnum)[keyof typeof AdminLoginAttemptScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -379,4 +390,11 @@ export const AdminUserAuditLogOrderByRelevanceFieldEnum = {
 } as const
 
 export type AdminUserAuditLogOrderByRelevanceFieldEnum = (typeof AdminUserAuditLogOrderByRelevanceFieldEnum)[keyof typeof AdminUserAuditLogOrderByRelevanceFieldEnum]
+
+
+export const AdminLoginAttemptOrderByRelevanceFieldEnum = {
+  ip: 'ip'
+} as const
+
+export type AdminLoginAttemptOrderByRelevanceFieldEnum = (typeof AdminLoginAttemptOrderByRelevanceFieldEnum)[keyof typeof AdminLoginAttemptOrderByRelevanceFieldEnum]
 
