@@ -14,14 +14,19 @@ interface GalleryImage {
 
 export default function Home() {
   const [featured, setFeatured] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    setLoading(true);
     fetch("/api/gallery?featured=true&limit=5")
       .then((r) => r.json())
       .then((res) => {
         if (res.success) setFeatured(res.data?.images || []);
+        else setError("获取精选数据失败");
       })
-      .catch(() => {});
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -113,7 +118,7 @@ export default function Home() {
       </section>
 
       {/* Featured */}
-      {featured.length > 0 && (
+      {!error && (loading || featured.length > 0) && (
         <section className="px-8 py-24 max-w-5xl mx-auto">
           <h2
             className="text-2xl font-light tracking-tight mb-2"
@@ -124,28 +129,41 @@ export default function Home() {
           <p className="text-sm text-muted mb-10">
             社区精选 AI 生成作品，hover 查看提示词
           </p>
-          <div className="grid grid-cols-4 grid-rows-2 gap-3 h-[480px]">
-            {featured.slice(0, 5).map((img, i) => (
-              <div
-                key={img.id}
-                className={`relative group rounded-lg overflow-hidden ${
-                  i === 0 ? "col-span-2 row-span-2" : ""
-                }`}
-              >
-                <img
-                  src={img.imageUrl}
-                  alt={img.prompt}
-                  className="w-full h-full object-cover"
+          {loading ? (
+            <div className="grid grid-cols-4 grid-rows-2 gap-3 h-[480px]">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`rounded-lg bg-surface2 animate-pulse ${
+                    i === 0 ? "col-span-2 row-span-2" : ""
+                  }`}
                 />
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
-                  <span className="text-xs text-accent mb-1">{img.model}</span>
-                  <p className="text-sm text-white/90 line-clamp-3">
-                    {img.prompt}
-                  </p>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 grid-rows-2 gap-3 h-[480px]">
+              {featured.slice(0, 5).map((img, i) => (
+                <div
+                  key={img.id}
+                  className={`relative group rounded-lg overflow-hidden ${
+                    i === 0 ? "col-span-2 row-span-2" : ""
+                  }`}
+                >
+                  <img
+                    src={img.imageUrl}
+                    alt={img.prompt}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
+                    <span className="text-xs text-accent mb-1">{img.model}</span>
+                    <p className="text-sm text-white/90 line-clamp-3">
+                      {img.prompt}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       )}
 
