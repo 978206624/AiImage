@@ -94,3 +94,8 @@ export type EmailToken = Prisma.EmailTokenModel
  * 
  */
 export type RegistrationAttempt = Prisma.RegistrationAttemptModel
+/**
+ * Model AdminUserAuditLog
+ * 
+ */
+export type AdminUserAuditLog = Prisma.AdminUserAuditLogModel

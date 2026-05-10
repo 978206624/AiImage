@@ -58,7 +58,8 @@ export const ModelName = {
   StylePreset: 'StylePreset',
   User: 'User',
   EmailToken: 'EmailToken',
-  RegistrationAttempt: 'RegistrationAttempt'
+  RegistrationAttempt: 'RegistrationAttempt',
+  AdminUserAuditLog: 'AdminUserAuditLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -213,6 +214,18 @@ export const RegistrationAttemptScalarFieldEnum = {
 export type RegistrationAttemptScalarFieldEnum = (typeof RegistrationAttemptScalarFieldEnum)[keyof typeof RegistrationAttemptScalarFieldEnum]
 
 
+export const AdminUserAuditLogScalarFieldEnum = {
+  id: 'id',
+  adminId: 'adminId',
+  targetUserId: 'targetUserId',
+  action: 'action',
+  payload: 'payload',
+  createdAt: 'createdAt'
+} as const
+
+export type AdminUserAuditLogScalarFieldEnum = (typeof AdminUserAuditLogScalarFieldEnum)[keyof typeof AdminUserAuditLogScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -313,4 +326,12 @@ export const RegistrationAttemptOrderByRelevanceFieldEnum = {
 } as const
 
 export type RegistrationAttemptOrderByRelevanceFieldEnum = (typeof RegistrationAttemptOrderByRelevanceFieldEnum)[keyof typeof RegistrationAttemptOrderByRelevanceFieldEnum]
+
+
+export const AdminUserAuditLogOrderByRelevanceFieldEnum = {
+  action: 'action',
+  payload: 'payload'
+} as const
+
+export type AdminUserAuditLogOrderByRelevanceFieldEnum = (typeof AdminUserAuditLogOrderByRelevanceFieldEnum)[keyof typeof AdminUserAuditLogOrderByRelevanceFieldEnum]
 

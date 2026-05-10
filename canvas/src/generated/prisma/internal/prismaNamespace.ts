@@ -399,7 +399,8 @@ export const ModelName = {
   StylePreset: 'StylePreset',
   User: 'User',
   EmailToken: 'EmailToken',
-  RegistrationAttempt: 'RegistrationAttempt'
+  RegistrationAttempt: 'RegistrationAttempt',
+  AdminUserAuditLog: 'AdminUserAuditLog'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -415,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "systemSetting" | "apiKey" | "usageRecord" | "galleryImage" | "category" | "promptTemplate" | "stylePreset" | "user" | "emailToken" | "registrationAttempt"
+    modelProps: "systemSetting" | "apiKey" | "usageRecord" | "galleryImage" | "category" | "promptTemplate" | "stylePreset" | "user" | "emailToken" | "registrationAttempt" | "adminUserAuditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1079,6 +1080,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AdminUserAuditLog: {
+      payload: Prisma.$AdminUserAuditLogPayload<ExtArgs>
+      fields: Prisma.AdminUserAuditLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AdminUserAuditLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserAuditLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AdminUserAuditLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserAuditLogPayload>
+        }
+        findFirst: {
+          args: Prisma.AdminUserAuditLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserAuditLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AdminUserAuditLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserAuditLogPayload>
+        }
+        findMany: {
+          args: Prisma.AdminUserAuditLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserAuditLogPayload>[]
+        }
+        create: {
+          args: Prisma.AdminUserAuditLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserAuditLogPayload>
+        }
+        createMany: {
+          args: Prisma.AdminUserAuditLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.AdminUserAuditLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserAuditLogPayload>
+        }
+        update: {
+          args: Prisma.AdminUserAuditLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserAuditLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.AdminUserAuditLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AdminUserAuditLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.AdminUserAuditLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdminUserAuditLogPayload>
+        }
+        aggregate: {
+          args: Prisma.AdminUserAuditLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAdminUserAuditLog>
+        }
+        groupBy: {
+          args: Prisma.AdminUserAuditLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminUserAuditLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AdminUserAuditLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdminUserAuditLogCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1254,6 +1321,18 @@ export const RegistrationAttemptScalarFieldEnum = {
 export type RegistrationAttemptScalarFieldEnum = (typeof RegistrationAttemptScalarFieldEnum)[keyof typeof RegistrationAttemptScalarFieldEnum]
 
 
+export const AdminUserAuditLogScalarFieldEnum = {
+  id: 'id',
+  adminId: 'adminId',
+  targetUserId: 'targetUserId',
+  action: 'action',
+  payload: 'payload',
+  createdAt: 'createdAt'
+} as const
+
+export type AdminUserAuditLogScalarFieldEnum = (typeof AdminUserAuditLogScalarFieldEnum)[keyof typeof AdminUserAuditLogScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1354,6 +1433,14 @@ export const RegistrationAttemptOrderByRelevanceFieldEnum = {
 } as const
 
 export type RegistrationAttemptOrderByRelevanceFieldEnum = (typeof RegistrationAttemptOrderByRelevanceFieldEnum)[keyof typeof RegistrationAttemptOrderByRelevanceFieldEnum]
+
+
+export const AdminUserAuditLogOrderByRelevanceFieldEnum = {
+  action: 'action',
+  payload: 'payload'
+} as const
+
+export type AdminUserAuditLogOrderByRelevanceFieldEnum = (typeof AdminUserAuditLogOrderByRelevanceFieldEnum)[keyof typeof AdminUserAuditLogOrderByRelevanceFieldEnum]
 
 
 
@@ -1500,6 +1587,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   emailToken?: Prisma.EmailTokenOmit
   registrationAttempt?: Prisma.RegistrationAttemptOmit
+  adminUserAuditLog?: Prisma.AdminUserAuditLogOmit
 }
 
 /* Types for Logging */

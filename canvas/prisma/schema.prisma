@@ -149,3 +149,15 @@ model RegistrationAttempt {
   @@index([ip, createdAt])
   @@map("registration_attempts")
 }
+
+model AdminUserAuditLog {
+  id            Int      @id @default(autoincrement())
+  adminId       Int      @default(0) @map("admin_id")
+  targetUserId  Int      @map("target_user_id")
+  action        String   @db.VarChar(40)
+  payload       String   @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([targetUserId, createdAt])
+  @@map("admin_user_audit_log")
+}
