@@ -176,7 +176,7 @@ export default function Home() {
           准备好开始创作了吗？
         </h2>
         <p className="text-muted mb-8 max-w-md mx-auto">
-          从模板库获取灵感，或直接输入你的创意提示词
+          从画廊获取灵感，或直接输入你的创意提示词
         </p>
         <div className="flex justify-center gap-4">
           <Link
@@ -186,10 +186,10 @@ export default function Home() {
             开始创作
           </Link>
           <Link
-            href="/templates"
+            href="/gallery"
             className="px-6 py-2.5 text-sm text-fg border border-border rounded-md hover:bg-surface2 transition-colors"
           >
-            浏览模板库
+            逛画廊
           </Link>
         </div>
       </section>

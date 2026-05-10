@@ -182,7 +182,7 @@ export function useGeneration() {
       quality: Quality;
       count: number;
       referenceImages: ReferenceImage[];
-      stylePresetId: number | null;
+      presetIds?: number[];
     }) => {
       if (!params.prompt.trim()) {
         setState((s) => ({
@@ -211,7 +211,7 @@ export function useGeneration() {
             quality: params.quality,
             count: params.count,
             referenceImages: refUrls,
-            stylePresetId: params.stylePresetId,
+            presetIds: params.presetIds?.length ? params.presetIds : undefined,
           }),
         });
 

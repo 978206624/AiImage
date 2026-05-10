@@ -39,6 +39,5 @@ export const GENERATION_COUNTS = [1, 2, 4] as const;
 export const NAV_LINKS = [
   { href: "/", label: "首页" },
   { href: "/gallery", label: "画廊" },
-  { href: "/templates", label: "模板库" },
   { href: "/generate", label: "生图" },
 ] as const;

@@ -1,10 +1,18 @@
 "use client";
 
+interface Category {
+  id: number;
+  name: string;
+}
+
 interface GalleryFiltersProps {
   selectedModel: string | null;
   selectedStyle: string | null;
+  selectedCategoryId: number | null;
+  categories: Category[];
   onModelChange: (model: string | null) => void;
   onStyleChange: (style: string | null) => void;
+  onCategoryChange: (id: number | null) => void;
 }
 
 const MODEL_FILTERS = [
@@ -23,44 +31,83 @@ const STYLE_FILTERS = [
   { label: "极简", value: "极简" },
 ];
 
+function ChipRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="shrink-0 text-[10px] font-mono uppercase tracking-[.08em] text-muted w-10">
+        {label}
+      </span>
+      <div className="flex items-center gap-1.5 flex-wrap">{children}</div>
+    </div>
+  );
+}
+
 export function GalleryFilters({
   selectedModel,
   selectedStyle,
+  selectedCategoryId,
+  categories,
   onModelChange,
   onStyleChange,
+  onCategoryChange,
 }: GalleryFiltersProps) {
+  const chipClass = (active: boolean) =>
+    `px-3 py-1.5 text-xs rounded-full border transition-colors ${
+      active
+        ? "bg-accent text-bg border-accent"
+        : "border-border text-muted hover:text-fg hover:border-fg/30"
+    }`;
+
   return (
     <div className="sticky top-[var(--nav)] z-30 bg-bg/80 backdrop-blur-md border-b border-border py-3 px-8">
-      <div className="flex items-center gap-3 flex-wrap">
-        {MODEL_FILTERS.map((f) => (
-    <button
-            key={f.label}
-            onClick={() => onModelChange(f.value)}
-            className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
-              selectedModel === f.value
-                ? "bg-accent text-bg border-accent"
-                : "border-border text-muted hover:text-fg hover:border-fg/30"
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
+      <div className="flex flex-col gap-2.5">
+        <ChipRow label="模型">
+          {MODEL_FILTERS.map((f) => (
+            <button
+              key={f.label}
+              onClick={() => onModelChange(f.value)}
+              className={chipClass(selectedModel === f.value)}
+            >
+              {f.label}
+            </button>
+          ))}
+        </ChipRow>
 
-        <div className="w-px h-5 bg-border mx-1" />
+        <ChipRow label="风格">
+          {STYLE_FILTERS.map((f) => (
+            <button
+              key={f.label}
+              onClick={() => onStyleChange(f.value)}
+              className={chipClass(selectedStyle === f.value)}
+            >
+              {f.label}
+            </button>
+          ))}
+        </ChipRow>
 
-        {STYLE_FILTERS.map((f) => (
+        <ChipRow label="分类">
           <button
-            key={f.label}
-            onClick={() => onStyleChange(f.value)}
-            className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
-              selectedStyle === f.value
-                ? "bg-accent text-bg border-accent"
-                : "border-border text-muted hover:text-fg hover:border-fg/30"
-            }`}
+            onClick={() => onCategoryChange(null)}
+            className={chipClass(selectedCategoryId === null)}
           >
-            {f.label}
+            全部
           </button>
-        ))}
+          {categories.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => onCategoryChange(c.id)}
+              className={chipClass(selectedCategoryId === c.id)}
+            >
+              {c.name}
+            </button>
+          ))}
+        </ChipRow>
       </div>
     </div>
   );

@@ -8,6 +8,8 @@ interface GalleryImage {
   prompt: string;
   modelTag: string;
   styleTag: string;
+  title: string | null;
+  category: { id: number; name: string } | null;
   width: number | null;
   height: number | null;
 }

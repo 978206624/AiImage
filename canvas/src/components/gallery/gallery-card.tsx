@@ -10,6 +10,8 @@ interface GalleryCardProps {
     prompt: string;
     modelTag: string;
     styleTag: string;
+    title: string | null;
+    category: { id: number; name: string } | null;
     width: number | null;
     height: number | null;
   };
@@ -49,9 +51,16 @@ export function GalleryCard({ image }: GalleryCardProps) {
         />
       </div>
       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-between p-4">
-        <span className="self-start px-2 py-0.5 text-[10px] rounded bg-accent/20 text-accent">
-          {image.modelTag}
-        </span>
+        <div className="flex items-start justify-between gap-2">
+          {image.title && (
+            <span className="text-xs text-white font-medium line-clamp-1">
+              {image.title}
+            </span>
+          )}
+          <span className="shrink-0 ml-auto px-2 py-0.5 text-[10px] rounded bg-accent/20 text-accent">
+            {image.modelTag}
+          </span>
+        </div>
         <div className="space-y-2">
           <p className="text-xs text-white/80 line-clamp-3 leading-relaxed">
             {image.prompt}

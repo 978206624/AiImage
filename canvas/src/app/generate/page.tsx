@@ -6,11 +6,11 @@ import { ModelSelector } from "@/components/generate/model-selector";
 import { PromptInput } from "@/components/generate/prompt-input";
 import { ReferenceImages } from "@/components/generate/reference-images";
 import type { ReferenceImage } from "@/components/generate/reference-images";
-import { QuickTemplates } from "@/components/generate/quick-templates";
 import { ParamPanel } from "@/components/generate/param-panel";
 import { GenerationResult } from "@/components/generate/generation-result";
 import { LoginPromptModal } from "@/components/generate/login-prompt-modal";
 import { InsufficientBalanceModal } from "@/components/generate/insufficient-balance-modal";
+import { StylePickerModal } from "@/components/generate/style-picker-modal";
 import { RecentHistory } from "@/components/generate/recent-history";
 import type { HistoryItem } from "@/components/generate/recent-history";
 import { useGeneration } from "@/hooks/use-generation";
@@ -57,10 +57,11 @@ function GenerateContent() {
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>("2:3");
   const [quality, setQuality] = useState<Quality>("medium");
   const [count, setCount] = useState(1);
-  const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
+  const [selectedPresetIds, setSelectedPresetIds] = useState<number[]>([]);
 
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [balanceModalOpen, setBalanceModalOpen] = useState(false);
+  const [stylePickerOpen, setStylePickerOpen] = useState(false);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
   const handleReuse = useCallback(
@@ -72,7 +73,11 @@ function GenerateContent() {
       if (item.count === 1 || item.count === 2 || item.count === 4) {
         setCount(item.count);
       }
-      setSelectedPresetId(item.stylePresetId);
+      if (item.stylePresetId) {
+        setSelectedPresetIds([item.stylePresetId]);
+      } else {
+        setSelectedPresetIds([]);
+      }
       setReferenceImages(
         item.referenceImages.map((url, idx) => ({
           id: `reuse-${Date.now()}-${idx}`,
@@ -88,12 +93,6 @@ function GenerateContent() {
   useEffect(() => {
     const p = searchParams.get("prompt");
     if (p) setPrompt(decodeURIComponent(p));
-
-    const presets = searchParams.get("presets");
-    if (presets) {
-      const ids = presets.split(",").map(Number).filter(Boolean);
-      if (ids.length > 0) setSelectedPresetId(ids[0]);
-    }
   }, [searchParams]);
 
   useEffect(() => {
@@ -127,6 +126,16 @@ function GenerateContent() {
     }
   }, [error, errorCode, toast]);
 
+  const handleStyleApply = (ids: number[], prefixes: string[]) => {
+    setSelectedPresetIds(ids);
+    if (prefixes.length > 0) {
+      const prefix = prefixes.join("\n");
+      const cleaned = prompt.trimStart();
+      setPrompt(cleaned ? `${prefix}\n${cleaned}` : prefix);
+    }
+    setStylePickerOpen(false);
+  };
+
   const handleGenerate = () => {
     if (!user) {
       setLoginModalOpen(true);
@@ -144,7 +153,7 @@ function GenerateContent() {
       quality,
       count,
       referenceImages,
-      stylePresetId: selectedPresetId,
+      presetIds: selectedPresetIds,
     });
   };
 
@@ -191,15 +200,19 @@ function GenerateContent() {
             </span>
           </div>
 
-          <PromptInput value={prompt} onChange={setPrompt} disabled={loading} />
+          <PromptInput
+            value={prompt}
+            onChange={setPrompt}
+            disabled={loading}
+            styleCount={selectedPresetIds.length}
+            onStyleClick={() => setStylePickerOpen(true)}
+          />
 
           <ReferenceImages
             images={referenceImages}
             onChange={setReferenceImages}
             disabled={loading}
           />
-
-          <QuickTemplates onApply={(p) => setPrompt(p)} />
 
           <button
             onClick={handleGenerate}
@@ -218,15 +231,19 @@ function GenerateContent() {
             aspectRatio={aspectRatio}
             quality={quality}
             count={count}
-            selectedPresetId={selectedPresetId}
             onAspectRatioChange={setAspectRatio}
             onQualityChange={setQuality}
             onCountChange={setCount}
-            onPresetChange={setSelectedPresetId}
           />
         </aside>
       </div>
 
+      <StylePickerModal
+        open={stylePickerOpen}
+        selectedIds={selectedPresetIds}
+        onApply={handleStyleApply}
+        onClose={() => setStylePickerOpen(false)}
+      />
       <LoginPromptModal
         open={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
