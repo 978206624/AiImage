@@ -6,7 +6,9 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { href: "/admin/keys", label: "Key 管理" },
   { href: "/admin/gallery", label: "画廊管理" },
+  { href: "/admin/categories", label: "分类管理" },
   { href: "/admin/templates", label: "模板管理" },
+  { href: "/admin/presets", label: "预设管理" },
   { href: "/admin/settings", label: "系统设置" },
 ];
 
