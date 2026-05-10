@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ASPECT_RATIOS } from "@/lib/constants";
 import type { AspectRatio, Quality } from "@/lib/size-map";
 
 interface StylePreset {
@@ -21,15 +22,6 @@ interface ParamPanelProps {
   onCountChange: (v: number) => void;
   onPresetChange: (id: number | null) => void;
 }
-
-const RATIOS: { value: AspectRatio; label: string; w: number; h: number }[] = [
-  { value: "2:3", label: "2∶3", w: 18, h: 24 },
-  { value: "1:1", label: "1∶1", w: 22, h: 22 },
-  { value: "16:9", label: "16∶9", w: 26, h: 16 },
-  { value: "9:16", label: "9∶16", w: 18, h: 26 },
-  { value: "4:3", label: "4∶3", w: 24, h: 18 },
-  { value: "3:4", label: "3∶4", w: 18, h: 24 },
-];
 
 const QUALITY_LABELS: Record<Quality, string> = {
   low: "1K",
@@ -91,7 +83,7 @@ export function ParamPanel({
           画面比例
         </div>
         <div className="grid grid-cols-3 gap-[5px]">
-          {RATIOS.map((r) => (
+          {ASPECT_RATIOS.map((r) => (
             <button
               key={r.value}
               onClick={() => onAspectRatioChange(r.value)}
@@ -106,8 +98,8 @@ export function ParamPanel({
                   aspectRatio === r.value ? "opacity-100" : "opacity-45"
                 }`}
                 style={{
-                  width: r.w,
-                  height: r.h,
+                  width: r.iconW,
+                  height: r.iconH,
                   background:
                     aspectRatio === r.value ? "var(--accent)" : "var(--muted)",
                 }}

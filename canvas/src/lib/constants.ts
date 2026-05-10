@@ -20,12 +20,12 @@ export const MODELS = [
 ] as const;
 
 export const ASPECT_RATIOS = [
-  { label: "2:3", value: "2:3" },
-  { label: "1:1", value: "1:1" },
-  { label: "16:9", value: "16:9" },
-  { label: "9:16", value: "9:16" },
-  { label: "4:3", value: "4:3" },
-  { label: "3:4", value: "3:4" },
+  { value: "2:3", label: "2∶3", iconW: 18, iconH: 24 },
+  { value: "1:1", label: "1∶1", iconW: 22, iconH: 22 },
+  { value: "16:9", label: "16∶9", iconW: 26, iconH: 16 },
+  { value: "9:16", label: "9∶16", iconW: 18, iconH: 26 },
+  { value: "4:3", label: "4∶3", iconW: 24, iconH: 18 },
+  { value: "3:4", label: "3∶4", iconW: 18, iconH: 24 },
 ] as const;
 
 export const QUALITY_OPTIONS = [
