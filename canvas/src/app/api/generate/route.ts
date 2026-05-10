@@ -102,8 +102,8 @@ export async function POST(request: Request) {
     const promptSummary = prompt.slice(0, 200);
 
     let billingSuccess = true;
-    try {
-      await prisma.$transaction([
+    const runBillingTx = () =>
+      prisma.$transaction([
         prisma.apiKey.update({
           where: { id: apiKey.id },
           data: {
@@ -122,9 +122,21 @@ export async function POST(request: Request) {
           })
         ),
       ]);
-    } catch (txError) {
-      console.error("billing transaction failed:", txError);
-      billingSuccess = false;
+
+    try {
+      await runBillingTx();
+    } catch (firstErr) {
+      try {
+        await runBillingTx();
+      } catch (retryErr) {
+        console.error("billing transaction failed after retry:", {
+          apiKeyId: apiKey.id,
+          actualCost,
+          imageCount: images.length,
+          error: retryErr instanceof Error ? retryErr.message : retryErr,
+        });
+        billingSuccess = false;
+      }
     }
 
     const newRemaining = billingSuccess ? remaining - actualCost : remaining;
