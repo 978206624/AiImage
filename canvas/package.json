@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "ali-oss": "^6.23.0",
     "dotenv": "^17.4.2",
     "jose": "^6.2.3",
     "next": "16.2.6",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/ali-oss": "^6.23.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

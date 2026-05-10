@@ -1,0 +1,128 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import ImageUploader from "@/components/admin/image-uploader";
+
+const MODEL_TAGS = ["GPT-4o Image", "Google Imagen 3"];
+const STYLE_TAGS = ["写实", "动漫", "油画", "赛博朋克", "水墨", "极简"];
+
+interface GalleryFormData {
+  imageUrl: string;
+  prompt: string;
+  modelTag: string;
+  styleTag: string;
+}
+
+interface GalleryModalProps {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (data: GalleryFormData) => Promise<void>;
+  initial?: GalleryFormData;
+  title: string;
+}
+
+export default function GalleryModal({
+  open,
+  onClose,
+  onSubmit,
+  initial,
+  title,
+}: GalleryModalProps) {
+  const [form, setForm] = useState<GalleryFormData>(
+    initial || { imageUrl: "", prompt: "", modelTag: MODEL_TAGS[0], styleTag: STYLE_TAGS[0] }
+  );
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!form.imageUrl) {
+        alert("请上传图片");
+        return;
+      }
+      setSubmitting(true);
+      try {
+        await onSubmit(form);
+        onClose();
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [form, onSubmit, onClose]
+  );
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative bg-surface border border-border rounded-xl w-full max-w-lg p-6 shadow-xl">
+        <h2 className="text-fg font-medium text-lg mb-4">{title}</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm text-muted mb-1.5">图片</label>
+            <ImageUploader
+              value={form.imageUrl}
+              onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-muted mb-1.5">Prompt</label>
+            <textarea
+              value={form.prompt}
+              onChange={(e) => setForm((f) => ({ ...f, prompt: e.target.value }))}
+              rows={3}
+              className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-fg text-sm resize-none focus:outline-none focus:border-accent"
+              placeholder="描述这张图片的提示词..."
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-muted mb-1.5">模型标签</label>
+              <select
+                value={form.modelTag}
+                onChange={(e) => setForm((f) => ({ ...f, modelTag: e.target.value }))}
+                className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-fg text-sm focus:outline-none focus:border-accent"
+              >
+                {MODEL_TAGS.map((tag) => (
+                  <option key={tag} value={tag}>{tag}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm text-muted mb-1.5">风格标签</label>
+              <select
+                value={form.styleTag}
+                onChange={(e) => setForm((f) => ({ ...f, styleTag: e.target.value }))}
+                className="w-full px-3 py-2 bg-bg border border-border rounded-lg text-fg text-sm focus:outline-none focus:border-accent"
+              >
+                {STYLE_TAGS.map((tag) => (
+                  <option key={tag} value={tag}>{tag}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-sm text-muted hover:text-fg transition-colors"
+            >
+              取消
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-4 py-2 text-sm bg-accent text-white rounded-lg hover:bg-accent/90 disabled:opacity-50"
+            >
+              {submitting ? "保存中..." : "保存"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
