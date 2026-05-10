@@ -207,7 +207,7 @@ export default function HistoryPage() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-3">
               {filteredItems.map((item, idx) => (
                 <HistoryCard
                   key={item.id}
@@ -293,64 +293,77 @@ function HistoryCard({ item, onView, onDownload, onReuse }: HistoryCardProps) {
     <div className="border border-border rounded-[var(--r)] overflow-hidden bg-surface">
       <button
         onClick={onView}
-        className="block w-full aspect-square relative group bg-bg"
+        className="block w-full aspect-square relative group bg-surface2"
       >
         {item.imageUrl ? (
           <Image
             src={item.imageUrl}
             alt={item.promptSummary || ""}
             fill
-            sizes="(max-width: 768px) 50vw, 25vw"
-            className="object-cover"
+            sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, (max-width: 1280px) 14vw, 12vw"
+            className="object-contain"
             unoptimized
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-muted text-xs">
+          <div className="absolute inset-0 flex items-center justify-center text-muted text-[10px]">
             无图
           </div>
         )}
         {!item.isPersisted && (
-          <span className="absolute top-2 right-2 px-1.5 py-0.5 bg-yellow-900/80 text-yellow-200 border border-yellow-700/50 text-[10px] rounded">
-            可能过期
+          <span className="absolute top-1 right-1 px-1 py-0.5 bg-yellow-900/80 text-yellow-200 border border-yellow-700/50 text-[9px] rounded">
+            过期
           </span>
         )}
       </button>
-      <div className="p-3">
+      <div className="p-2">
         <p
-          className="text-xs text-fg/90 line-clamp-2 leading-relaxed mb-2 min-h-[2.4em]"
+          className="text-[11px] text-fg/90 line-clamp-1 leading-tight mb-1.5"
           title={item.prompt || item.promptSummary || ""}
         >
           {item.promptSummary || "无提示词"}
         </p>
-        <div className="flex items-center gap-2 mb-3 flex-wrap">
+        <div className="flex items-center gap-1.5 mb-2 flex-wrap">
           {item.aspectRatio && (
-            <span className="font-mono text-[10px] text-muted px-1.5 py-0.5 bg-bg rounded">
+            <span className="font-mono text-[9px] text-muted px-1 py-0.5 bg-bg rounded">
               {item.aspectRatio}
             </span>
           )}
-          <span className="font-mono text-[10px] text-muted">
+          <span className="font-mono text-[9px] text-muted">
             {formatDate(item.createdAt)}
           </span>
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex gap-1">
           <button
             onClick={onView}
-            className="flex-1 px-2 py-1 text-[11px] text-muted border border-border rounded hover:text-fg hover:border-accent transition-colors"
+            title="查看"
+            className="flex-1 h-6 flex items-center justify-center text-muted border border-border rounded hover:text-fg hover:border-accent transition-colors"
           >
-            查看
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
           </button>
           <button
             onClick={onDownload}
-            className="flex-1 px-2 py-1 text-[11px] text-muted border border-border rounded hover:text-fg hover:border-accent transition-colors"
+            title="下载"
             disabled={!item.imageUrl}
+            className="flex-1 h-6 flex items-center justify-center text-muted border border-border rounded hover:text-fg hover:border-accent transition-colors disabled:opacity-40"
           >
-            下载
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
           </button>
           <button
             onClick={onReuse}
-            className="flex-1 px-2 py-1 text-[11px] text-accent border border-accent-b rounded hover:bg-accent-d transition-colors"
+            title="复用参数"
+            className="flex-1 h-6 flex items-center justify-center text-accent border border-accent-b rounded hover:bg-accent-d transition-colors"
           >
-            复用
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="23 4 23 10 17 10" />
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+            </svg>
           </button>
         </div>
       </div>
