@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { maskEmail } from "@/lib/mask";
 
 interface ApiKey {
   id: number;
@@ -12,6 +13,22 @@ interface ApiKey {
   status: string;
   lastUsedAt: string | null;
   createdAt: string;
+  redeemedAt: string | null;
+  redeemedByUserId: number | null;
+  redeemedByEmail: string | null;
+}
+
+function statusLabel(k: ApiKey) {
+  if (k.redeemedByUserId) {
+    return { text: "已兑换", cls: "bg-blue-900/30 text-blue-400" };
+  }
+  if (k.status === "active") {
+    return { text: "未使用", cls: "bg-green-900/30 text-green-400" };
+  }
+  if (k.status === "redeemed") {
+    return { text: "已兑换", cls: "bg-blue-900/30 text-blue-400" };
+  }
+  return { text: "已禁用", cls: "bg-red-900/30 text-red-400" };
 }
 
 export default function AdminKeysPage() {
@@ -86,7 +103,7 @@ export default function AdminKeysPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-lg font-medium text-fg">Key 管理</h1>
+        <h1 className="text-lg font-medium text-fg">充值码管理</h1>
         <button
           onClick={() => {
             setShowGenerate(true);
@@ -115,7 +132,7 @@ export default function AdminKeysPage() {
               </div>
               <div>
                 <label className="block text-sm text-muted mb-1">
-                  每个 Key 积分
+                  每个充值码积分
                 </label>
                 <input
                   type="number"
@@ -144,7 +161,7 @@ export default function AdminKeysPage() {
             <div>
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm text-fg">
-                  已生成 {generatedKeys.length} 个 Key
+                  已生成 {generatedKeys.length} 个充值码
                 </span>
                 <div className="flex gap-2">
                   <button
@@ -174,7 +191,7 @@ export default function AdminKeysPage() {
           <thead>
             <tr className="bg-surface border-b border-border">
               <th className="text-left px-4 py-3 text-muted font-medium">
-                Key
+                充值码
               </th>
               <th className="text-left px-4 py-3 text-muted font-medium">
                 总积分
@@ -184,6 +201,12 @@ export default function AdminKeysPage() {
               </th>
               <th className="text-left px-4 py-3 text-muted font-medium">
                 状态
+              </th>
+              <th className="text-left px-4 py-3 text-muted font-medium">
+                使用者
+              </th>
+              <th className="text-left px-4 py-3 text-muted font-medium">
+                使用时间
               </th>
               <th className="text-left px-4 py-3 text-muted font-medium">
                 创建时间
@@ -196,57 +219,88 @@ export default function AdminKeysPage() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-muted">
+                <td colSpan={8} className="px-4 py-8 text-center text-muted">
                   加载中...
                 </td>
               </tr>
             ) : keys.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-muted">
-                  暂无 Key，点击"批量生成"创建
+                <td colSpan={8} className="px-4 py-8 text-center text-muted">
+                  暂无充值码，点击&ldquo;批量生成&rdquo;创建
                 </td>
               </tr>
             ) : (
-              keys.map((k) => (
-                <tr
-                  key={k.id}
-                  className="border-b border-border hover:bg-surface2 transition-colors"
-                >
-                  <td className="px-4 py-3 font-mono text-xs">{k.key}</td>
-                  <td className="px-4 py-3">{k.totalCredits}</td>
-                  <td className="px-4 py-3">{k.remainingCredits.toFixed(2)}</td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`inline-block px-2 py-0.5 rounded text-xs ${
-                        k.status === "active"
-                          ? "bg-green-900/30 text-green-400"
-                          : "bg-red-900/30 text-red-400"
-                      }`}
-                    >
-                      {k.status === "active" ? "启用" : "禁用"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-muted">
-                    {new Date(k.createdAt).toLocaleDateString("zh-CN")}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleToggleStatus(k.id, k.status)}
-                        className="text-xs text-muted hover:text-fg"
+              keys.map((k) => {
+                const sl = statusLabel(k);
+                const isLegacy =
+                  !k.redeemedByUserId && k.status !== "active" && !k.redeemedAt;
+                return (
+                  <tr
+                    key={k.id}
+                    className="border-b border-border hover:bg-surface2 transition-colors"
+                  >
+                    <td className="px-4 py-3 font-mono text-xs">
+                      {k.key}
+                      {isLegacy && (
+                        <span className="ml-2 px-1.5 py-0.5 bg-yellow-900/30 text-yellow-400 text-[10px] rounded">
+                          v1.0 老 Key
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">{k.totalCredits}</td>
+                    <td className="px-4 py-3">
+                      {k.remainingCredits.toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded text-xs ${sl.cls}`}
                       >
-                        {k.status === "active" ? "禁用" : "启用"}
-                      </button>
-                      <Link
-                        href={`/admin/keys/${k.id}`}
-                        className="text-xs text-accent hover:opacity-80"
-                      >
-                        详情
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                        {sl.text}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-muted">
+                      {k.redeemedByEmail ? (
+                        <Link
+                          href={`/admin/users/${k.redeemedByUserId}`}
+                          className="text-accent hover:opacity-80"
+                        >
+                          {maskEmail(k.redeemedByEmail)}
+                        </Link>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-muted">
+                      {k.redeemedAt
+                        ? new Date(k.redeemedAt).toLocaleString("zh-CN")
+                        : "-"}
+                    </td>
+                    <td className="px-4 py-3 text-muted">
+                      {new Date(k.createdAt).toLocaleDateString("zh-CN")}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2">
+                        {!k.redeemedByUserId && (
+                          <button
+                            onClick={() =>
+                              handleToggleStatus(k.id, k.status)
+                            }
+                            className="text-xs text-muted hover:text-fg"
+                          >
+                            {k.status === "active" ? "禁用" : "启用"}
+                          </button>
+                        )}
+                        <Link
+                          href={`/admin/keys/${k.id}`}
+                          className="text-xs text-accent hover:opacity-80"
+                        >
+                          详情
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

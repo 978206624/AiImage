@@ -22,6 +22,9 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
       skip,
       take: pageSize,
+      include: {
+        redeemedUser: { select: { id: true, email: true } },
+      },
     }),
     prisma.apiKey.count(),
   ]);
@@ -38,6 +41,9 @@ export async function GET(request: Request) {
         status: k.status,
         lastUsedAt: k.lastUsedAt,
         createdAt: k.createdAt,
+        redeemedAt: k.redeemedAt,
+        redeemedByUserId: k.redeemedUser?.id ?? null,
+        redeemedByEmail: k.redeemedUser?.email ?? null,
       })),
       total,
       page,
