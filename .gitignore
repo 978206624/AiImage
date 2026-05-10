@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+
+# Prisma
+canvas/src/generated/
+
+# Planning docs (not in git)
+Product-Spec.md
+Product-Spec-CHANGELOG.md
+Design-Brief.md
+DEV-PLAN.md
+
+# Claude framework
+.claude/
