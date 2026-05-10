@@ -55,29 +55,34 @@ model UsageRecord {
 }
 
 model GalleryImage {
-  id          Int      @id @default(autoincrement())
-  imageUrl    String   @map("image_url") @db.Text
-  prompt      String?  @db.Text
-  modelTag    String   @map("model_tag") @db.VarChar(50)
-  styleTag    String   @map("style_tag") @db.VarChar(50)
+  id          Int       @id @default(autoincrement())
+  imageUrl    String    @map("image_url") @db.Text
+  prompt      String?   @db.Text
+  modelTag    String    @map("model_tag") @db.VarChar(50)
+  styleTag    String    @map("style_tag") @db.VarChar(50)
+  title       String?   @db.VarChar(100)
+  categoryId  Int?      @map("category_id")
   width       Int?
   height      Int?
-  isFeatured  Boolean  @default(false) @map("is_featured")
-  isPublished Boolean  @default(true) @map("is_published")
-  sortOrder   Int      @default(0) @map("sort_order")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  isFeatured  Boolean   @default(false) @map("is_featured")
+  isPublished Boolean   @default(true) @map("is_published")
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  category    Category? @relation(fields: [categoryId], references: [id])
 
+  @@index([categoryId])
   @@map("gallery_images")
 }
 
 model Category {
-  id        Int              @id @default(autoincrement())
-  name      String           @db.VarChar(50)
-  sortOrder Int              @default(0) @map("sort_order")
-  createdAt DateTime         @default(now()) @map("created_at")
-  updatedAt DateTime         @updatedAt @map("updated_at")
-  templates PromptTemplate[]
+  id            Int              @id @default(autoincrement())
+  name          String           @db.VarChar(50)
+  sortOrder     Int              @default(0) @map("sort_order")
+  createdAt     DateTime         @default(now()) @map("created_at")
+  updatedAt     DateTime         @updatedAt @map("updated_at")
+  templates     PromptTemplate[]
+  galleryImages GalleryImage[]
 
   @@map("categories")
 }

@@ -1367,6 +1367,8 @@ export const GalleryImageScalarFieldEnum = {
   prompt: 'prompt',
   modelTag: 'modelTag',
   styleTag: 'styleTag',
+  title: 'title',
+  categoryId: 'categoryId',
   width: 'width',
   height: 'height',
   isFeatured: 'isFeatured',
@@ -1551,7 +1553,8 @@ export const GalleryImageOrderByRelevanceFieldEnum = {
   imageUrl: 'imageUrl',
   prompt: 'prompt',
   modelTag: 'modelTag',
-  styleTag: 'styleTag'
+  styleTag: 'styleTag',
+  title: 'title'
 } as const
 
 export type GalleryImageOrderByRelevanceFieldEnum = (typeof GalleryImageOrderByRelevanceFieldEnum)[keyof typeof GalleryImageOrderByRelevanceFieldEnum]

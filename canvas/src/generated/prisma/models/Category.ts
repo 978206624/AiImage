@@ -221,6 +221,7 @@ export type CategoryWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Category"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Category"> | Date | string
   templates?: Prisma.PromptTemplateListRelationFilter
+  galleryImages?: Prisma.GalleryImageListRelationFilter
 }
 
 export type CategoryOrderByWithRelationInput = {
@@ -230,6 +231,7 @@ export type CategoryOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   templates?: Prisma.PromptTemplateOrderByRelationAggregateInput
+  galleryImages?: Prisma.GalleryImageOrderByRelationAggregateInput
   _relevance?: Prisma.CategoryOrderByRelevanceInput
 }
 
@@ -243,6 +245,7 @@ export type CategoryWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Category"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Category"> | Date | string
   templates?: Prisma.PromptTemplateListRelationFilter
+  galleryImages?: Prisma.GalleryImageListRelationFilter
 }, "id">
 
 export type CategoryOrderByWithAggregationInput = {
@@ -275,6 +278,7 @@ export type CategoryCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   templates?: Prisma.PromptTemplateCreateNestedManyWithoutCategoryInput
+  galleryImages?: Prisma.GalleryImageCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUncheckedCreateInput = {
@@ -284,6 +288,7 @@ export type CategoryUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   templates?: Prisma.PromptTemplateUncheckedCreateNestedManyWithoutCategoryInput
+  galleryImages?: Prisma.GalleryImageUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUpdateInput = {
@@ -292,6 +297,7 @@ export type CategoryUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   templates?: Prisma.PromptTemplateUpdateManyWithoutCategoryNestedInput
+  galleryImages?: Prisma.GalleryImageUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryUncheckedUpdateInput = {
@@ -301,6 +307,7 @@ export type CategoryUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   templates?: Prisma.PromptTemplateUncheckedUpdateManyWithoutCategoryNestedInput
+  galleryImages?: Prisma.GalleryImageUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryCreateManyInput = {
@@ -324,6 +331,11 @@ export type CategoryUncheckedUpdateManyInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type CategoryNullableScalarRelationFilter = {
+  is?: Prisma.CategoryWhereInput | null
+  isNot?: Prisma.CategoryWhereInput | null
 }
 
 export type CategoryOrderByRelevanceInput = {
@@ -371,6 +383,22 @@ export type CategoryScalarRelationFilter = {
   isNot?: Prisma.CategoryWhereInput
 }
 
+export type CategoryCreateNestedOneWithoutGalleryImagesInput = {
+  create?: Prisma.XOR<Prisma.CategoryCreateWithoutGalleryImagesInput, Prisma.CategoryUncheckedCreateWithoutGalleryImagesInput>
+  connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutGalleryImagesInput
+  connect?: Prisma.CategoryWhereUniqueInput
+}
+
+export type CategoryUpdateOneWithoutGalleryImagesNestedInput = {
+  create?: Prisma.XOR<Prisma.CategoryCreateWithoutGalleryImagesInput, Prisma.CategoryUncheckedCreateWithoutGalleryImagesInput>
+  connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutGalleryImagesInput
+  upsert?: Prisma.CategoryUpsertWithoutGalleryImagesInput
+  disconnect?: Prisma.CategoryWhereInput | boolean
+  delete?: Prisma.CategoryWhereInput | boolean
+  connect?: Prisma.CategoryWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CategoryUpdateToOneWithWhereWithoutGalleryImagesInput, Prisma.CategoryUpdateWithoutGalleryImagesInput>, Prisma.CategoryUncheckedUpdateWithoutGalleryImagesInput>
+}
+
 export type CategoryCreateNestedOneWithoutTemplatesInput = {
   create?: Prisma.XOR<Prisma.CategoryCreateWithoutTemplatesInput, Prisma.CategoryUncheckedCreateWithoutTemplatesInput>
   connectOrCreate?: Prisma.CategoryCreateOrConnectWithoutTemplatesInput
@@ -385,11 +413,62 @@ export type CategoryUpdateOneRequiredWithoutTemplatesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CategoryUpdateToOneWithWhereWithoutTemplatesInput, Prisma.CategoryUpdateWithoutTemplatesInput>, Prisma.CategoryUncheckedUpdateWithoutTemplatesInput>
 }
 
+export type CategoryCreateWithoutGalleryImagesInput = {
+  name: string
+  sortOrder?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  templates?: Prisma.PromptTemplateCreateNestedManyWithoutCategoryInput
+}
+
+export type CategoryUncheckedCreateWithoutGalleryImagesInput = {
+  id?: number
+  name: string
+  sortOrder?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  templates?: Prisma.PromptTemplateUncheckedCreateNestedManyWithoutCategoryInput
+}
+
+export type CategoryCreateOrConnectWithoutGalleryImagesInput = {
+  where: Prisma.CategoryWhereUniqueInput
+  create: Prisma.XOR<Prisma.CategoryCreateWithoutGalleryImagesInput, Prisma.CategoryUncheckedCreateWithoutGalleryImagesInput>
+}
+
+export type CategoryUpsertWithoutGalleryImagesInput = {
+  update: Prisma.XOR<Prisma.CategoryUpdateWithoutGalleryImagesInput, Prisma.CategoryUncheckedUpdateWithoutGalleryImagesInput>
+  create: Prisma.XOR<Prisma.CategoryCreateWithoutGalleryImagesInput, Prisma.CategoryUncheckedCreateWithoutGalleryImagesInput>
+  where?: Prisma.CategoryWhereInput
+}
+
+export type CategoryUpdateToOneWithWhereWithoutGalleryImagesInput = {
+  where?: Prisma.CategoryWhereInput
+  data: Prisma.XOR<Prisma.CategoryUpdateWithoutGalleryImagesInput, Prisma.CategoryUncheckedUpdateWithoutGalleryImagesInput>
+}
+
+export type CategoryUpdateWithoutGalleryImagesInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  templates?: Prisma.PromptTemplateUpdateManyWithoutCategoryNestedInput
+}
+
+export type CategoryUncheckedUpdateWithoutGalleryImagesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  templates?: Prisma.PromptTemplateUncheckedUpdateManyWithoutCategoryNestedInput
+}
+
 export type CategoryCreateWithoutTemplatesInput = {
   name: string
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  galleryImages?: Prisma.GalleryImageCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryUncheckedCreateWithoutTemplatesInput = {
@@ -398,6 +477,7 @@ export type CategoryUncheckedCreateWithoutTemplatesInput = {
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  galleryImages?: Prisma.GalleryImageUncheckedCreateNestedManyWithoutCategoryInput
 }
 
 export type CategoryCreateOrConnectWithoutTemplatesInput = {
@@ -421,6 +501,7 @@ export type CategoryUpdateWithoutTemplatesInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  galleryImages?: Prisma.GalleryImageUpdateManyWithoutCategoryNestedInput
 }
 
 export type CategoryUncheckedUpdateWithoutTemplatesInput = {
@@ -429,6 +510,7 @@ export type CategoryUncheckedUpdateWithoutTemplatesInput = {
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  galleryImages?: Prisma.GalleryImageUncheckedUpdateManyWithoutCategoryNestedInput
 }
 
 
@@ -438,10 +520,12 @@ export type CategoryUncheckedUpdateWithoutTemplatesInput = {
 
 export type CategoryCountOutputType = {
   templates: number
+  galleryImages: number
 }
 
 export type CategoryCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   templates?: boolean | CategoryCountOutputTypeCountTemplatesArgs
+  galleryImages?: boolean | CategoryCountOutputTypeCountGalleryImagesArgs
 }
 
 /**
@@ -461,6 +545,13 @@ export type CategoryCountOutputTypeCountTemplatesArgs<ExtArgs extends runtime.Ty
   where?: Prisma.PromptTemplateWhereInput
 }
 
+/**
+ * CategoryCountOutputType without action
+ */
+export type CategoryCountOutputTypeCountGalleryImagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GalleryImageWhereInput
+}
+
 
 export type CategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -469,6 +560,7 @@ export type CategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   createdAt?: boolean
   updatedAt?: boolean
   templates?: boolean | Prisma.Category$templatesArgs<ExtArgs>
+  galleryImages?: boolean | Prisma.Category$galleryImagesArgs<ExtArgs>
   _count?: boolean | Prisma.CategoryCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["category"]>
 
@@ -485,6 +577,7 @@ export type CategorySelectScalar = {
 export type CategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["category"]>
 export type CategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   templates?: boolean | Prisma.Category$templatesArgs<ExtArgs>
+  galleryImages?: boolean | Prisma.Category$galleryImagesArgs<ExtArgs>
   _count?: boolean | Prisma.CategoryCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -492,6 +585,7 @@ export type $CategoryPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   name: "Category"
   objects: {
     templates: Prisma.$PromptTemplatePayload<ExtArgs>[]
+    galleryImages: Prisma.$GalleryImagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -840,6 +934,7 @@ readonly fields: CategoryFieldRefs;
 export interface Prisma__CategoryClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   templates<T extends Prisma.Category$templatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Category$templatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PromptTemplatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  galleryImages<T extends Prisma.Category$galleryImagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Category$galleryImagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GalleryImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1238,6 +1333,30 @@ export type Category$templatesArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.PromptTemplateScalarFieldEnum | Prisma.PromptTemplateScalarFieldEnum[]
+}
+
+/**
+ * Category.galleryImages
+ */
+export type Category$galleryImagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the GalleryImage
+   */
+  select?: Prisma.GalleryImageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the GalleryImage
+   */
+  omit?: Prisma.GalleryImageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GalleryImageInclude<ExtArgs> | null
+  where?: Prisma.GalleryImageWhereInput
+  orderBy?: Prisma.GalleryImageOrderByWithRelationInput | Prisma.GalleryImageOrderByWithRelationInput[]
+  cursor?: Prisma.GalleryImageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GalleryImageScalarFieldEnum | Prisma.GalleryImageScalarFieldEnum[]
 }
 
 /**
