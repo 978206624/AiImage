@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { Lightbox } from "@/components/ui/lightbox";
 
 export interface HistoryItem {
   id: number;
@@ -42,6 +43,7 @@ export function RecentHistory({ onReuse, refreshKey }: RecentHistoryProps) {
   const { user, loading: userLoading } = useCurrentUser();
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [previewItem, setPreviewItem] = useState<HistoryItem | null>(null);
 
   const load = useCallback(async () => {
     if (!user) {
@@ -103,35 +105,69 @@ export function RecentHistory({ onReuse, refreshKey }: RecentHistoryProps) {
       ) : (
         <div className="space-y-2">
           {items.map((item) => (
-            <button
+            <div
               key={item.id}
-              onClick={() => onReuse(item)}
-              className="w-full flex gap-2.5 items-start p-1.5 rounded hover:bg-surface transition-colors text-left"
+              className="group flex gap-2.5 items-start p-1.5 rounded hover:bg-surface transition-colors"
               title={item.prompt || item.promptSummary || ""}
             >
-              {item.imageUrl ? (
-                <Image
-                  src={item.imageUrl}
-                  alt=""
-                  width={44}
-                  height={44}
-                  className="w-11 h-11 rounded border border-border object-cover shrink-0"
-                  unoptimized
-                />
-              ) : (
-                <div className="w-11 h-11 rounded border border-border bg-bg shrink-0" />
-              )}
-              <div className="flex-1 min-w-0">
+              <button
+                type="button"
+                onClick={() => item.imageUrl && setPreviewItem(item)}
+                disabled={!item.imageUrl}
+                className="relative w-11 h-11 shrink-0 rounded border border-border overflow-hidden bg-bg group/thumb hover:border-accent transition-colors"
+                aria-label="预览大图"
+              >
+                {item.imageUrl ? (
+                  <>
+                    <Image
+                      src={item.imageUrl}
+                      alt=""
+                      width={44}
+                      height={44}
+                      className="w-full h-full object-cover"
+                      unoptimized
+                    />
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover/thumb:opacity-100 transition-opacity">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        className="text-white"
+                      >
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    </span>
+                  </>
+                ) : null}
+              </button>
+              <button
+                type="button"
+                onClick={() => onReuse(item)}
+                className="flex-1 min-w-0 text-left"
+              >
                 <div className="text-[11px] text-fg/90 truncate leading-relaxed">
                   {item.promptSummary || "无提示词"}
                 </div>
                 <div className="font-mono text-[10px] text-muted mt-0.5 tracking-[.04em]">
-                  {timeAgo(item.createdAt)}
+                  {timeAgo(item.createdAt)} · 复用参数
                 </div>
-              </div>
-            </button>
+              </button>
+            </div>
           ))}
         </div>
+      )}
+
+      {previewItem?.imageUrl && (
+        <Lightbox
+          src={previewItem.imageUrl}
+          prompt={previewItem.prompt || previewItem.promptSummary || undefined}
+          model={previewItem.modelTag}
+          onClose={() => setPreviewItem(null)}
+        />
       )}
     </div>
   );
