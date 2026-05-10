@@ -9,11 +9,12 @@ interface GenerationResultProps {
   count: number;
 }
 
+const TILE_SIZE = 140;
+
 function gridStyle(cols: number) {
-  if (cols <= 1)
-    return { gridTemplateColumns: "1fr", maxWidth: "280px" } as const;
-  if (cols <= 2) return { gridTemplateColumns: "1fr 1fr" } as const;
-  return { gridTemplateColumns: "repeat(4, 1fr)" } as const;
+  return {
+    gridTemplateColumns: `repeat(${cols}, ${TILE_SIZE}px)`,
+  } as const;
 }
 
 export function GenerationResult({
@@ -52,8 +53,7 @@ export function GenerationResult({
           {Array.from({ length: count }).map((_, i) => (
             <div
               key={i}
-              className="rounded-[var(--r)] bg-surface2 animate-pulse"
-              style={{ aspectRatio: "2 / 3" }}
+              className="rounded-[var(--r)] bg-surface2 animate-pulse aspect-square"
             />
           ))}
         </div>
@@ -84,14 +84,13 @@ export function GenerationResult({
         {images.map((url, i) => (
           <div
             key={i}
-            className="group relative rounded-[var(--r)] overflow-hidden border border-transparent hover:border-accent transition-colors cursor-pointer"
-            style={{ aspectRatio: "2 / 3" }}
+            className="group relative rounded-[var(--r)] overflow-hidden border border-transparent hover:border-accent transition-colors cursor-pointer aspect-square bg-surface2"
             onClick={() => setLightboxIndex(i)}
           >
             <img
               src={url}
               alt={`生成结果 ${i + 1}`}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
             <div
               className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-fg"
