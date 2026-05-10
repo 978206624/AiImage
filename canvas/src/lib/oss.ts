@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import OSS from "ali-oss";
 import { getRequiredSetting, getSetting } from "./system-settings";
 
 interface OssConfig {
@@ -89,5 +90,34 @@ export async function generateUploadCredentials(
 
 export async function getPublicUrl(key: string): Promise<string> {
   const config = await getOssConfig();
+  return `${buildHost(config.bucket, config.endpoint)}/${key}`;
+}
+
+async function buildOssClient(): Promise<{ client: OSS; config: OssConfig }> {
+  const config = await getOssConfig();
+  const endpoint = config.endpoint.startsWith("http")
+    ? config.endpoint
+    : `https://${config.endpoint}`;
+  const client = new OSS({
+    accessKeyId: config.accessKeyId,
+    accessKeySecret: config.accessKeySecret,
+    bucket: config.bucket,
+    endpoint,
+    secure: true,
+  });
+  return { client, config };
+}
+
+export async function uploadBuffer(
+  key: string,
+  buffer: Buffer,
+  contentType?: string
+): Promise<string> {
+  const { client, config } = await buildOssClient();
+  await client.put(
+    key,
+    buffer,
+    contentType ? { mime: contentType } : undefined
+  );
   return `${buildHost(config.bucket, config.endpoint)}/${key}`;
 }

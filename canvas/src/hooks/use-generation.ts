@@ -132,6 +132,12 @@ async function uploadReferenceImages(
   const urls: string[] = [];
 
   for (const img of images) {
+    if (img.url) {
+      urls.push(img.url);
+      continue;
+    }
+    if (!img.file) continue;
+
     const credRes = await fetch("/api/upload", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

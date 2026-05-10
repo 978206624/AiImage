@@ -74,11 +74,6 @@ export function ModelSelector({ selected, onSelect }: ModelSelectorProps) {
           </button>
         );
       })}
-      <div className="h-px bg-border my-5" />
-      <div className="font-mono text-[10px] tracking-[.1em] uppercase text-muted mb-4">
-        历史记录
-      </div>
-      <div className="text-xs text-muted">暂无历史记录</div>
     </div>
   );
 }

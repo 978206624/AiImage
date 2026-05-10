@@ -6,6 +6,7 @@ import { getSize } from "@/lib/size-map";
 import type { AspectRatio, Quality } from "@/lib/size-map";
 import { getSetting } from "@/lib/system-settings";
 import { requireUser, AuthError } from "@/lib/c-auth";
+import { persistImage } from "@/lib/image-persist";
 
 interface GenerateRequest {
   prompt: string;
@@ -110,6 +111,11 @@ export async function POST(request: Request) {
       );
     }
 
+    const persisted = await Promise.all(
+      images.map((src) => persistImage(src, user.id))
+    );
+    const finalImages = persisted.map((p) => p.url);
+
     const actualCost = creditsPerImage * images.length;
     const promptSummary = prompt.slice(0, 200);
     const paramsJson = JSON.stringify({
@@ -132,12 +138,13 @@ export async function POST(request: Request) {
           select: { balance: true },
         });
         await tx.usageRecord.createMany({
-          data: images.map((imageUrl) => ({
+          data: persisted.map((p) => ({
             userId: user.id,
             apiKeyId: null,
             creditsUsed: new Prisma.Decimal(creditsPerImage),
             promptSummary,
-            imageUrl,
+            imageUrl: p.url,
+            isPersisted: p.isPersisted,
             paramsJson,
           })),
         });
@@ -162,7 +169,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      images,
+      images: finalImages,
       errors: errors.length > 0 ? errors : undefined,
       creditsUsed: billingSuccess ? actualCost : 0,
       remainingCredits: newBalance,

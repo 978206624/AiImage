@@ -4,8 +4,9 @@ import { useCallback, useRef, useState } from "react";
 
 interface ReferenceImage {
   id: string;
-  file: File;
   preview: string;
+  file?: File;
+  url?: string;
 }
 
 interface ReferenceImagesProps {
@@ -71,7 +72,7 @@ export function ReferenceImages({
   const handleRemove = useCallback(
     (id: string) => {
       const img = images.find((i) => i.id === id);
-      if (img) URL.revokeObjectURL(img.preview);
+      if (img?.file) URL.revokeObjectURL(img.preview);
       onChange(images.filter((i) => i.id !== id));
     },
     [images, onChange]

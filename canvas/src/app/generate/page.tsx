@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
+import { useCallback, useEffect, useState, Suspense } from "react";
 import { ModelSelector } from "@/components/generate/model-selector";
 import { PromptInput } from "@/components/generate/prompt-input";
 import { ReferenceImages } from "@/components/generate/reference-images";
@@ -11,12 +11,32 @@ import { ParamPanel } from "@/components/generate/param-panel";
 import { GenerationResult } from "@/components/generate/generation-result";
 import { LoginPromptModal } from "@/components/generate/login-prompt-modal";
 import { InsufficientBalanceModal } from "@/components/generate/insufficient-balance-modal";
+import { RecentHistory } from "@/components/generate/recent-history";
+import type { HistoryItem } from "@/components/generate/recent-history";
 import { useGeneration } from "@/hooks/use-generation";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useToast } from "@/components/ui/toast";
 import type { AspectRatio, Quality } from "@/lib/size-map";
 
 const CREDITS_PER_IMAGE = 0.07;
+const REUSE_KEY = "canvas_reuse_params";
+
+const VALID_ASPECT: AspectRatio[] = [
+  "2:3",
+  "1:1",
+  "16:9",
+  "9:16",
+  "4:3",
+  "3:4",
+];
+const VALID_QUALITY: Quality[] = ["low", "medium", "high"];
+
+function isAspectRatio(v: unknown): v is AspectRatio {
+  return typeof v === "string" && VALID_ASPECT.includes(v as AspectRatio);
+}
+function isQuality(v: unknown): v is Quality {
+  return typeof v === "string" && VALID_QUALITY.includes(v as Quality);
+}
 
 function GenerateContent() {
   const searchParams = useSearchParams();
@@ -42,6 +62,29 @@ function GenerateContent() {
 
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [balanceModalOpen, setBalanceModalOpen] = useState(false);
+  const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
+
+  const handleReuse = useCallback(
+    (item: HistoryItem) => {
+      if (item.prompt) setPrompt(item.prompt);
+      else if (item.promptSummary) setPrompt(item.promptSummary);
+      if (isAspectRatio(item.aspectRatio)) setAspectRatio(item.aspectRatio);
+      if (isQuality(item.quality)) setQuality(item.quality);
+      if (item.count === 1 || item.count === 2 || item.count === 4) {
+        setCount(item.count);
+      }
+      setSelectedPresetId(item.stylePresetId);
+      setReferenceImages(
+        item.referenceImages.map((url, idx) => ({
+          id: `reuse-${Date.now()}-${idx}`,
+          preview: url,
+          url,
+        }))
+      );
+      toast("已复用历史参数", "success");
+    },
+    [toast]
+  );
 
   useEffect(() => {
     const p = searchParams.get("prompt");
@@ -53,6 +96,25 @@ function GenerateContent() {
       if (ids.length > 0) setSelectedPresetId(ids[0]);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = sessionStorage.getItem(REUSE_KEY);
+    if (!raw) return;
+    sessionStorage.removeItem(REUSE_KEY);
+    try {
+      const item = JSON.parse(raw) as HistoryItem;
+      handleReuse(item);
+    } catch {
+      // ignore
+    }
+  }, [handleReuse]);
+
+  useEffect(() => {
+    if (images.length > 0) {
+      setHistoryRefreshKey((k) => k + 1);
+    }
+  }, [images]);
 
   useEffect(() => {
     if (!error) return;
@@ -106,9 +168,14 @@ function GenerateContent() {
           minHeight: "calc(100vh - var(--nav))",
         }}
       >
-        {/* Left Panel - Model Selector */}
+        {/* Left Panel - Model Selector + Recent History */}
         <aside className="border-r border-border overflow-y-auto px-[18px] py-[28px]">
           <ModelSelector selected={model} onSelect={setModel} />
+          <div className="h-px bg-border my-5" />
+          <RecentHistory
+            onReuse={handleReuse}
+            refreshKey={historyRefreshKey}
+          />
         </aside>
 
         {/* Center - Creation Area */}
