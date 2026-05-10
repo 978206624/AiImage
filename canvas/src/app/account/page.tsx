@@ -14,10 +14,13 @@ function maskEmail(email: string): string {
   return `${name[0]}***${name[name.length - 1]}@${domain}`;
 }
 
+type AccountTab = "wallet" | "security";
+
 export default function AccountPage() {
   const router = useRouter();
   const { user, loading } = useCurrentUser();
   const [refreshKey, setRefreshKey] = useState(0);
+  const [activeTab, setActiveTab] = useState<AccountTab>("wallet");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -70,24 +73,54 @@ export default function AccountPage() {
         </p>
       </section>
 
-      <section className="mb-10">
-        <h2 className="text-base font-medium text-fg mb-3">充值码兑换</h2>
-        <p className="text-xs text-muted mb-3">
-          输入淘宝购买的充值码（CV- 开头的 16 位字符）兑换为账号余额。v1.0
-          时代购买的旧 Key 同样可在此兑换。
-        </p>
-        <RedeemForm onSuccess={() => setRefreshKey((k) => k + 1)} />
-      </section>
+      <div className="flex border-b border-border mb-6">
+        {(
+          [
+            ["wallet", "钱包"],
+            ["security", "安全设置"],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key)}
+            className={`px-4 py-2 text-sm transition-colors ${
+              activeTab === key
+                ? "text-fg border-b-2 border-accent"
+                : "text-muted hover:text-fg"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
-      <section className="mb-10">
-        <h2 className="text-base font-medium text-fg mb-3">账单记录</h2>
-        <TransactionList refreshKey={refreshKey} />
-      </section>
+      {activeTab === "wallet" && (
+        <>
+          <section className="mb-10">
+            <h2 className="text-base font-medium text-fg mb-3">充值码兑换</h2>
+            <p className="text-xs text-muted mb-3">
+              输入淘宝购买的充值码（CV- 开头的 16 位字符）兑换为账号余额。v1.0
+              时代购买的旧 Key 同样可在此兑换。
+            </p>
+            <RedeemForm onSuccess={() => setRefreshKey((k) => k + 1)} />
+          </section>
 
-      <section>
-        <h2 className="text-base font-medium text-fg mb-3">安全设置</h2>
-        <ChangePasswordForm />
-      </section>
+          <section>
+            <h2 className="text-base font-medium text-fg mb-3">账单记录</h2>
+            <TransactionList refreshKey={refreshKey} />
+          </section>
+        </>
+      )}
+
+      {activeTab === "security" && (
+        <section>
+          <h2 className="text-base font-medium text-fg mb-3">修改密码</h2>
+          <p className="text-xs text-muted mb-4">
+            填写当前密码与新密码，提交后立即生效，原密码作废。
+          </p>
+          <ChangePasswordForm />
+        </section>
+      )}
     </div>
   );
 }
