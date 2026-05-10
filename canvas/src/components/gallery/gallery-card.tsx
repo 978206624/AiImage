@@ -10,6 +10,8 @@ interface GalleryCardProps {
     prompt: string;
     modelTag: string;
     styleTag: string;
+    width: number | null;
+    height: number | null;
   };
 }
 
@@ -28,14 +30,24 @@ export function GalleryCard({ image }: GalleryCardProps) {
     router.push(`/generate?prompt=${encodeURIComponent(image.prompt)}`);
   };
 
+  const aspectRatio =
+    image.width && image.height ? `${image.width} / ${image.height}` : "4 / 5";
+
   return (
     <div className="group relative rounded-lg overflow-hidden break-inside-avoid mb-3">
-      <img
-        src={image.imageUrl}
-        alt={image.prompt}
-        className="w-full block rounded-lg"
-        loading="lazy"
-      />
+      <div
+        className="w-full bg-surface2"
+        style={{ aspectRatio }}
+      >
+        <img
+          src={image.imageUrl}
+          alt={image.prompt}
+          className="w-full h-full block rounded-lg object-cover"
+          loading="lazy"
+          width={image.width ?? undefined}
+          height={image.height ?? undefined}
+        />
+      </div>
       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-between p-4">
         <span className="self-start px-2 py-0.5 text-[10px] rounded bg-accent/20 text-accent">
           {image.modelTag}

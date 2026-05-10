@@ -10,6 +10,8 @@ interface GalleryImage {
   prompt: string;
   modelTag: string;
   styleTag: string;
+  width: number | null;
+  height: number | null;
 }
 
 export default function GalleryPage() {

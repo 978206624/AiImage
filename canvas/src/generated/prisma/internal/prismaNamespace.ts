@@ -1367,6 +1367,8 @@ export const GalleryImageScalarFieldEnum = {
   prompt: 'prompt',
   modelTag: 'modelTag',
   styleTag: 'styleTag',
+  width: 'width',
+  height: 'height',
   isFeatured: 'isFeatured',
   isPublished: 'isPublished',
   sortOrder: 'sortOrder',

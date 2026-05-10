@@ -9,6 +9,8 @@ interface GalleryImage {
   prompt: string | null;
   modelTag: string;
   styleTag: string;
+  width: number | null;
+  height: number | null;
   isFeatured: boolean;
   isPublished: boolean;
   sortOrder: number;

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/auth";
+import { probeImageDimensions } from "@/lib/image-dimensions";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -29,9 +30,27 @@ export async function PUT(request: Request, { params }: RouteParams) {
   try {
     const { imageUrl, prompt, modelTag, styleTag } = await request.json();
 
+    const existing = await prisma.galleryImage.findUnique({
+      where: { id: imageId },
+      select: { imageUrl: true },
+    });
+
+    const data: Prisma.GalleryImageUpdateInput = {
+      imageUrl,
+      prompt,
+      modelTag,
+      styleTag,
+    };
+
+    if (existing && imageUrl && imageUrl !== existing.imageUrl) {
+      const dims = await probeImageDimensions(imageUrl);
+      data.width = dims?.width ?? null;
+      data.height = dims?.height ?? null;
+    }
+
     const image = await prisma.galleryImage.update({
       where: { id: imageId },
-      data: { imageUrl, prompt, modelTag, styleTag },
+      data,
     });
 
     return NextResponse.json({ success: true, data: image });

@@ -19,35 +19,35 @@ model SystemSetting {
 }
 
 model ApiKey {
-  id            Int           @id @default(autoincrement())
-  key           String        @unique @db.VarChar(20)
-  totalCredits  Decimal       @map("total_credits") @db.Decimal(10, 2)
-  usedCredits   Decimal       @default(0) @map("used_credits") @db.Decimal(10, 2)
-  status        String        @default("active") @db.VarChar(20)
-  lastUsedAt    DateTime?     @map("last_used_at")
-  redeemedBy    Int?          @map("redeemed_by")
-  redeemedAt    DateTime?     @map("redeemed_at")
-  createdAt     DateTime      @default(now()) @map("created_at")
-  updatedAt     DateTime      @updatedAt @map("updated_at")
-  redeemedUser  User?         @relation(fields: [redeemedBy], references: [id])
-  usageRecords  UsageRecord[]
+  id           Int           @id @default(autoincrement())
+  key          String        @unique @db.VarChar(20)
+  totalCredits Decimal       @map("total_credits") @db.Decimal(10, 2)
+  usedCredits  Decimal       @default(0) @map("used_credits") @db.Decimal(10, 2)
+  status       String        @default("active") @db.VarChar(20)
+  lastUsedAt   DateTime?     @map("last_used_at")
+  redeemedBy   Int?          @map("redeemed_by")
+  redeemedAt   DateTime?     @map("redeemed_at")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  redeemedUser User?         @relation(fields: [redeemedBy], references: [id])
+  usageRecords UsageRecord[]
 
   @@index([redeemedBy])
   @@map("api_keys")
 }
 
 model UsageRecord {
-  id             Int      @id @default(autoincrement())
-  apiKeyId       Int?     @map("api_key_id")
-  userId         Int?     @map("user_id")
-  creditsUsed    Decimal  @map("credits_used") @db.Decimal(10, 2)
-  promptSummary  String?  @map("prompt_summary") @db.VarChar(200)
-  imageUrl       String?  @map("image_url") @db.Text
-  paramsJson     String?  @map("params_json") @db.Text
-  isPersisted    Boolean  @default(true) @map("is_persisted")
-  createdAt      DateTime @default(now()) @map("created_at")
-  apiKey         ApiKey?  @relation(fields: [apiKeyId], references: [id])
-  user           User?    @relation(fields: [userId], references: [id])
+  id            Int      @id @default(autoincrement())
+  apiKeyId      Int?     @map("api_key_id")
+  userId        Int?     @map("user_id")
+  creditsUsed   Decimal  @map("credits_used") @db.Decimal(10, 2)
+  promptSummary String?  @map("prompt_summary") @db.VarChar(200)
+  imageUrl      String?  @map("image_url") @db.Text
+  paramsJson    String?  @map("params_json") @db.Text
+  isPersisted   Boolean  @default(true) @map("is_persisted")
+  createdAt     DateTime @default(now()) @map("created_at")
+  apiKey        ApiKey?  @relation(fields: [apiKeyId], references: [id])
+  user          User?    @relation(fields: [userId], references: [id])
 
   @@index([apiKeyId])
   @@index([userId])
@@ -60,6 +60,8 @@ model GalleryImage {
   prompt      String?  @db.Text
   modelTag    String   @map("model_tag") @db.VarChar(50)
   styleTag    String   @map("style_tag") @db.VarChar(50)
+  width       Int?
+  height      Int?
   isFeatured  Boolean  @default(false) @map("is_featured")
   isPublished Boolean  @default(true) @map("is_published")
   sortOrder   Int      @default(0) @map("sort_order")
@@ -98,7 +100,7 @@ model PromptTemplate {
 model StylePreset {
   id            Int      @id @default(autoincrement())
   name          String   @db.VarChar(100)
-  description   String?  @db.VarChar(200)
+  description   String?  @db.Text
   coverImageUrl String?  @map("cover_image_url") @db.Text
   promptPrefix  String   @map("prompt_prefix") @db.Text
   sortOrder     Int      @default(0) @map("sort_order")
@@ -109,34 +111,34 @@ model StylePreset {
 }
 
 model User {
-  id                Int           @id @default(autoincrement())
-  email             String        @unique @db.VarChar(190)
-  passwordHash      String        @map("password_hash") @db.VarChar(100)
-  balance           Decimal       @default(0) @db.Decimal(10, 2)
-  emailVerified     Boolean       @default(false) @map("email_verified")
-  hasReceivedBonus  Boolean       @default(false) @map("has_received_bonus")
-  registerIp        String?       @map("register_ip") @db.VarChar(45)
-  status            String        @default("active") @db.VarChar(20)
-  lastLoginAt       DateTime?     @map("last_login_at")
-  createdAt         DateTime      @default(now()) @map("created_at")
-  updatedAt         DateTime      @updatedAt @map("updated_at")
-  redeemedKeys      ApiKey[]
-  usageRecords      UsageRecord[]
-  emailTokens       EmailToken[]
-  imageTasks        ImageTask[]
+  id               Int           @id @default(autoincrement())
+  email            String        @unique @db.VarChar(190)
+  passwordHash     String        @map("password_hash") @db.VarChar(100)
+  balance          Decimal       @default(0) @db.Decimal(10, 2)
+  emailVerified    Boolean       @default(false) @map("email_verified")
+  hasReceivedBonus Boolean       @default(false) @map("has_received_bonus")
+  registerIp       String?       @map("register_ip") @db.VarChar(45)
+  status           String        @default("active") @db.VarChar(20)
+  lastLoginAt      DateTime?     @map("last_login_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+  redeemedKeys     ApiKey[]
+  usageRecords     UsageRecord[]
+  emailTokens      EmailToken[]
+  imageTasks       ImageTask[]
 
   @@map("users")
 }
 
 model EmailToken {
-  id         Int       @id @default(autoincrement())
-  userId     Int       @map("user_id")
-  token      String    @unique @db.VarChar(100)
-  type       String    @db.VarChar(20)
-  expiresAt  DateTime  @map("expires_at")
-  usedAt     DateTime? @map("used_at")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  token     String    @unique @db.VarChar(100)
+  type      String    @db.VarChar(20)
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("email_tokens")
@@ -152,28 +154,28 @@ model RegistrationAttempt {
 }
 
 model ImageTask {
-  id                   Int       @id @default(autoincrement())
-  userId               Int       @map("user_id")
-  groupId              String    @map("group_id") @db.VarChar(40)
-  status               String    @default("pending") @db.VarChar(20)
-  externalTaskId       String?   @map("external_task_id") @db.VarChar(120)
-  failReason           String?   @map("fail_reason") @db.Text
-  prompt               String    @db.Text
-  promptSummary        String    @map("prompt_summary") @db.VarChar(200)
-  aspectRatio          String    @map("aspect_ratio") @db.VarChar(20)
-  quality              String    @db.VarChar(20)
-  size                 String    @db.VarChar(20)
-  referenceImagesJson  String?   @map("reference_images_json") @db.Text
-  stylePresetId        Int?      @map("style_preset_id")
-  creditsLocked        Decimal   @map("credits_locked") @db.Decimal(10, 2)
-  refunded             Boolean   @default(false)
-  progress             Int       @default(0)
-  imageUrl             String?   @map("image_url") @db.Text
-  isPersisted          Boolean   @default(false) @map("is_persisted")
-  usageRecordId        Int?      @map("usage_record_id")
-  createdAt            DateTime  @default(now()) @map("created_at")
-  updatedAt            DateTime  @updatedAt @map("updated_at")
-  user                 User      @relation(fields: [userId], references: [id])
+  id                  Int      @id @default(autoincrement())
+  userId              Int      @map("user_id")
+  groupId             String   @map("group_id") @db.VarChar(40)
+  status              String   @default("pending") @db.VarChar(20)
+  externalTaskId      String?  @map("external_task_id") @db.VarChar(120)
+  failReason          String?  @map("fail_reason") @db.Text
+  prompt              String   @db.Text
+  promptSummary       String   @map("prompt_summary") @db.VarChar(200)
+  aspectRatio         String   @map("aspect_ratio") @db.VarChar(20)
+  quality             String   @db.VarChar(20)
+  size                String   @db.VarChar(20)
+  referenceImagesJson String?  @map("reference_images_json") @db.Text
+  stylePresetId       Int?     @map("style_preset_id")
+  creditsLocked       Decimal  @map("credits_locked") @db.Decimal(10, 2)
+  refunded            Boolean  @default(false)
+  progress            Int      @default(0)
+  imageUrl            String?  @map("image_url") @db.Text
+  isPersisted         Boolean  @default(false) @map("is_persisted")
+  usageRecordId       Int?     @map("usage_record_id")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  user                User     @relation(fields: [userId], references: [id])
 
   @@index([userId, createdAt])
   @@index([groupId])
@@ -182,12 +184,12 @@ model ImageTask {
 }
 
 model AdminUserAuditLog {
-  id            Int      @id @default(autoincrement())
-  adminId       Int      @default(0) @map("admin_id")
-  targetUserId  Int      @map("target_user_id")
-  action        String   @db.VarChar(40)
-  payload       String   @db.Text
-  createdAt     DateTime @default(now()) @map("created_at")
+  id           Int      @id @default(autoincrement())
+  adminId      Int      @default(0) @map("admin_id")
+  targetUserId Int      @map("target_user_id")
+  action       String   @db.VarChar(40)
+  payload      String   @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
 
   @@index([targetUserId, createdAt])
   @@map("admin_user_audit_log")

@@ -29,8 +29,6 @@ build/
 canvas/src/generated/
 
 # Planning docs (not in git)
-Product-Spec.md
-Product-Spec-CHANGELOG.md
 Design-Brief.md
 DEV-PLAN.md
 

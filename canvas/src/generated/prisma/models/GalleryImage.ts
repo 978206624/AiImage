@@ -28,11 +28,15 @@ export type AggregateGalleryImage = {
 
 export type GalleryImageAvgAggregateOutputType = {
   id: number | null
+  width: number | null
+  height: number | null
   sortOrder: number | null
 }
 
 export type GalleryImageSumAggregateOutputType = {
   id: number | null
+  width: number | null
+  height: number | null
   sortOrder: number | null
 }
 
@@ -42,6 +46,8 @@ export type GalleryImageMinAggregateOutputType = {
   prompt: string | null
   modelTag: string | null
   styleTag: string | null
+  width: number | null
+  height: number | null
   isFeatured: boolean | null
   isPublished: boolean | null
   sortOrder: number | null
@@ -55,6 +61,8 @@ export type GalleryImageMaxAggregateOutputType = {
   prompt: string | null
   modelTag: string | null
   styleTag: string | null
+  width: number | null
+  height: number | null
   isFeatured: boolean | null
   isPublished: boolean | null
   sortOrder: number | null
@@ -68,6 +76,8 @@ export type GalleryImageCountAggregateOutputType = {
   prompt: number
   modelTag: number
   styleTag: number
+  width: number
+  height: number
   isFeatured: number
   isPublished: number
   sortOrder: number
@@ -79,11 +89,15 @@ export type GalleryImageCountAggregateOutputType = {
 
 export type GalleryImageAvgAggregateInputType = {
   id?: true
+  width?: true
+  height?: true
   sortOrder?: true
 }
 
 export type GalleryImageSumAggregateInputType = {
   id?: true
+  width?: true
+  height?: true
   sortOrder?: true
 }
 
@@ -93,6 +107,8 @@ export type GalleryImageMinAggregateInputType = {
   prompt?: true
   modelTag?: true
   styleTag?: true
+  width?: true
+  height?: true
   isFeatured?: true
   isPublished?: true
   sortOrder?: true
@@ -106,6 +122,8 @@ export type GalleryImageMaxAggregateInputType = {
   prompt?: true
   modelTag?: true
   styleTag?: true
+  width?: true
+  height?: true
   isFeatured?: true
   isPublished?: true
   sortOrder?: true
@@ -119,6 +137,8 @@ export type GalleryImageCountAggregateInputType = {
   prompt?: true
   modelTag?: true
   styleTag?: true
+  width?: true
+  height?: true
   isFeatured?: true
   isPublished?: true
   sortOrder?: true
@@ -219,6 +239,8 @@ export type GalleryImageGroupByOutputType = {
   prompt: string | null
   modelTag: string
   styleTag: string
+  width: number | null
+  height: number | null
   isFeatured: boolean
   isPublished: boolean
   sortOrder: number
@@ -255,6 +277,8 @@ export type GalleryImageWhereInput = {
   prompt?: Prisma.StringNullableFilter<"GalleryImage"> | string | null
   modelTag?: Prisma.StringFilter<"GalleryImage"> | string
   styleTag?: Prisma.StringFilter<"GalleryImage"> | string
+  width?: Prisma.IntNullableFilter<"GalleryImage"> | number | null
+  height?: Prisma.IntNullableFilter<"GalleryImage"> | number | null
   isFeatured?: Prisma.BoolFilter<"GalleryImage"> | boolean
   isPublished?: Prisma.BoolFilter<"GalleryImage"> | boolean
   sortOrder?: Prisma.IntFilter<"GalleryImage"> | number
@@ -268,6 +292,8 @@ export type GalleryImageOrderByWithRelationInput = {
   prompt?: Prisma.SortOrderInput | Prisma.SortOrder
   modelTag?: Prisma.SortOrder
   styleTag?: Prisma.SortOrder
+  width?: Prisma.SortOrderInput | Prisma.SortOrder
+  height?: Prisma.SortOrderInput | Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
   isPublished?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
@@ -285,6 +311,8 @@ export type GalleryImageWhereUniqueInput = Prisma.AtLeast<{
   prompt?: Prisma.StringNullableFilter<"GalleryImage"> | string | null
   modelTag?: Prisma.StringFilter<"GalleryImage"> | string
   styleTag?: Prisma.StringFilter<"GalleryImage"> | string
+  width?: Prisma.IntNullableFilter<"GalleryImage"> | number | null
+  height?: Prisma.IntNullableFilter<"GalleryImage"> | number | null
   isFeatured?: Prisma.BoolFilter<"GalleryImage"> | boolean
   isPublished?: Prisma.BoolFilter<"GalleryImage"> | boolean
   sortOrder?: Prisma.IntFilter<"GalleryImage"> | number
@@ -298,6 +326,8 @@ export type GalleryImageOrderByWithAggregationInput = {
   prompt?: Prisma.SortOrderInput | Prisma.SortOrder
   modelTag?: Prisma.SortOrder
   styleTag?: Prisma.SortOrder
+  width?: Prisma.SortOrderInput | Prisma.SortOrder
+  height?: Prisma.SortOrderInput | Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
   isPublished?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
@@ -319,6 +349,8 @@ export type GalleryImageScalarWhereWithAggregatesInput = {
   prompt?: Prisma.StringNullableWithAggregatesFilter<"GalleryImage"> | string | null
   modelTag?: Prisma.StringWithAggregatesFilter<"GalleryImage"> | string
   styleTag?: Prisma.StringWithAggregatesFilter<"GalleryImage"> | string
+  width?: Prisma.IntNullableWithAggregatesFilter<"GalleryImage"> | number | null
+  height?: Prisma.IntNullableWithAggregatesFilter<"GalleryImage"> | number | null
   isFeatured?: Prisma.BoolWithAggregatesFilter<"GalleryImage"> | boolean
   isPublished?: Prisma.BoolWithAggregatesFilter<"GalleryImage"> | boolean
   sortOrder?: Prisma.IntWithAggregatesFilter<"GalleryImage"> | number
@@ -331,6 +363,8 @@ export type GalleryImageCreateInput = {
   prompt?: string | null
   modelTag: string
   styleTag: string
+  width?: number | null
+  height?: number | null
   isFeatured?: boolean
   isPublished?: boolean
   sortOrder?: number
@@ -344,6 +378,8 @@ export type GalleryImageUncheckedCreateInput = {
   prompt?: string | null
   modelTag: string
   styleTag: string
+  width?: number | null
+  height?: number | null
   isFeatured?: boolean
   isPublished?: boolean
   sortOrder?: number
@@ -356,6 +392,8 @@ export type GalleryImageUpdateInput = {
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelTag?: Prisma.StringFieldUpdateOperationsInput | string
   styleTag?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -369,6 +407,8 @@ export type GalleryImageUncheckedUpdateInput = {
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelTag?: Prisma.StringFieldUpdateOperationsInput | string
   styleTag?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -382,6 +422,8 @@ export type GalleryImageCreateManyInput = {
   prompt?: string | null
   modelTag: string
   styleTag: string
+  width?: number | null
+  height?: number | null
   isFeatured?: boolean
   isPublished?: boolean
   sortOrder?: number
@@ -394,6 +436,8 @@ export type GalleryImageUpdateManyMutationInput = {
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelTag?: Prisma.StringFieldUpdateOperationsInput | string
   styleTag?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -407,6 +451,8 @@ export type GalleryImageUncheckedUpdateManyInput = {
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   modelTag?: Prisma.StringFieldUpdateOperationsInput | string
   styleTag?: Prisma.StringFieldUpdateOperationsInput | string
+  width?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  height?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   isFeatured?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
@@ -426,6 +472,8 @@ export type GalleryImageCountOrderByAggregateInput = {
   prompt?: Prisma.SortOrder
   modelTag?: Prisma.SortOrder
   styleTag?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
   isPublished?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
@@ -435,6 +483,8 @@ export type GalleryImageCountOrderByAggregateInput = {
 
 export type GalleryImageAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
 }
 
@@ -444,6 +494,8 @@ export type GalleryImageMaxOrderByAggregateInput = {
   prompt?: Prisma.SortOrder
   modelTag?: Prisma.SortOrder
   styleTag?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
   isPublished?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
@@ -457,6 +509,8 @@ export type GalleryImageMinOrderByAggregateInput = {
   prompt?: Prisma.SortOrder
   modelTag?: Prisma.SortOrder
   styleTag?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   isFeatured?: Prisma.SortOrder
   isPublished?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
@@ -466,6 +520,8 @@ export type GalleryImageMinOrderByAggregateInput = {
 
 export type GalleryImageSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  width?: Prisma.SortOrder
+  height?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
 }
 
@@ -477,6 +533,8 @@ export type GalleryImageSelect<ExtArgs extends runtime.Types.Extensions.Internal
   prompt?: boolean
   modelTag?: boolean
   styleTag?: boolean
+  width?: boolean
+  height?: boolean
   isFeatured?: boolean
   isPublished?: boolean
   sortOrder?: boolean
@@ -492,6 +550,8 @@ export type GalleryImageSelectScalar = {
   prompt?: boolean
   modelTag?: boolean
   styleTag?: boolean
+  width?: boolean
+  height?: boolean
   isFeatured?: boolean
   isPublished?: boolean
   sortOrder?: boolean
@@ -499,7 +559,7 @@ export type GalleryImageSelectScalar = {
   updatedAt?: boolean
 }
 
-export type GalleryImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "imageUrl" | "prompt" | "modelTag" | "styleTag" | "isFeatured" | "isPublished" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["galleryImage"]>
+export type GalleryImageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "imageUrl" | "prompt" | "modelTag" | "styleTag" | "width" | "height" | "isFeatured" | "isPublished" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["galleryImage"]>
 
 export type $GalleryImagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "GalleryImage"
@@ -510,6 +570,8 @@ export type $GalleryImagePayload<ExtArgs extends runtime.Types.Extensions.Intern
     prompt: string | null
     modelTag: string
     styleTag: string
+    width: number | null
+    height: number | null
     isFeatured: boolean
     isPublished: boolean
     sortOrder: number
@@ -889,6 +951,8 @@ export interface GalleryImageFieldRefs {
   readonly prompt: Prisma.FieldRef<"GalleryImage", 'String'>
   readonly modelTag: Prisma.FieldRef<"GalleryImage", 'String'>
   readonly styleTag: Prisma.FieldRef<"GalleryImage", 'String'>
+  readonly width: Prisma.FieldRef<"GalleryImage", 'Int'>
+  readonly height: Prisma.FieldRef<"GalleryImage", 'Int'>
   readonly isFeatured: Prisma.FieldRef<"GalleryImage", 'Boolean'>
   readonly isPublished: Prisma.FieldRef<"GalleryImage", 'Boolean'>
   readonly sortOrder: Prisma.FieldRef<"GalleryImage", 'Int'>

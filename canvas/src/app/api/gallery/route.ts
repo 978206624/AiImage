@@ -28,6 +28,8 @@ export async function GET(request: Request) {
         prompt: true,
         modelTag: true,
         styleTag: true,
+        width: true,
+        height: true,
         isFeatured: true,
         createdAt: true,
       },

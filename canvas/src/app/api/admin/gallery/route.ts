@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/auth";
+import { probeImageDimensions } from "@/lib/image-dimensions";
 
 export async function GET(request: Request) {
   const session = await verifySession();
@@ -50,8 +51,17 @@ export async function POST(request: Request) {
       );
     }
 
+    const dims = await probeImageDimensions(imageUrl);
+
     const image = await prisma.galleryImage.create({
-      data: { imageUrl, prompt, modelTag, styleTag },
+      data: {
+        imageUrl,
+        prompt,
+        modelTag,
+        styleTag,
+        width: dims?.width,
+        height: dims?.height,
+      },
     });
 
     return NextResponse.json({ success: true, data: image });
