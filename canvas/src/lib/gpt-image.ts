@@ -36,7 +36,7 @@ export async function submitTask(params: SubmitParams): Promise<SubmitResult> {
   const { baseUrl, apiKey } = await getConfig();
 
   const body: Record<string, unknown> = {
-    model: "gpt-image-1",
+    model: "gpt-image-2",
     prompt: params.prompt,
     size: params.size,
     response_format: "url",

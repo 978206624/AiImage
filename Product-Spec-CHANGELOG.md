@@ -8,6 +8,7 @@
 - Google/Midjourney 仍为「即将支持」状态（available=false），不影响当前 OpenAI 接口调用逻辑
 - Product-Spec 中明确：当前仅 GPT-4o Image 可用，Google Nano Banana Pro 与 Midjourney V7 作为即将支持模型展示，具体 model id 以中转站文档为准
 - 前端代码同步更新模型 id、名称、描述、标签、筛选项
+- OpenAI 生图接口实际提交给中转站的模型 ID 从 `gpt-image-1` 调整为 `gpt-image-2`
 
 ---
 

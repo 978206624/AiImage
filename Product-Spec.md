@@ -327,6 +327,7 @@ CANVAS 是一个 AI 图像生成与展示平台，用户注册账号后通过充
 
 **图像生成接口（第三方中转站）**：
 - 提交任务：`POST {baseUrl}/v1/images/generations?async=true`
+- 当前 OpenAI 生图提交模型 ID 固定为 `gpt-image-2`
 - 请求体：`{ model: "gpt-image-2", prompt, size, quality, response_format: "url", image?: string[] }`
 - 返回 task_id，异步轮询获取结果
 - 轮询：`GET {baseUrl}/v1/images/tasks/{taskId}`
