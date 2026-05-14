@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import Image from "next/image";
 
 interface ReferenceImage {
   id: string;
@@ -120,10 +121,12 @@ export function ReferenceImages({
                   dragIndex === idx ? "opacity-40 scale-[.92]" : ""
                 }`}
               >
-                <img
+                <Image
                   src={img.preview}
                   alt={`参考图 ${idx + 1}`}
                   className="w-full h-full object-cover pointer-events-none"
+                  fill
+                  unoptimized
                 />
                 <button
                   onClick={() => handleRemove(img.id)}

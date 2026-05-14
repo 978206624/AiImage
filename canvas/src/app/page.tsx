@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { MODELS } from "@/lib/constants";
 
@@ -18,15 +19,17 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-    fetch("/api/gallery?featured=true&pageSize=5")
-      .then((r) => r.json())
-      .then((res) => {
-        if (res.success) setFeatured(res.data?.images || []);
-        else setError("获取精选数据失败");
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    void Promise.resolve().then(() => {
+      setLoading(true);
+      fetch("/api/gallery?featured=true&pageSize=5")
+        .then((r) => r.json())
+        .then((res) => {
+          if (res.success) setFeatured(res.data?.images || []);
+          else setError("获取精选数据失败");
+        })
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false));
+    });
   }, []);
 
   return (
@@ -149,10 +152,12 @@ export default function Home() {
                     i === 0 ? "col-span-2 row-span-2" : ""
                   }`}
                 >
-                  <img
+                  <Image
                     src={img.imageUrl}
                     alt={img.prompt}
                     className="w-full h-full object-cover"
+                    fill
+                    unoptimized
                   />
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
                     <span className="text-xs text-accent mb-1">{img.model}</span>

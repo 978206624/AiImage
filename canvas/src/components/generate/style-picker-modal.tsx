@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface StylePreset {
   id: number;
@@ -28,7 +29,9 @@ export function StylePickerModal({
 
   useEffect(() => {
     if (!open) return;
-    setLocalSelected(selectedIds);
+    void Promise.resolve().then(() => {
+      setLocalSelected(selectedIds);
+    });
   }, [open, selectedIds]);
 
   useEffect(() => {
@@ -97,10 +100,13 @@ export function StylePickerModal({
                     </span>
                   )}
                   {preset.coverImageUrl ? (
-                    <img
+                    <Image
                       src={preset.coverImageUrl}
                       alt={preset.name}
                       className="w-full aspect-[4/3] object-cover rounded mb-2"
+                      width={200}
+                      height={150}
+                      unoptimized
                     />
                   ) : (
                     <div className="w-full aspect-[4/3] rounded mb-2 bg-surface2" />

@@ -92,7 +92,9 @@ function GenerateContent() {
 
   useEffect(() => {
     const p = searchParams.get("prompt");
-    if (p) setPrompt(decodeURIComponent(p));
+    if (p) {
+      void Promise.resolve().then(() => setPrompt(decodeURIComponent(p)));
+    }
   }, [searchParams]);
 
   useEffect(() => {
@@ -102,7 +104,7 @@ function GenerateContent() {
     sessionStorage.removeItem(REUSE_KEY);
     try {
       const item = JSON.parse(raw) as HistoryItem;
-      handleReuse(item);
+      void Promise.resolve().then(() => handleReuse(item));
     } catch {
       // ignore
     }
@@ -111,19 +113,21 @@ function GenerateContent() {
   const completedCount = tasks.filter((t) => t.status === "completed").length;
   useEffect(() => {
     if (completedCount > 0) {
-      setHistoryRefreshKey((k) => k + 1);
+      void Promise.resolve().then(() => setHistoryRefreshKey((k) => k + 1));
     }
   }, [completedCount]);
 
   useEffect(() => {
     if (!error) return;
-    if (errorCode === "UNAUTHENTICATED") {
-      setLoginModalOpen(true);
-    } else if (errorCode === "INSUFFICIENT_BALANCE") {
-      setBalanceModalOpen(true);
-    } else {
-      toast(error, "error");
-    }
+    void Promise.resolve().then(() => {
+      if (errorCode === "UNAUTHENTICATED") {
+        setLoginModalOpen(true);
+      } else if (errorCode === "INSUFFICIENT_BALANCE") {
+        setBalanceModalOpen(true);
+      } else {
+        toast(error, "error");
+      }
+    });
   }, [error, errorCode, toast]);
 
   const handleStyleApply = (ids: number[], prefixes: string[]) => {
@@ -160,9 +164,9 @@ function GenerateContent() {
   const modelBadge =
     model === "gpt-4o-image"
       ? "GPT-4O IMAGE"
-      : model === "google-imagen-3"
-        ? "GOOGLE IMAGEN 3"
-        : "MIDJOURNEY V6";
+      : model === "google-nano-banana-pro"
+        ? "GOOGLE NANO BANANA PRO"
+        : "MIDJOURNEY V7";
 
   const requiredCredits = CREDITS_PER_IMAGE * count;
   const displayBalance = user?.balance ?? 0;

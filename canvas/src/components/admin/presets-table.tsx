@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import PresetModal from "@/components/admin/preset-modal";
 
 interface Preset {
@@ -39,7 +40,7 @@ export function PresetsTable() {
   }, []);
 
   useEffect(() => {
-    fetchPresets();
+    void Promise.resolve().then(() => fetchPresets());
   }, [fetchPresets]);
 
   const handleAdd = useCallback(async (data: PresetFormData) => {
@@ -116,10 +117,13 @@ export function PresetsTable() {
                 <tr key={preset.id} className="hover:bg-surface2/50">
                   <td className="px-4 py-3">
                     {preset.coverImageUrl ? (
-                      <img
+                      <Image
                         src={preset.coverImageUrl}
                         alt=""
                         className="w-12 h-12 object-cover rounded"
+                        width={48}
+                        height={48}
+                        unoptimized
                       />
                     ) : (
                       <div className="w-12 h-12 bg-surface2 rounded flex items-center justify-center text-muted text-xs">

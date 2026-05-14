@@ -9,20 +9,20 @@ interface ModelSelectorProps {
 
 const MODEL_DOT: Record<string, string> = {
   "gpt-4o-image": "oklch(62% .18 255)",
-  "google-imagen-3": "oklch(62% .2 145)",
-  "midjourney-v6": "oklch(62% .16 30)",
+  "google-nano-banana-pro": "oklch(62% .2 145)",
+  "midjourney-v7": "oklch(62% .16 30)",
 };
 
 const MODEL_TAG_BG: Record<string, string> = {
   "gpt-4o-image": "oklch(62% .18 255 / .14)",
-  "google-imagen-3": "oklch(62% .2 145 / .14)",
-  "midjourney-v6": "oklch(62% .16 30 / .14)",
+  "google-nano-banana-pro": "oklch(62% .2 145 / .14)",
+  "midjourney-v7": "oklch(62% .16 30 / .14)",
 };
 
 const MODEL_TAGS: Record<string, string> = {
   "gpt-4o-image": "原生多模态",
-  "google-imagen-3": "Imagen 3",
-  "midjourney-v6": "v6",
+  "google-nano-banana-pro": "Nano Banana Pro",
+  "midjourney-v7": "V7",
 };
 
 export function ModelSelector({ selected, onSelect }: ModelSelectorProps) {

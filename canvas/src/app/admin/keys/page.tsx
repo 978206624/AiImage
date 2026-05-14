@@ -58,7 +58,7 @@ export default function AdminKeysPage() {
   }, [page]);
 
   useEffect(() => {
-    fetchKeys();
+    void Promise.resolve().then(() => fetchKeys());
   }, [fetchKeys]);
 
   async function handleGenerate() {

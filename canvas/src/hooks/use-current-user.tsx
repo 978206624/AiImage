@@ -43,7 +43,7 @@ export function CurrentUserProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    void refresh();
+    void Promise.resolve().then(() => refresh());
   }, [refresh]);
 
   return (

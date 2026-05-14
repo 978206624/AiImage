@@ -100,7 +100,7 @@ function GalleryContent() {
   }, [selectedModel, selectedStyle, selectedCategoryId]);
 
   useEffect(() => {
-    fetchImages();
+    void Promise.resolve().then(() => fetchImages());
   }, [fetchImages]);
 
   return (

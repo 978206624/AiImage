@@ -55,9 +55,10 @@ export function Select({
   }, [open]);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    void Promise.resolve().then(() => {
       setActiveIdx(selectedIdx >= 0 ? selectedIdx : 0);
-    }
+    });
   }, [open, selectedIdx]);
 
   useEffect(() => {

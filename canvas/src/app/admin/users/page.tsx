@@ -49,7 +49,7 @@ export default function AdminUsersPage() {
   }, [page, q, statusFilter]);
 
   useEffect(() => {
-    fetchUsers();
+    void Promise.resolve().then(() => fetchUsers());
   }, [fetchUsers]);
 
   function applySearch() {

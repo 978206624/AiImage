@@ -18,7 +18,8 @@ interface GalleryFiltersProps {
 const MODEL_FILTERS = [
   { label: "全部", value: null },
   { label: "GPT-4o Image", value: "GPT-4o Image" },
-  { label: "Imagen 3", value: "Google Imagen 3" },
+  { label: "Nano Banana Pro", value: "Google Nano Banana Pro" },
+  { label: "Midjourney V7", value: "Midjourney V7" },
 ];
 
 const STYLE_FILTERS = [

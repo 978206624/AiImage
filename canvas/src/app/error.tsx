@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useId } from "react";
+import Link from "next/link";
 
 export default function GlobalError({
   error,
@@ -9,10 +10,8 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const errorId = useMemo(
-    () => error.digest || Math.random().toString(36).slice(2, 10),
-    [error.digest]
-  );
+  const fallbackId = useId();
+  const errorId = error.digest || fallbackId;
 
   useEffect(() => {
     console.error("[GlobalError]", errorId, error);
@@ -34,12 +33,12 @@ export default function GlobalError({
         >
           重试
         </button>
-        <a
+        <Link
           href="/"
           className="px-5 py-2 text-sm text-fg border border-border rounded-md hover:bg-surface2 transition-colors"
         >
           返回首页
-        </a>
+        </Link>
       </div>
       <p className="text-xs text-muted/60">
         错误 ID：<code className="font-mono">{errorId}</code>

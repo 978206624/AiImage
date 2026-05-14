@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import Image from "next/image";
 
 interface ImageUploaderProps {
   value?: string;
@@ -127,10 +128,13 @@ export default function ImageUploader({
 
       {value ? (
         <div className="relative group">
-          <img
+          <Image
             src={value}
             alt="已上传"
             className="w-full h-48 object-cover rounded-lg"
+            width={400}
+            height={192}
+            unoptimized
           />
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
             <button

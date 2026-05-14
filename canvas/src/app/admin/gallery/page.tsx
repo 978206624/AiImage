@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import GalleryModal from "@/components/admin/gallery-modal";
 import { CategoriesTable } from "@/components/admin/categories-table";
 import { PresetsTable } from "@/components/admin/presets-table";
@@ -94,7 +95,7 @@ function GalleryImagesTab() {
   }, [page]);
 
   useEffect(() => {
-    fetchImages();
+    void Promise.resolve().then(() => fetchImages());
   }, [fetchImages]);
 
   const handleAdd = useCallback(async (data: GalleryFormData) => {
@@ -188,10 +189,13 @@ function GalleryImagesTab() {
                 {images.map((img) => (
                   <tr key={img.id} className="hover:bg-surface2/50">
                     <td className="px-4 py-3">
-                      <img
+                      <Image
                         src={img.imageUrl}
                         alt=""
                         className="w-16 h-16 object-cover rounded"
+                        width={64}
+                        height={64}
+                        unoptimized
                       />
                     </td>
                     <td className="px-4 py-3 text-fg max-w-[140px] truncate">

@@ -105,10 +105,12 @@ export default function UserDetailPage() {
   }, [id]);
 
   useEffect(() => {
-    setLoading(true);
-    Promise.all([fetchDetail(), fetchTopups(), fetchUsage()]).finally(() =>
-      setLoading(false)
-    );
+    void Promise.resolve().then(() => {
+      setLoading(true);
+      Promise.all([fetchDetail(), fetchTopups(), fetchUsage()]).finally(() =>
+        setLoading(false)
+      );
+    });
   }, [fetchDetail, fetchTopups, fetchUsage]);
 
   if (loading && !user) {

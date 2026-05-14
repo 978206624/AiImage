@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { useToast } from "@/components/ui/toast";
+
 import { Lightbox } from "@/components/ui/lightbox";
 import { Select } from "@/components/ui/select";
 import type { HistoryItem } from "@/components/generate/recent-history";
@@ -74,7 +74,7 @@ async function downloadImage(url: string, filename: string) {
 export default function HistoryPage() {
   const router = useRouter();
   const { user, loading: userLoading } = useCurrentUser();
-  const { toast } = useToast();
+
 
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [page, setPage] = useState(0);
@@ -123,7 +123,7 @@ export default function HistoryPage() {
 
   useEffect(() => {
     if (user) {
-      void loadPage(1, true);
+      void Promise.resolve().then(() => loadPage(1, true));
     }
   }, [user, loadPage]);
 

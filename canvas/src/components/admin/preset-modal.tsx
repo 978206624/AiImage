@@ -32,7 +32,10 @@ export default function PresetModal({
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (initial) setForm(initial);
+    if (!initial) return;
+    void Promise.resolve().then(() => {
+      setForm(initial);
+    });
   }, [initial]);
 
   const handleSubmit = useCallback(

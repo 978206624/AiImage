@@ -57,7 +57,7 @@ export default function KeyDetailPage() {
   }, [id, page]);
 
   useEffect(() => {
-    fetchData();
+    void Promise.resolve().then(() => fetchData());
   }, [fetchData]);
 
   if (loading && !keyInfo) {

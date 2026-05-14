@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useToast } from "@/components/ui/toast";
 
 interface GalleryCardProps {
@@ -41,13 +42,14 @@ export function GalleryCard({ image }: GalleryCardProps) {
         className="w-full bg-surface2"
         style={{ aspectRatio }}
       >
-        <img
+        <Image
           src={image.imageUrl}
           alt={image.prompt}
           className="w-full h-full block rounded-lg object-cover"
           loading="lazy"
-          width={image.width ?? undefined}
-          height={image.height ?? undefined}
+          width={image.width ?? 512}
+          height={image.height ?? 512}
+          unoptimized
         />
       </div>
       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-between p-4">

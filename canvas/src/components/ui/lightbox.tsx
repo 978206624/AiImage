@@ -60,7 +60,9 @@ export function Lightbox({ src, alt, prompt, model, onClose }: LightboxProps) {
 
   // 切换 src 时重置视图
   useEffect(() => {
-    setView(INITIAL_VIEW);
+    void Promise.resolve().then(() => {
+      setView(INITIAL_VIEW);
+    });
   }, [src]);
 
   // 滚轮缩放（必须 native listener + passive:false 才能 preventDefault）

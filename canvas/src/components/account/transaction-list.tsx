@@ -103,7 +103,7 @@ export function TransactionList({ refreshKey }: { refreshKey?: number }) {
   );
 
   useEffect(() => {
-    void loadInitial(tab);
+    void Promise.resolve().then(() => loadInitial(tab));
   }, [tab, refreshKey, loadInitial]);
 
   async function loadMore() {

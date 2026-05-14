@@ -31,7 +31,7 @@ export function CategoriesTable() {
   }, []);
 
   useEffect(() => {
-    fetchCategories();
+    void Promise.resolve().then(() => fetchCategories());
   }, [fetchCategories]);
 
   const handleAdd = async () => {

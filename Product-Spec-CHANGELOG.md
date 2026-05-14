@@ -1,5 +1,16 @@
 # 变更记录
 
+## [v1.4] - 2026-05-14
+
+### 修改
+
+- 修正模型展示口径：Google Imagen 3 → Google Nano Banana Pro，Midjourney v6 → Midjourney V7
+- Google/Midjourney 仍为「即将支持」状态（available=false），不影响当前 OpenAI 接口调用逻辑
+- Product-Spec 中明确：当前仅 GPT-4o Image 可用，Google Nano Banana Pro 与 Midjourney V7 作为即将支持模型展示，具体 model id 以中转站文档为准
+- 前端代码同步更新模型 id、名称、描述、标签、筛选项
+
+---
+
 ## [v1.3] - 2026-05-10
 
 ### 新增

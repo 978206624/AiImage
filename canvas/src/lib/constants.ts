@@ -6,15 +6,15 @@ export const MODELS = [
     available: true,
   },
   {
-    id: "google-imagen-3",
-    name: "Google Imagen 3",
-    description: "Google 最新图像生成模型，擅长自然场景与细节",
+    id: "google-nano-banana-pro",
+    name: "Google Nano Banana Pro",
+    description: "Google 新一代高质量图像生成与编辑模型，适合复杂设计、文字与产品图场景",
     available: false,
   },
   {
-    id: "midjourney-v6",
-    name: "Midjourney v6",
-    description: "艺术风格图像生成，擅长概念艺术与插画",
+    id: "midjourney-v7",
+    name: "Midjourney V7",
+    description: "Midjourney 当前稳定图像模型，适合风格化视觉、概念艺术与插画",
     available: false,
   },
 ] as const;

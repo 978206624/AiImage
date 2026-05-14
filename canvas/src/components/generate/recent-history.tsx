@@ -63,7 +63,7 @@ export function RecentHistory({ onReuse, refreshKey }: RecentHistoryProps) {
   }, [user]);
 
   useEffect(() => {
-    void load();
+    void Promise.resolve().then(() => load());
   }, [load, refreshKey]);
 
   if (userLoading) {
