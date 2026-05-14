@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const nextConfig: NextConfig = {
   output: "standalone",
   serverExternalPackages: ["ali-oss"],
@@ -16,12 +18,19 @@ const nextConfig: NextConfig = {
     ],
   },
   headers: async () => [
-    {
-      source: "/_next/static/:path*",
-      headers: [
-        { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
-      ],
-    },
+    ...(isProduction
+      ? [
+          {
+            source: "/_next/static/:path*",
+            headers: [
+              {
+                key: "Cache-Control",
+                value: "public, max-age=31536000, immutable",
+              },
+            ],
+          },
+        ]
+      : []),
     {
       source: "/favicon.ico",
       headers: [

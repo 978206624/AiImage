@@ -31,6 +31,7 @@ export default function RootLayout({
     <html
       lang="zh-CN"
       className={`${fontDisplay.variable} ${fontMono.variable}`}
+      suppressHydrationWarning
     >
       <body>
         <ClientProviders>{children}</ClientProviders>

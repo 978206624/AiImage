@@ -18,6 +18,33 @@
   --nav: 60px;
 }
 
+html.light {
+  --bg: oklch(97.5% 0.005 60);
+  --surface: oklch(94% 0.005 60);
+  --surface2: oklch(90% 0.008 60);
+  --fg: oklch(25% 0.02 60);
+  --muted: oklch(55% 0.015 60);
+  --border: oklch(85% 0.01 60);
+  --accent-d: oklch(68% 0.16 58 / 0.12);
+  --accent-b: oklch(68% 0.16 58 / 0.22);
+}
+
+.theme-toggle-icon {
+  display: flex;
+}
+
+.theme-toggle-moon {
+  display: none;
+}
+
+html.light .theme-toggle-sun {
+  display: none;
+}
+
+html.light .theme-toggle-moon {
+  display: flex;
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);

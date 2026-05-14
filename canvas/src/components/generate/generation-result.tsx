@@ -158,8 +158,7 @@ function TaskTile({ task, onClick, onDownload }: TaskTileProps) {
               e.stopPropagation();
               onDownload();
             }}
-            className="absolute bottom-2 right-2 w-7 h-7 rounded-[4px] flex items-center justify-center hover:bg-fg/10 transition-colors"
-            style={{ background: "oklch(13% .012 60 / .82)" }}
+            className="absolute bottom-2 right-2 w-7 h-7 rounded-[4px] flex items-center justify-center bg-bg/82 hover:bg-fg/10 transition-colors"
             aria-label="下载"
           >
             <svg

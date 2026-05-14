@@ -6,6 +6,7 @@ import { NAV_LINKS } from "@/lib/constants";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { BalanceBadge } from "./balance-badge";
 import { UserMenu } from "./user-menu";
+import { ThemeToggle } from "./theme-toggle";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -15,12 +16,11 @@ export function Navbar() {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-[200] flex items-center border-b border-border backdrop-blur-[18px]"
+      className="fixed top-0 left-0 right-0 z-[200] flex items-center border-b border-border bg-bg/94 backdrop-blur-[18px]"
       style={{
         height: "var(--nav)",
         padding: "0 40px",
         gap: "8px",
-        background: "oklch(13% 0.012 60 / 0.94)",
       }}
     >
       <Link
@@ -77,6 +77,8 @@ export function Navbar() {
             </Link>
           </>
         )}
+
+        <ThemeToggle />
 
         <Link
           href="/generate"
