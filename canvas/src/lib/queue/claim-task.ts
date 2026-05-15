@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "../prisma";
 import { Prisma } from "@/generated/prisma/client";
+import { isCircuitOpen } from "./circuit-breaker";
 
 const LOCK_TIMEOUT_SECONDS = 60;
 
@@ -10,8 +11,8 @@ export async function claimTask(workerId: string): Promise<number | null> {
       const now = new Date();
       const lockExpiresAt = new Date(now.getTime() + LOCK_TIMEOUT_SECONDS * 1000);
 
-      const result = await tx.$queryRaw<{ id: number; started_at: Date | null }[]>`
-        SELECT id, started_at FROM image_tasks
+      const result = await tx.$queryRaw<{ id: number; started_at: Date | null; model: string | null }[]>`
+        SELECT id, started_at, model FROM image_tasks
         WHERE status = 'pending'
           AND (next_run_at IS NULL OR next_run_at <= ${now})
           AND (lock_expires_at IS NULL OR lock_expires_at < ${now})
@@ -27,6 +28,15 @@ export async function claimTask(workerId: string): Promise<number | null> {
       }
 
       const row = result[0];
+
+      const modelId = row.model ?? "gpt-image-2";
+      const providerType = modelId?.startsWith("gemini") ? "google" : "openai";
+
+      if (isCircuitOpen(providerType)) {
+        console.log(`[claimTask] ${providerType} circuit breaker is open, skipping task ${row.id}`);
+        return null;
+      }
+
       const startedAt = row.started_at ?? now;
 
       const updateResult = await tx.imageTask.updateMany({

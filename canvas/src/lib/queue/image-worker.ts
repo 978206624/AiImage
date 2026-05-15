@@ -164,11 +164,6 @@ export class ImageWorker {
       modelId = task.model ?? "gpt-image-2";
       providerType = modelId?.startsWith("gemini") ? "google" : "openai";
 
-      if (isCircuitOpen(providerType)) {
-        console.log(`[ImageWorker] ${providerType} circuit breaker is open, skipping task ${taskId}`);
-        return;
-      }
-
       const provider = await getProvider(modelId);
 
       if (!provider) {
