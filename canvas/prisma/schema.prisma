@@ -22,7 +22,7 @@ model ModelConfig {
   id              Int      @id @default(autoincrement())
   displayName     String   @map("display_name") @db.VarChar(100)
   provider        String   @db.VarChar(20)
-  modelId         String   @map("model_id") @db.VarChar(100)
+  modelId         String   @unique @map("model_id") @db.VarChar(100)
   endpointType    String   @map("endpoint_type") @db.VarChar(50)
   billingType     String   @map("billing_type") @db.VarChar(20)
   platformCost    Decimal? @map("platform_cost") @db.Decimal(10, 4)

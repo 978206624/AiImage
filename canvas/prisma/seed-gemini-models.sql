@@ -36,8 +36,15 @@ INSERT INTO model_configs (
   display_name = VALUES(display_name),
   provider = VALUES(provider),
   endpoint_type = VALUES(endpoint_type),
+  billing_type = VALUES(billing_type),
   platform_cost = VALUES(platform_cost),
-  user_credit_cost = VALUES(user_credit_cost);
+  user_credit_cost = VALUES(user_credit_cost),
+  enabled = VALUES(enabled),
+  user_selectable = VALUES(user_selectable),
+  sort_order = VALUES(sort_order),
+  concurrency_limit = VALUES(concurrency_limit),
+  timeout_seconds = VALUES(timeout_seconds),
+  updated_at = NOW();
 
 -- Google Nano Banana 2 (gemini-3.1-flash-image-preview)
 INSERT INTO model_configs (
@@ -74,8 +81,15 @@ INSERT INTO model_configs (
   display_name = VALUES(display_name),
   provider = VALUES(provider),
   endpoint_type = VALUES(endpoint_type),
+  billing_type = VALUES(billing_type),
   platform_cost = VALUES(platform_cost),
-  user_credit_cost = VALUES(user_credit_cost);
+  user_credit_cost = VALUES(user_credit_cost),
+  enabled = VALUES(enabled),
+  user_selectable = VALUES(user_selectable),
+  sort_order = VALUES(sort_order),
+  concurrency_limit = VALUES(concurrency_limit),
+  timeout_seconds = VALUES(timeout_seconds),
+  updated_at = NOW();
 
 -- Google Nano Banana Pro (gemini-3-pro-image-preview)
 INSERT INTO model_configs (
@@ -112,5 +126,12 @@ INSERT INTO model_configs (
   display_name = VALUES(display_name),
   provider = VALUES(provider),
   endpoint_type = VALUES(endpoint_type),
+  billing_type = VALUES(billing_type),
   platform_cost = VALUES(platform_cost),
-  user_credit_cost = VALUES(user_credit_cost);
+  user_credit_cost = VALUES(user_credit_cost),
+  enabled = VALUES(enabled),
+  user_selectable = VALUES(user_selectable),
+  sort_order = VALUES(sort_order),
+  concurrency_limit = VALUES(concurrency_limit),
+  timeout_seconds = VALUES(timeout_seconds),
+  updated_at = NOW();

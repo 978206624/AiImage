@@ -45,47 +45,37 @@ async function main() {
   console.log("Seeding Gemini models...");
 
   for (const model of geminiModels) {
-    const existing = await prisma.modelConfig.findFirst({
+    console.log(`Upserting ${model.displayName}...`);
+    await prisma.modelConfig.upsert({
       where: { modelId: model.modelId },
+      create: {
+        displayName: model.displayName,
+        provider: model.provider,
+        modelId: model.modelId,
+        endpointType: model.endpointType,
+        billingType: model.billingType,
+        platformCost: model.platformCost,
+        userCreditCost: model.userCreditCost,
+        sortOrder: model.sortOrder,
+        concurrencyLimit: model.concurrencyLimit,
+        timeoutSeconds: model.timeoutSeconds,
+        enabled: true,
+        userSelectable: true,
+      },
+      update: {
+        displayName: model.displayName,
+        provider: model.provider,
+        endpointType: model.endpointType,
+        billingType: model.billingType,
+        platformCost: model.platformCost,
+        userCreditCost: model.userCreditCost,
+        sortOrder: model.sortOrder,
+        concurrencyLimit: model.concurrencyLimit,
+        timeoutSeconds: model.timeoutSeconds,
+        enabled: true,
+        userSelectable: true,
+      },
     });
-
-    if (existing) {
-      console.log(`Updating ${model.displayName}...`);
-      await prisma.modelConfig.update({
-        where: { id: existing.id },
-        data: {
-          displayName: model.displayName,
-          provider: model.provider,
-          endpointType: model.endpointType,
-          billingType: model.billingType,
-          platformCost: model.platformCost,
-          userCreditCost: model.userCreditCost,
-          sortOrder: model.sortOrder,
-          concurrencyLimit: model.concurrencyLimit,
-          timeoutSeconds: model.timeoutSeconds,
-          enabled: true,
-          userSelectable: true,
-        },
-      });
-    } else {
-      console.log(`Creating ${model.displayName}...`);
-      await prisma.modelConfig.create({
-        data: {
-          displayName: model.displayName,
-          provider: model.provider,
-          modelId: model.modelId,
-          endpointType: model.endpointType,
-          billingType: model.billingType,
-          platformCost: model.platformCost,
-          userCreditCost: model.userCreditCost,
-          sortOrder: model.sortOrder,
-          concurrencyLimit: model.concurrencyLimit,
-          timeoutSeconds: model.timeoutSeconds,
-          enabled: true,
-          userSelectable: true,
-        },
-      });
-    }
   }
 
   console.log("Gemini models seeded successfully!");
