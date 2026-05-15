@@ -1,3 +1,9 @@
+/**
+ * @deprecated Legacy async polling module. VectorEngine does NOT support async
+ * tasks or /v1/images/tasks/{id} polling. Only used by PollManager for
+ * historical source='poll' tasks. New tasks use source='worker' and go through
+ * providers/openai-image.ts + image-worker.ts.
+ */
 import { getRequiredSetting } from "./system-settings";
 
 export type Quality = "low" | "medium" | "high" | "auto";

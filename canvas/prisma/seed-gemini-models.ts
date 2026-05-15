@@ -2,7 +2,19 @@ import { PrismaClient } from "../src/generated/prisma/client";
 
 const prisma = new PrismaClient();
 
-const geminiModels = [
+const models = [
+  {
+    displayName: "GPT Image2",
+    provider: "openai",
+    modelId: "gpt-image-2",
+    endpointType: "openai_images",
+    billingType: "metered",
+    platformCost: 0.12,
+    userCreditCost: 0.07,
+    sortOrder: 10,
+    concurrencyLimit: 5,
+    timeoutSeconds: 120,
+  },
   {
     displayName: "Google Nano Banana",
     provider: "google",
@@ -12,6 +24,18 @@ const geminiModels = [
     platformCost: 0.09,
     userCreditCost: 0.07,
     sortOrder: 20,
+    concurrencyLimit: 3,
+    timeoutSeconds: 120,
+  },
+  {
+    displayName: "Google Nano Banana Preview",
+    provider: "google",
+    modelId: "gemini-2.5-flash-image-preview",
+    endpointType: "gemini_generate_content",
+    billingType: "per_request",
+    platformCost: 0.09,
+    userCreditCost: 0.07,
+    sortOrder: 25,
     concurrencyLimit: 3,
     timeoutSeconds: 120,
   },
@@ -44,7 +68,7 @@ const geminiModels = [
 async function main() {
   console.log("Seeding Gemini models...");
 
-  for (const model of geminiModels) {
+  for (const model of models) {
     console.log(`Upserting ${model.displayName}...`);
     await prisma.modelConfig.upsert({
       where: { modelId: model.modelId },

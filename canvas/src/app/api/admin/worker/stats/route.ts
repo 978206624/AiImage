@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/auth";
 import { getAllCircuitBreakers } from "@/lib/queue/circuit-breaker";
+import { imageWorker } from "@/lib/queue/image-worker";
 
 async function requireAdmin() {
   const session = await verifySession();
@@ -53,10 +54,14 @@ export async function GET() {
     failureCount: cb.failureCount,
   }));
 
+  const workerRunning = imageWorker.isActive();
+  const workerActiveTasks = imageWorker.getActiveCount();
+
   return NextResponse.json({
     success: true,
     data: {
-      activeWorkers: 0,
+      activeWorkers: workerRunning ? 1 : 0,
+      workerActiveTasks,
       processingTasks,
       pendingTasks,
       failedTasks24h,

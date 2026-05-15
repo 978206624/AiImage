@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { MODELS } from "@/lib/constants";
 
 interface GalleryImage {
   id: number;
@@ -13,19 +12,31 @@ interface GalleryImage {
   style: string;
 }
 
+interface ModelItem {
+  id: string;
+  name: string;
+  provider: string;
+}
+
 export default function Home() {
   const [featured, setFeatured] = useState<GalleryImage[]>([]);
+  const [models, setModels] = useState<ModelItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     void Promise.resolve().then(() => {
       setLoading(true);
-      fetch("/api/gallery?featured=true&pageSize=5")
-        .then((r) => r.json())
-        .then((res) => {
-          if (res.success) setFeatured(res.data?.images || []);
+      Promise.all([
+        fetch("/api/gallery?featured=true&pageSize=5").then((r) => r.json()),
+        fetch("/api/models").then((r) => r.json()),
+      ])
+        .then(([galleryRes, modelsRes]) => {
+          if (galleryRes.success) setFeatured(galleryRes.data?.images || []);
           else setError("获取精选数据失败");
+          if (modelsRes.success && modelsRes.models?.length > 0) {
+            setModels(modelsRes.models);
+          }
         })
         .catch((err) => setError(err.message))
         .finally(() => setLoading(false));
@@ -80,45 +91,37 @@ export default function Home() {
       </section>
 
       {/* Models */}
-      <section className="px-8 py-24 max-w-5xl mx-auto">
-        <h2
-          className="text-2xl font-light tracking-tight mb-2"
-          style={{ fontFamily: "var(--font-d)" }}
-        >
-          支持的模型
-        </h2>
-        <p className="text-sm text-muted mb-10">
-          多种 AI 图像生成模型，满足不同创作需求
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {MODELS.map((model) => (
-            <div
-              key={model.id}
-              className={`relative p-6 rounded-lg border transition-colors ${
-                model.available
-                  ? "border-accent/30 bg-accent-d"
-                  : "border-border bg-surface"
-              }`}
-            >
+      {models.length > 0 && (
+        <section className="px-8 py-24 max-w-5xl mx-auto">
+          <h2
+            className="text-2xl font-light tracking-tight mb-2"
+            style={{ fontFamily: "var(--font-d)" }}
+          >
+            支持的模型
+          </h2>
+          <p className="text-sm text-muted mb-10">
+            多种 AI 图像生成模型，满足不同创作需求
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {models.map((model) => (
               <div
-                className={`absolute top-4 right-4 px-2 py-0.5 text-xs rounded ${
-                  model.available
-                    ? "bg-accent/20 text-accent"
-                    : "bg-surface2 text-muted"
-                }`}
+                key={model.id}
+                className="relative p-6 rounded-lg border border-accent/30 bg-accent-d transition-colors"
               >
-                {model.available ? "可用" : "即将支持"}
+                <div className="absolute top-4 right-4 px-2 py-0.5 text-xs rounded bg-accent/20 text-accent">
+                  可用
+                </div>
+                <h3 className="text-base font-medium text-fg mb-1">
+                  {model.name}
+                </h3>
+                <p className="text-sm text-muted leading-relaxed">
+                  {model.provider.toUpperCase()} · {model.id}
+                </p>
               </div>
-              <h3 className="text-base font-medium text-fg mb-1">
-                {model.name}
-              </h3>
-              <p className="text-sm text-muted leading-relaxed">
-                {model.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Featured */}
       {!error && (loading || featured.length > 0) && (

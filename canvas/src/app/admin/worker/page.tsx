@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 
 interface WorkerStats {
   activeWorkers: number;
+  workerActiveTasks: number;
   processingTasks: number;
   pendingTasks: number;
   failedTasks24h: number;
@@ -67,10 +68,14 @@ export default function AdminWorkerPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-5 gap-4 mb-6">
         <div className="bg-surface border border-border rounded-lg p-4">
           <div className="text-sm text-muted mb-1">活跃 Worker</div>
           <div className="text-2xl font-medium text-fg">{stats.activeWorkers}</div>
+        </div>
+        <div className="bg-surface border border-border rounded-lg p-4">
+          <div className="text-sm text-muted mb-1">Worker 执行中</div>
+          <div className="text-2xl font-medium text-fg">{stats.workerActiveTasks ?? 0}</div>
         </div>
         <div className="bg-surface border border-border rounded-lg p-4">
           <div className="text-sm text-muted mb-1">处理中任务</div>

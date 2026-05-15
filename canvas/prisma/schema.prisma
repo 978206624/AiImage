@@ -218,6 +218,8 @@ model ImageTask {
   @@index([userId, createdAt])
   @@index([groupId])
   @@index([status])
+  @@index([source, status])
+  @@index([status, nextRunAt, lockExpiresAt, attemptCount, createdAt])
   @@unique([idempotencyKey])
   @@map("image_tasks")
 }

@@ -1,24 +1,3 @@
-export const MODELS = [
-  {
-    id: "gpt-4o-image",
-    name: "GPT Image2",
-    description: "OpenAI GPT Image 2 生图模型，支持高质量写实与创意风格",
-    available: true,
-  },
-  {
-    id: "google-nano-banana-pro",
-    name: "Google Nano Banana Pro",
-    description: "Google 新一代高质量图像生成与编辑模型，适合复杂设计、文字与产品图场景",
-    available: false,
-  },
-  {
-    id: "midjourney-v7",
-    name: "Midjourney V7",
-    description: "Midjourney 当前稳定图像模型，适合风格化视觉、概念艺术与插画",
-    available: false,
-  },
-] as const;
-
 export const ASPECT_RATIOS = [
   { value: "2:3", label: "2∶3", iconW: 18, iconH: 24 },
   { value: "1:1", label: "1∶1", iconW: 22, iconH: 22 },

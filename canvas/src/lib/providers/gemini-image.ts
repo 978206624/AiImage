@@ -15,11 +15,6 @@ interface GeminiPart {
   thought?: boolean;
 }
 
-interface GeminiContent {
-  role?: string;
-  parts: GeminiPart[];
-}
-
 interface GeminiCandidate {
   content?: {
     parts: GeminiPart[];

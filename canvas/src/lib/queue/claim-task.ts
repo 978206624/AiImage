@@ -6,7 +6,10 @@ import { isCircuitOpen } from "./circuit-breaker";
 const LOCK_TIMEOUT_SECONDS = 60;
 const MAX_CANDIDATE_TASKS = 10;
 
-export async function claimTask(workerId: string): Promise<number | null> {
+export async function claimTask(
+  workerId: string,
+  excludeModels?: Set<string>
+): Promise<number | null> {
   try {
     const taskId = await prisma.$transaction(async (tx) => {
       const now = new Date();
@@ -30,10 +33,13 @@ export async function claimTask(workerId: string): Promise<number | null> {
 
       for (const row of result) {
         const modelId = row.model ?? "gpt-image-2";
-        const providerType = modelId?.startsWith("gemini") ? "google" : "openai";
+        const providerType = modelId.startsWith("gemini") ? "google" : "openai";
 
         if (isCircuitOpen(providerType)) {
-          console.log(`[claimTask] ${providerType} circuit breaker is open, skipping task ${row.id}`);
+          continue;
+        }
+
+        if (excludeModels?.has(modelId)) {
           continue;
         }
 
@@ -70,26 +76,6 @@ export async function claimTask(workerId: string): Promise<number | null> {
   } catch (error) {
     console.error("[claimTask] failed:", error);
     return null;
-  }
-}
-
-export async function releaseTask(taskId: number, workerId: string): Promise<void> {
-  try {
-    await prisma.imageTask.updateMany({
-      where: {
-        id: taskId,
-        lockedBy: workerId,
-        status: "processing",
-      },
-      data: {
-        status: "pending",
-        lockedBy: null,
-        lockExpiresAt: null,
-        nextRunAt: new Date(Date.now() + 30 * 1000),
-      },
-    });
-  } catch (error) {
-    console.error("[releaseTask] failed:", error);
   }
 }
 

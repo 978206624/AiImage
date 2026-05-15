@@ -181,6 +181,7 @@ export function useGeneration() {
       aspectRatio: AspectRatio;
       quality: Quality;
       count: number;
+      model?: string;
       referenceImages: ReferenceImage[];
       presetIds?: number[];
     }) => {
@@ -210,8 +211,9 @@ export function useGeneration() {
             aspectRatio: params.aspectRatio,
             quality: params.quality,
             count: params.count,
+            model: params.model,
             referenceImages: refUrls,
-            presetIds: params.presetIds?.length ? params.presetIds : undefined,
+            stylePresetId: params.presetIds?.[0],
           }),
         });
 

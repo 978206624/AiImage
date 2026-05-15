@@ -17,7 +17,6 @@ import { useGeneration } from "@/hooks/use-generation";
 import { useAuthModal } from "@/components/layout/auth-modal-context";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useToast } from "@/components/ui/toast";
-import { GPT_IMAGE_DISPLAY_NAME } from "@/lib/constants";
 import type { AspectRatio, Quality } from "@/lib/size-map";
 
 const CREDITS_PER_IMAGE = 0.07;
@@ -53,7 +52,8 @@ function GenerateContent() {
     clearResults,
   } = useGeneration();
 
-  const [model, setModel] = useState("gpt-4o-image");
+  const [model, setModel] = useState("gpt-image-2");
+  const [modelCreditCost, setModelCreditCost] = useState(CREDITS_PER_IMAGE);
   const [prompt, setPrompt] = useState("");
   const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>("2:3");
@@ -143,12 +143,24 @@ function GenerateContent() {
     setStylePickerOpen(false);
   };
 
+  const handleModelsLoaded = useCallback((models: { id: string; creditCost: number }[]) => {
+    const current = models.find((m) => m.id === model);
+    if (current) setModelCreditCost(current.creditCost);
+  }, [model]);
+
+  const handleModelSelect = useCallback((id: string, creditCost?: number) => {
+    setModel(id);
+    if (typeof creditCost === "number") {
+      setModelCreditCost(creditCost);
+    }
+  }, []);
+
   const handleGenerate = () => {
     if (!user) {
       setLoginModalOpen(true);
       return;
     }
-    const required = CREDITS_PER_IMAGE * count;
+    const required = modelCreditCost * count;
     if (user.balance < required) {
       setBalanceModalOpen(true);
       return;
@@ -159,19 +171,15 @@ function GenerateContent() {
       aspectRatio,
       quality,
       count,
+      model,
       referenceImages,
       presetIds: selectedPresetIds,
     });
   };
 
-  const modelBadge =
-    model === "gpt-4o-image"
-      ? GPT_IMAGE_DISPLAY_NAME.toUpperCase()
-      : model === "google-nano-banana-pro"
-        ? "GOOGLE NANO BANANA PRO"
-        : "MIDJOURNEY V7";
+  const modelBadge = model.toUpperCase();
 
-  const requiredCredits = CREDITS_PER_IMAGE * count;
+  const requiredCredits = modelCreditCost * count;
   const displayBalance = user?.balance ?? 0;
 
   return (
@@ -185,7 +193,7 @@ function GenerateContent() {
       >
         {/* Left Panel - Model Selector + Recent History */}
         <aside className="border-r border-border overflow-y-auto px-[18px] py-[28px]">
-          <ModelSelector selected={model} onSelect={setModel} />
+          <ModelSelector selected={model} onSelect={handleModelSelect} onModelsLoaded={handleModelsLoaded} />
           <div className="h-px bg-border my-5" />
           <RecentHistory
             onReuse={handleReuse}

@@ -1,5 +1,50 @@
--- Gemini 模型配置种子数据
+-- 模型配置种子数据
 -- 运行方式: npx prisma db execute --file=prisma/seed-gemini-models.sql
+
+-- GPT Image2 (gpt-image-2)
+INSERT INTO model_configs (
+  display_name,
+  provider,
+  model_id,
+  endpoint_type,
+  billing_type,
+  platform_cost,
+  user_credit_cost,
+  enabled,
+  user_selectable,
+  sort_order,
+  concurrency_limit,
+  timeout_seconds,
+  created_at,
+  updated_at
+) VALUES (
+  'GPT Image2',
+  'openai',
+  'gpt-image-2',
+  'openai_images',
+  'metered',
+  0.1200,
+  0.07,
+  true,
+  true,
+  10,
+  5,
+  120,
+  NOW(),
+  NOW()
+) ON DUPLICATE KEY UPDATE
+  display_name = VALUES(display_name),
+  provider = VALUES(provider),
+  endpoint_type = VALUES(endpoint_type),
+  billing_type = VALUES(billing_type),
+  platform_cost = VALUES(platform_cost),
+  user_credit_cost = VALUES(user_credit_cost),
+  enabled = VALUES(enabled),
+  user_selectable = VALUES(user_selectable),
+  sort_order = VALUES(sort_order),
+  concurrency_limit = VALUES(concurrency_limit),
+  timeout_seconds = VALUES(timeout_seconds),
+  updated_at = NOW();
 
 -- Google Nano Banana (gemini-2.5-flash-image)
 INSERT INTO model_configs (
@@ -28,6 +73,51 @@ INSERT INTO model_configs (
   true,
   true,
   20,
+  3,
+  120,
+  NOW(),
+  NOW()
+) ON DUPLICATE KEY UPDATE
+  display_name = VALUES(display_name),
+  provider = VALUES(provider),
+  endpoint_type = VALUES(endpoint_type),
+  billing_type = VALUES(billing_type),
+  platform_cost = VALUES(platform_cost),
+  user_credit_cost = VALUES(user_credit_cost),
+  enabled = VALUES(enabled),
+  user_selectable = VALUES(user_selectable),
+  sort_order = VALUES(sort_order),
+  concurrency_limit = VALUES(concurrency_limit),
+  timeout_seconds = VALUES(timeout_seconds),
+  updated_at = NOW();
+
+-- Google Nano Banana Preview (gemini-2.5-flash-image-preview)
+INSERT INTO model_configs (
+  display_name,
+  provider,
+  model_id,
+  endpoint_type,
+  billing_type,
+  platform_cost,
+  user_credit_cost,
+  enabled,
+  user_selectable,
+  sort_order,
+  concurrency_limit,
+  timeout_seconds,
+  created_at,
+  updated_at
+) VALUES (
+  'Google Nano Banana Preview',
+  'google',
+  'gemini-2.5-flash-image-preview',
+  'gemini_generate_content',
+  'per_request',
+  0.0900,
+  0.07,
+  true,
+  true,
+  25,
   3,
   120,
   NOW(),
