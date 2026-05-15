@@ -1,0 +1,116 @@
+-- Gemini 模型配置种子数据
+-- 运行方式: npx prisma db execute --file=prisma/seed-gemini-models.sql
+
+-- Google Nano Banana (gemini-2.5-flash-image)
+INSERT INTO model_configs (
+  display_name,
+  provider,
+  model_id,
+  endpoint_type,
+  billing_type,
+  platform_cost,
+  user_credit_cost,
+  enabled,
+  user_selectable,
+  sort_order,
+  concurrency_limit,
+  timeout_seconds,
+  created_at,
+  updated_at
+) VALUES (
+  'Google Nano Banana',
+  'google',
+  'gemini-2.5-flash-image',
+  'gemini_generate_content',
+  'per_request',
+  0.0900,
+  0.07,
+  true,
+  true,
+  20,
+  3,
+  120,
+  NOW(),
+  NOW()
+) ON DUPLICATE KEY UPDATE
+  display_name = VALUES(display_name),
+  provider = VALUES(provider),
+  endpoint_type = VALUES(endpoint_type),
+  platform_cost = VALUES(platform_cost),
+  user_credit_cost = VALUES(user_credit_cost);
+
+-- Google Nano Banana 2 (gemini-3.1-flash-image-preview)
+INSERT INTO model_configs (
+  display_name,
+  provider,
+  model_id,
+  endpoint_type,
+  billing_type,
+  platform_cost,
+  user_credit_cost,
+  enabled,
+  user_selectable,
+  sort_order,
+  concurrency_limit,
+  timeout_seconds,
+  created_at,
+  updated_at
+) VALUES (
+  'Google Nano Banana 2',
+  'google',
+  'gemini-3.1-flash-image-preview',
+  'gemini_generate_content',
+  'per_request',
+  0.2480,
+  0.15,
+  true,
+  true,
+  30,
+  3,
+  120,
+  NOW(),
+  NOW()
+) ON DUPLICATE KEY UPDATE
+  display_name = VALUES(display_name),
+  provider = VALUES(provider),
+  endpoint_type = VALUES(endpoint_type),
+  platform_cost = VALUES(platform_cost),
+  user_credit_cost = VALUES(user_credit_cost);
+
+-- Google Nano Banana Pro (gemini-3-pro-image-preview)
+INSERT INTO model_configs (
+  display_name,
+  provider,
+  model_id,
+  endpoint_type,
+  billing_type,
+  platform_cost,
+  user_credit_cost,
+  enabled,
+  user_selectable,
+  sort_order,
+  concurrency_limit,
+  timeout_seconds,
+  created_at,
+  updated_at
+) VALUES (
+  'Google Nano Banana Pro',
+  'google',
+  'gemini-3-pro-image-preview',
+  'gemini_generate_content',
+  'per_request',
+  0.4950,
+  0.30,
+  true,
+  true,
+  40,
+  2,
+  180,
+  NOW(),
+  NOW()
+) ON DUPLICATE KEY UPDATE
+  display_name = VALUES(display_name),
+  provider = VALUES(provider),
+  endpoint_type = VALUES(endpoint_type),
+  platform_cost = VALUES(platform_cost),
+  user_credit_cost = VALUES(user_credit_cost);
