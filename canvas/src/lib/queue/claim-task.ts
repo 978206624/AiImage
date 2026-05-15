@@ -6,41 +6,51 @@ const LOCK_TIMEOUT_SECONDS = 60;
 
 export async function claimTask(workerId: string): Promise<number | null> {
   try {
-    const result = await prisma.$queryRaw<{ id: number }[]>`
-      SELECT id FROM image_tasks
-      WHERE status = 'pending'
-        AND (next_run_at IS NULL OR next_run_at <= NOW())
-        AND (lock_expires_at IS NULL OR lock_expires_at < NOW())
-        AND attempt_count < COALESCE(max_attempts, 2)
-        AND source = 'worker'
-      ORDER BY created_at ASC
-      LIMIT 1
-      FOR UPDATE SKIP LOCKED
-    `;
+    const taskId = await prisma.$transaction(async (tx) => {
+      const now = new Date();
+      const lockExpiresAt = new Date(now.getTime() + LOCK_TIMEOUT_SECONDS * 1000);
 
-    if (!result || result.length === 0) {
-      return null;
-    }
+      const result = await tx.$queryRaw<{ id: number; started_at: Date | null }[]>`
+        SELECT id, started_at FROM image_tasks
+        WHERE status = 'pending'
+          AND (next_run_at IS NULL OR next_run_at <= ${now})
+          AND (lock_expires_at IS NULL OR lock_expires_at < ${now})
+          AND attempt_count < COALESCE(max_attempts, 2)
+          AND source = 'worker'
+        ORDER BY created_at ASC
+        LIMIT 1
+        FOR UPDATE SKIP LOCKED
+      `;
 
-    const taskId = result[0].id;
+      if (!result || result.length === 0) {
+        return null;
+      }
 
-    // 查询当前任务状态，用于判断是否首次处理
-    const currentTask = await prisma.imageTask.findUnique({
-      where: { id: taskId },
-      select: { startedAt: true },
-    });
+      const row = result[0];
+      const startedAt = row.started_at ?? now;
 
-    const lockExpiresAt = new Date(Date.now() + LOCK_TIMEOUT_SECONDS * 1000);
+      const updateResult = await tx.imageTask.updateMany({
+        where: {
+          id: row.id,
+          status: "pending",
+        },
+        data: {
+          status: "processing",
+          lockedBy: workerId,
+          lockExpiresAt: lockExpiresAt,
+          attemptCount: { increment: 1 },
+          startedAt: startedAt,
+        },
+      });
 
-    await prisma.imageTask.update({
-      where: { id: taskId },
-      data: {
-        status: "processing",
-        lockedBy: workerId,
-        lockExpiresAt: lockExpiresAt,
-        attemptCount: { increment: 1 },
-        startedAt: currentTask?.startedAt ?? new Date(),
-      },
+      if (updateResult.count === 0) {
+        return null;
+      }
+
+      return row.id;
+    }, {
+      isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+      timeout: 10000,
     });
 
     return taskId;

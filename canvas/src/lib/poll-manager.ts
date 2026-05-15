@@ -52,6 +52,10 @@ class PollManager {
     const task = await prisma.imageTask.findUnique({ where: { id: taskId } });
     if (!task) return true;
     if (TERMINAL_STATUSES.includes(task.status)) return true;
+    if (task.source !== "poll") {
+      console.log(`[PollManager] 跳过 source=${task.source} 任务 ${taskId}`);
+      return true;
+    }
 
     const ageMs = Date.now() - task.createdAt.getTime();
     const timeoutMs = task.externalTaskId
@@ -190,7 +194,10 @@ class PollManager {
     this.recovered = true;
     try {
       const pending = await prisma.imageTask.findMany({
-        where: { status: { in: RUNNABLE_STATUSES } },
+        where: {
+          status: { in: RUNNABLE_STATUSES },
+          source: "poll",
+        },
         select: { id: true },
       });
       for (const t of pending) this.startPolling(t.id);
@@ -205,7 +212,10 @@ class PollManager {
   async scanAndAdopt(): Promise<void> {
     try {
       const tasks = await prisma.imageTask.findMany({
-        where: { status: { in: RUNNABLE_STATUSES } },
+        where: {
+          status: { in: RUNNABLE_STATUSES },
+          source: "poll",
+        },
         select: { id: true },
       });
       const ids = new Set(tasks.map((t) => t.id));

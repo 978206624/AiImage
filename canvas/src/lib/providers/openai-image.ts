@@ -18,6 +18,8 @@ const SIZE_MAP: Record<string, string> = {
   "2:3": "1024x1024",
 };
 
+const DEFAULT_TIMEOUT_MS = 120_000;
+
 function mapToOpenAISize(projectSize: string): string {
   return SIZE_MAP[projectSize] ?? "1024x1024";
 }
@@ -40,9 +42,11 @@ export class OpenAIImageProvider implements ImageProvider {
   readonly provider = "openai" as const;
   readonly modelId: string;
   readonly endpointType = "openai_images" as const;
+  private timeoutMs: number;
 
-  constructor(modelId: string = "gpt-image-2") {
+  constructor(modelId: string = "gpt-image-2", timeoutMs: number = DEFAULT_TIMEOUT_MS) {
     this.modelId = modelId;
+    this.timeoutMs = timeoutMs;
   }
 
   async submitTask(params: SubmitParams): Promise<SubmitResult> {
@@ -62,6 +66,9 @@ export class OpenAIImageProvider implements ImageProvider {
       body.image = params.referenceImages;
     }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
+
     let res: Response;
     try {
       res = await fetch(`${baseUrl}/v1/images/generations`, {
@@ -71,14 +78,26 @@ export class OpenAIImageProvider implements ImageProvider {
           Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify(body),
+        signal: controller.signal,
       });
-    } catch {
+    } catch (error) {
+      clearTimeout(timeout);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(`生图请求超时 (${this.timeoutMs}ms)`);
+      }
       throw new Error("中转站连接失败，请检查节点地址或稍后重试");
+    } finally {
+      clearTimeout(timeout);
     }
 
     if (!res.ok) {
       const text = await res.text().catch(() => "");
-      throw new Error(`生图请求失败 (${res.status}): ${text || "Unknown error"}`);
+      const status = res.status;
+      let errorType = "upstream";
+      if (status === 400) errorType = "param";
+      else if (status === 401 || status === 403) errorType = "auth";
+      else if (status === 429) errorType = "rate_limit";
+      throw Object.assign(new Error(`生图请求失败 (${status}): ${text || "Unknown error"}`), { status, errorType });
     }
 
     const data = await res.json() as Record<string, unknown>;

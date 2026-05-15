@@ -3,33 +3,50 @@ import { prisma } from "../prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { getProvider } from "../providers";
 import { persistOutput } from "./persist-output";
-import { claimTask, releaseTask } from "./claim-task";
-import { recordFailure, recordSuccess } from "./circuit-breaker";
+import { claimTask, releaseTask, recoverStuckTasks } from "./claim-task";
+import { recordFailure, recordSuccess, isCircuitOpen } from "./circuit-breaker";
 
 export interface WorkerConfig {
   workerId: string;
   pollIntervalMs: number;
   maxConcurrency: number;
+  recoverIntervalMs: number;
 }
 
 const DEFAULT_CONFIG: WorkerConfig = {
   workerId: `worker-${process.pid}-${Date.now()}`,
   pollIntervalMs: 2000,
   maxConcurrency: 3,
+  recoverIntervalMs: 60000,
 };
+
+export interface WorkerStats {
+  workerId: string;
+  isRunning: boolean;
+  activeTasks: number;
+  circuitBreakers: Array<{
+    provider: string;
+    failureCount: number;
+    isOpen: boolean;
+    lastFailureAt: string | null;
+  }>;
+}
 
 export class ImageWorker {
   private workerId: string;
   private pollIntervalMs: number;
   private maxConcurrency: number;
+  private recoverIntervalMs: number;
   private isRunning = false;
   private activeTasks = new Set<number>();
+  private recoverTimer?: NodeJS.Timeout;
 
   constructor(config: Partial<WorkerConfig> = {}) {
     const cfg = { ...DEFAULT_CONFIG, ...config };
     this.workerId = cfg.workerId;
     this.pollIntervalMs = cfg.pollIntervalMs;
     this.maxConcurrency = cfg.maxConcurrency;
+    this.recoverIntervalMs = cfg.recoverIntervalMs;
   }
 
   get workerIdValue(): string {
@@ -44,16 +61,60 @@ export class ImageWorker {
     return this.activeTasks.size;
   }
 
+  getStats(): WorkerStats {
+    const breakers = Array.from(
+      new Set([
+        ...Array.from(this.activeTasks).map(() => "openai"),
+      ])
+    );
+    return {
+      workerId: this.workerId,
+      isRunning: this.isRunning,
+      activeTasks: this.activeTasks.size,
+      circuitBreakers: breakers.map((p) => ({
+        provider: p,
+        failureCount: 0,
+        isOpen: isCircuitOpen(p),
+        lastFailureAt: null,
+      })),
+    };
+  }
+
   async start(): Promise<void> {
-    if (this.isRunning) return;
+    if (this.isRunning) {
+      console.log(`[ImageWorker] ${this.workerId} already running`);
+      return;
+    }
+
     this.isRunning = true;
+    console.log(`[ImageWorker] ${this.workerId} starting...`);
+
+    await recoverStuckTasks();
+
+    this.startRecoverTimer();
+
     console.log(`[ImageWorker] ${this.workerId} started`);
     this.runLoop();
   }
 
   stop(): void {
+    if (!this.isRunning) return;
     this.isRunning = false;
-    console.log(`[ImageWorker] ${this.workerId} stopped`);
+    if (this.recoverTimer) {
+      clearInterval(this.recoverTimer);
+      this.recoverTimer = undefined;
+    }
+    console.log(`[ImageWorker] ${this.workerId} stopping...`);
+  }
+
+  private startRecoverTimer(): void {
+    this.recoverTimer = setInterval(async () => {
+      try {
+        await recoverStuckTasks();
+      } catch (error) {
+        console.error(`[ImageWorker] ${this.workerId} recover error:`, error);
+      }
+    }, this.recoverIntervalMs);
   }
 
   private async runLoop(): Promise<void> {
@@ -65,6 +126,7 @@ export class ImageWorker {
       }
       await this.sleep(this.pollIntervalMs);
     }
+    console.log(`[ImageWorker] ${this.workerId} stopped`);
   }
 
   private async processBatch(): Promise<void> {
@@ -72,6 +134,8 @@ export class ImageWorker {
     if (slotsAvailable <= 0) return;
 
     for (let i = 0; i < slotsAvailable; i++) {
+      if (!this.isRunning) break;
+
       const taskId = await claimTask(this.workerId);
       if (!taskId) break;
 
@@ -84,6 +148,7 @@ export class ImageWorker {
 
   private async processTask(taskId: number): Promise<void> {
     let modelId: string | undefined;
+    let providerType = "openai";
 
     try {
       const task = await prisma.imageTask.findUnique({
@@ -97,10 +162,18 @@ export class ImageWorker {
       }
 
       modelId = task.model ?? "gpt-image-2";
+      providerType = modelId?.startsWith("gemini") ? "google" : "openai";
+
+      if (isCircuitOpen(providerType)) {
+        console.log(`[ImageWorker] ${providerType} circuit breaker is open, releasing task ${taskId}`);
+        await releaseTask(taskId, this.workerId);
+        return;
+      }
+
       const provider = await getProvider(modelId);
 
       if (!provider) {
-        await this.failTask(taskId, `Provider for model ${modelId} not found or disabled`);
+        await this.failTask(taskId, `Provider for model ${modelId} not found or disabled`, providerType);
         return;
       }
 
@@ -128,7 +201,7 @@ export class ImageWorker {
         isPersisted = persistResult.isPersisted;
 
         if (!persistResult.isPersisted) {
-          await this.failTask(taskId, `OSS upload failed: ${persistResult.error}`, provider.provider);
+          await this.failTask(taskId, `OSS upload failed: ${persistResult.error}`, providerType);
           return;
         }
       } else {
@@ -136,12 +209,11 @@ export class ImageWorker {
       }
 
       await this.completeTask(taskId, imageUrl, isPersisted, submitResult.raw);
-      recordSuccess(provider.provider);
+      recordSuccess(providerType);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error(`[ImageWorker] Task ${taskId} failed:`, errorMessage);
 
-      const providerType = modelId?.startsWith("gemini") ? "google" : "openai";
       recordFailure(providerType);
       await this.failTask(taskId, errorMessage, providerType);
     }
@@ -153,89 +225,93 @@ export class ImageWorker {
     isPersisted: boolean,
     raw?: unknown
   ): Promise<void> {
-    const result = await prisma.imageTask.updateMany({
-      where: {
-        id: taskId,
-        lockedBy: this.workerId,
-        status: "processing",
-      },
-      data: {
-        status: "completed",
-        progress: 100,
-        imageUrl,
-        isPersisted,
-        finishedAt: new Date(),
-        upstreamRaw: raw ? JSON.stringify(raw).slice(0, 2000) : null,
-      },
-    });
+    await prisma.$transaction(async (tx) => {
+      const result = await tx.imageTask.updateMany({
+        where: {
+          id: taskId,
+          lockedBy: this.workerId,
+          status: "processing",
+        },
+        data: {
+          status: "completed",
+          progress: 100,
+          imageUrl,
+          isPersisted,
+          finishedAt: new Date(),
+          upstreamRaw: raw ? JSON.stringify(raw).slice(0, 2000) : null,
+        },
+      });
 
-    if (result.count === 0) {
-      console.log(`[ImageWorker] Task ${taskId} already processed by another worker, skipping`);
-      return;
-    }
+      if (result.count === 0) {
+        console.log(`[ImageWorker] Task ${taskId} already processed by another worker, skipping`);
+        return;
+      }
 
-    const task = await prisma.imageTask.findUnique({
-      where: { id: taskId },
-      select: { userId: true, creditsLocked: true },
-    });
+      const task = await tx.imageTask.findUnique({
+        where: { id: taskId },
+        select: { userId: true, creditsLocked: true },
+      });
 
-    if (!task) return;
+      if (!task) return;
 
-    const usageRecord = await prisma.usageRecord.create({
-      data: {
-        userId: task.userId,
-        creditsUsed: task.creditsLocked,
-        promptSummary: "",
-        imageUrl,
-        isPersisted,
-      },
-    });
+      const usageRecord = await tx.usageRecord.create({
+        data: {
+          userId: task.userId,
+          creditsUsed: task.creditsLocked,
+          promptSummary: "",
+          imageUrl,
+          isPersisted,
+        },
+      });
 
-    await prisma.imageTask.update({
-      where: { id: taskId },
-      data: { usageRecordId: usageRecord.id },
+      await tx.imageTask.update({
+        where: { id: taskId },
+        data: { usageRecordId: usageRecord.id },
+      });
     });
 
     console.log(`[ImageWorker] Task ${taskId} completed: ${imageUrl}`);
   }
 
-  private async failTask(taskId: number, reason: string, providerType: string = "openai"): Promise<void> {
-    const result = await prisma.imageTask.updateMany({
-      where: {
-        id: taskId,
-        lockedBy: this.workerId,
-        status: { in: ["pending", "processing", "submitted"] },
-      },
-      data: {
-        status: "failed",
-        failReason: reason,
-        finishedAt: new Date(),
-      },
-    });
+  private async failTask(taskId: number, reason: string, providerType: string): Promise<void> {
+    await prisma.$transaction(async (tx) => {
+      const result = await tx.imageTask.updateMany({
+        where: {
+          id: taskId,
+          lockedBy: this.workerId,
+          status: { in: ["pending", "processing", "submitted"] },
+        },
+        data: {
+          status: "failed",
+          failReason: reason,
+          finishedAt: new Date(),
+        },
+      });
 
-    if (result.count === 0) {
-      console.log(`[ImageWorker] Task ${taskId} already processed by another worker, skipping`);
-      return;
-    }
+      if (result.count === 0) {
+        console.log(`[ImageWorker] Task ${taskId} already processed by another worker, skipping`);
+        return;
+      }
 
-    const task = await prisma.imageTask.findUnique({
-      where: { id: taskId },
-      select: { userId: true, creditsLocked: true, refunded: true },
-    });
-
-    if (!task) return;
-
-    if (!task.refunded) {
-      await prisma.imageTask.update({
+      const task = await tx.imageTask.findUnique({
         where: { id: taskId },
-        data: { refunded: true },
+        select: { userId: true, creditsLocked: true, refunded: true },
       });
 
-      await prisma.user.update({
-        where: { id: task.userId },
-        data: { balance: { increment: task.creditsLocked } },
-      });
-    }
+      if (!task) return;
+
+      if (!task.refunded) {
+        await tx.imageTask.update({
+          where: { id: taskId },
+          data: { refunded: true },
+        });
+
+        await tx.user.update({
+          where: { id: task.userId },
+          data: { balance: { increment: task.creditsLocked } },
+        });
+      }
+    });
 
     console.log(`[ImageWorker] Task ${taskId} failed: ${reason}`);
   }
@@ -254,4 +330,16 @@ export const imageWorker =
 
 if (process.env.NODE_ENV !== "production") {
   globalForWorker.__canvasImageWorker = imageWorker;
+}
+
+export async function startWorker(): Promise<void> {
+  await imageWorker.start();
+}
+
+export function stopWorker(): void {
+  imageWorker.stop();
+}
+
+export function getWorkerStats(): WorkerStats {
+  return imageWorker.getStats();
 }

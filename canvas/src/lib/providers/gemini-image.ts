@@ -40,6 +40,8 @@ interface GeminiResponse {
   responseId?: string;
 }
 
+const DEFAULT_TIMEOUT_MS = 120_000;
+
 async function getConfig() {
   const baseUrl = await getRequiredSetting(
     "api_base_url",
@@ -58,9 +60,11 @@ export class GeminiImageProvider implements ImageProvider {
   readonly provider = "google" as const;
   readonly modelId: string;
   readonly endpointType = "gemini_generate_content" as const;
+  private timeoutMs: number;
 
-  constructor(modelId: string) {
+  constructor(modelId: string, timeoutMs: number = DEFAULT_TIMEOUT_MS) {
     this.modelId = modelId;
+    this.timeoutMs = timeoutMs;
   }
 
   async submitTask(params: SubmitParams): Promise<SubmitResult> {
@@ -103,6 +107,9 @@ export class GeminiImageProvider implements ImageProvider {
       },
     };
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
+
     let res: Response;
     try {
       res = await fetch(
@@ -113,15 +120,27 @@ export class GeminiImageProvider implements ImageProvider {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(body),
+          signal: controller.signal,
         }
       );
-    } catch {
+    } catch (error) {
+      clearTimeout(timeout);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error(`Gemini 请求超时 (${this.timeoutMs}ms)`);
+      }
       throw new Error("Gemini API 连接失败，请检查节点地址或稍后重试");
+    } finally {
+      clearTimeout(timeout);
     }
 
     if (!res.ok) {
       const text = await res.text().catch(() => "");
-      throw new Error(`Gemini 请求失败 (${res.status}): ${text || "Unknown error"}`);
+      const status = res.status;
+      let errorType = "upstream";
+      if (status === 400) errorType = "param";
+      else if (status === 401 || status === 403) errorType = "auth";
+      else if (status === 429) errorType = "rate_limit";
+      throw Object.assign(new Error(`Gemini 请求失败 (${status}): ${text || "Unknown error"}`), { status, errorType });
     }
 
     const data = (await res.json()) as GeminiResponse;
