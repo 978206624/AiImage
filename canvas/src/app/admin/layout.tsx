@@ -6,6 +6,9 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { href: "/admin/users", label: "用户管理" },
   { href: "/admin/keys", label: "充值码管理" },
+  { href: "/admin/models", label: "模型管理" },
+  { href: "/admin/tasks", label: "任务管理" },
+  { href: "/admin/worker", label: "Worker 监控" },
   { href: "/admin/gallery", label: "画廊管理" },
   { href: "/admin/settings", label: "系统设置" },
 ];

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { GPT_IMAGE_DISPLAY_NAME, GPT_IMAGE_MODEL_TAG_VALUES } from "@/lib/constants";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -13,7 +14,13 @@ export async function GET(request: Request) {
 
   const where: Record<string, unknown> = { isPublished: true };
 
-  if (model) where.modelTag = model;
+  if (model) {
+    if (model === GPT_IMAGE_DISPLAY_NAME || model === "GPT-4o Image") {
+      where.OR = GPT_IMAGE_MODEL_TAG_VALUES.map((modelTag) => ({ modelTag }));
+    } else {
+      where.modelTag = model;
+    }
+  }
   if (style) where.styleTag = style;
   if (featured === "true") where.isFeatured = true;
   if (categoryIdParam) {

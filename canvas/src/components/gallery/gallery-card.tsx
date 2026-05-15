@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useToast } from "@/components/ui/toast";
+import { normalizeModelTag } from "@/lib/constants";
 
 interface GalleryCardProps {
   image: {
@@ -60,7 +61,7 @@ export function GalleryCard({ image }: GalleryCardProps) {
             </span>
           )}
           <span className="shrink-0 ml-auto px-2 py-0.5 text-[10px] rounded bg-accent/20 text-accent">
-            {image.modelTag}
+            {normalizeModelTag(image.modelTag)}
           </span>
         </div>
         <div className="space-y-2">

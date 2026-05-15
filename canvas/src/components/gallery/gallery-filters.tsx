@@ -1,5 +1,7 @@
 "use client";
 
+import { GPT_IMAGE_DISPLAY_NAME } from "@/lib/constants";
+
 interface Category {
   id: number;
   name: string;
@@ -17,7 +19,7 @@ interface GalleryFiltersProps {
 
 const MODEL_FILTERS = [
   { label: "全部", value: null },
-  { label: "GPT-4o Image", value: "GPT-4o Image" },
+  { label: GPT_IMAGE_DISPLAY_NAME, value: GPT_IMAGE_DISPLAY_NAME },
   { label: "Nano Banana Pro", value: "Google Nano Banana Pro" },
   { label: "Midjourney V7", value: "Midjourney V7" },
 ];

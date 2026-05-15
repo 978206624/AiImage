@@ -1,8 +1,8 @@
 export const MODELS = [
   {
     id: "gpt-4o-image",
-    name: "GPT-4o Image",
-    description: "OpenAI 旗舰图像生成模型，支持高质量写实与创意风格",
+    name: "GPT Image2",
+    description: "OpenAI GPT Image 2 生图模型，支持高质量写实与创意风格",
     available: true,
   },
   {
@@ -41,3 +41,22 @@ export const NAV_LINKS = [
   { href: "/gallery", label: "画廊" },
   { href: "/generate", label: "生图" },
 ] as const;
+
+export const GPT_IMAGE_DISPLAY_NAME = "GPT Image2";
+export const GPT_IMAGE_LEGACY_MODEL_TAG = "GPT-4o Image";
+export const GPT_IMAGE_MODEL_TAG_VALUES = [
+  GPT_IMAGE_DISPLAY_NAME,
+  GPT_IMAGE_LEGACY_MODEL_TAG,
+] as const;
+
+export function normalizeModelTag(modelTag: string): string {
+  if (
+    modelTag === GPT_IMAGE_LEGACY_MODEL_TAG ||
+    modelTag === "GPT-4O Image" ||
+    modelTag === "GPT Image" ||
+    modelTag === "gpt-4o-image"
+  ) {
+    return GPT_IMAGE_DISPLAY_NAME;
+  }
+  return modelTag;
+}

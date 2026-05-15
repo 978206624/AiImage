@@ -23,6 +23,11 @@ export * from './enums';
  */
 export type SystemSetting = Prisma.SystemSettingModel
 /**
+ * Model ModelConfig
+ * 
+ */
+export type ModelConfig = Prisma.ModelConfigModel
+/**
  * Model ApiKey
  * 
  */

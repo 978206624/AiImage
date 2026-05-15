@@ -2,11 +2,8 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
-import { submitTask } from "@/lib/gpt-image";
-import { pollManager } from "@/lib/poll-manager";
 import { getSize } from "@/lib/size-map";
 import type { AspectRatio, Quality } from "@/lib/size-map";
-import { getSetting } from "@/lib/system-settings";
 import { requireUser, AuthError } from "@/lib/c-auth";
 
 interface GenerateRequest {
@@ -14,8 +11,76 @@ interface GenerateRequest {
   aspectRatio: AspectRatio;
   quality: Quality;
   count: number;
+  model?: string;
   referenceImages?: string[];
   stylePresetId?: number;
+}
+
+async function getCreditsPerImage(modelId?: string): Promise<number> {
+  if (modelId) {
+    const modelConfig = await prisma.modelConfig.findFirst({
+      where: { modelId, enabled: true },
+      select: { userCreditCost: true },
+    });
+    if (modelConfig) {
+      const cost = Number(modelConfig.userCreditCost);
+      if (Number.isFinite(cost) && cost > 0) {
+        return cost;
+      }
+    }
+  }
+
+  const { getSetting } = await import("@/lib/system-settings");
+  const creditsRaw = await getSetting("credits_per_image", "CREDITS_PER_IMAGE", "0.07");
+  const parsed = parseFloat(creditsRaw ?? "0.07");
+  return Number.isFinite(parsed) && parsed >= 0.01 ? parsed : 0.07;
+}
+
+async function getModelInfo(modelId: string | undefined) {
+  const defaultModel = "gpt-image-2";
+
+  if (modelId) {
+    const modelConfig = await prisma.modelConfig.findFirst({
+      where: { modelId, enabled: true },
+      select: {
+        modelId: true,
+        provider: true,
+        displayName: true,
+      },
+    });
+
+    if (modelConfig) {
+      return {
+        modelId: modelConfig.modelId,
+        provider: modelConfig.provider,
+        displayName: modelConfig.displayName,
+      };
+    }
+  }
+
+  const defaultConfig = await prisma.modelConfig.findFirst({
+    where: { enabled: true, userSelectable: true },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    select: {
+      modelId: true,
+      provider: true,
+      displayName: true,
+    },
+  });
+
+  if (defaultConfig) {
+    return {
+      modelId: defaultConfig.modelId,
+      provider: defaultConfig.provider,
+      displayName: defaultConfig.displayName,
+    };
+  }
+
+  return {
+    modelId: defaultModel,
+    provider: "openai",
+    displayName: "GPT Image2",
+  };
 }
 
 export async function POST(request: Request) {
@@ -42,7 +107,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const { prompt, aspectRatio, quality, count, referenceImages, stylePresetId } =
+  const { prompt, aspectRatio, quality, count, model, referenceImages, stylePresetId } =
     body;
 
   if (!prompt || !aspectRatio || !quality || !count) {
@@ -58,14 +123,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const creditsRaw = await getSetting(
-    "credits_per_image",
-    "CREDITS_PER_IMAGE",
-    "0.07"
-  );
-  const parsed = parseFloat(creditsRaw ?? "0.07");
-  const creditsPerImage =
-    Number.isFinite(parsed) && parsed >= 0.01 ? parsed : 0.07;
+  const modelInfo = await getModelInfo(model);
+  const creditsPerImage = await getCreditsPerImage(modelInfo.modelId);
   const totalCost = creditsPerImage * count;
 
   if (user.balance < totalCost) {
@@ -113,6 +172,7 @@ export async function POST(request: Request) {
       }
       const created: { id: number }[] = [];
       for (let i = 0; i < count; i++) {
+        const idempotencyKey = `${groupId}-${i}`;
         const t = await tx.imageTask.create({
           data: {
             userId: user.id,
@@ -126,6 +186,10 @@ export async function POST(request: Request) {
             referenceImagesJson: refImagesJson,
             stylePresetId: stylePresetId ?? null,
             creditsLocked: new Prisma.Decimal(creditsPerImage),
+            provider: modelInfo.provider,
+            model: modelInfo.modelId,
+            source: "worker",
+            idempotencyKey,
           },
           select: { id: true },
         });
@@ -150,35 +214,6 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-
-  await Promise.all(
-    tasks.map(async ({ id: taskId }) => {
-      try {
-        const result = await submitTask({
-          prompt: finalPrompt,
-          size: sizeConfig.size,
-          quality,
-          referenceImages,
-        });
-        if (result.async) {
-          await prisma.imageTask.update({
-            where: { id: taskId },
-            data: {
-              status: "submitted",
-              externalTaskId: result.taskId,
-            },
-          });
-          pollManager.startPolling(taskId);
-        } else {
-          await pollManager.completeTask(taskId, user.id, result.imageUrl);
-        }
-      } catch (err) {
-        const reason =
-          err instanceof Error ? err.message : "提交失败";
-        await pollManager.failTask(taskId, reason);
-      }
-    })
-  );
 
   return NextResponse.json({
     success: true,

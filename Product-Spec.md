@@ -6,7 +6,7 @@ CANVAS 是一个 AI 图像生成与展示平台，用户注册账号后通过充
 
 **目标用户**：对 AI 生图感兴趣但不想折腾 API 对接的普通用户。设计师、自媒体创作者、AI 绘画爱好者，通过淘宝购买充值码兑换积分使用，可在账号下查看历史创作。
 
-**核心价值**：零门槛使用 GPT-4o Image 生图能力。注册 → 体验赠送积分 / 充值码兑换 → 写提示词 → 出图 → 历史永久保存。同时提供精选画廊（精选作品 + 可直接套用的提示词模板，按分类组织）降低创作门槛。
+**核心价值**：零门槛使用 GPT Image2 生图能力。注册 → 体验赠送积分 / 充值码兑换 → 写提示词 → 出图 → 历史永久保存。同时提供精选画廊（精选作品 + 可直接套用的提示词模板，按分类组织）降低创作门槛。
 
 **商业模式**：淘宝出售充值码（一次性兑换码），每次生图消耗 0.07 积分（约 7 分钱），后端通过第三方中转站调用 GPT Image 2 接口赚取差价。新用户注册赠送 0.21 积分（3 张免费体验）作为拉新激励。
 
@@ -41,7 +41,7 @@ CANVAS 是一个 AI 图像生成与展示平台，用户注册账号后通过充
 - 兑换入口：账号中心页面 `/account` 的「充值码兑换」区域
 
 **AI 生图**
-- 用户登录后输入提示词 → 选择画面比例、质量、数量 → 点击「开始生图」 → 系统验证账号余额 → 调用中转站 GPT Image 2 接口（异步提交 + 轮询） → 拉取中转站返回的图片 → 上传到自有 OSS（路径 `gallery/users/<uid>/<timestamp>_<rand>.png`）→ 写入历史记录（user_id、prompt、参数 JSON、OSS 图片 URL）→ 在页面上展示
+- 用户登录后输入提示词 → 选择画面比例、质量、数量 → 点击「开始生图」 → 系统验证账号余额 → 创建本地生图任务并返回 taskId → 后台 worker 按并发限制调用中转站生图接口 → 拉取或解析中转站返回的图片 → 上传到自有 OSS（路径 `gallery/users/<uid>/<timestamp>_<rand>.png`）→ 写入历史记录（user_id、prompt、参数 JSON、OSS 图片 URL）→ 前端轮询任务状态并在完成后展示
 - 未登录用户可访问生图页、可编辑参数、可上传参考图，但点击「开始生图」时弹出登录窗
 - 支持上传参考图（最多 12 张，支持拖拽排序）→ 参考图 URL 传给接口的 image 字段
 - 支持风格预设 → 提示词输入框内的「选择风格」按钮 → 弹窗以宫格形式展示全部预设（封面图 + 名称） → 可多选 → 关闭弹窗后选中预设对应的 prompt 前缀依次拼接到用户提示词前面
@@ -68,7 +68,7 @@ CANVAS 是一个 AI 图像生成与展示平台，用户注册账号后通过充
 
 **首页展示**
 - Hero 区域：品牌展示 + CTA 引导（未登录显示「立即注册」，已登录显示「开始创作」）
-- 支持的生图模型：当前仅 GPT-4o Image 可用；Google Nano Banana Pro、Midjourney V7 作为即将支持模型展示（不可选），为后续扩展留位
+- 支持的生图模型：当前仅 GPT Image2 可用；Google Nano Banana Pro、Midjourney V7 作为即将支持模型展示（不可选），为后续扩展留位
 - 今日精选：展示后台标记为「精选」的画廊图片
 - 底部 CTA：引导进入画廊或生图页面
 
@@ -106,11 +106,29 @@ CANVAS 是一个 AI 图像生成与展示平台，用户注册账号后通过充
 - 分类 Tab：分类 CRUD（名称、排序），供画廊筛选与编辑使用
 - 风格预设 Tab：风格预设 CRUD（预设名、长描述、封面图、prompt 前缀），仅供生图页「选择风格」弹窗使用，不再有独立前台页面
 
+**模型管理 / VectorEngine 接入配置**
+- 管理 GPT Image2、Google Nano Banana 系列、Midjourney V7 等可用生图模型
+- 字段至少包含：前端展示名、provider、真实 model id / 接口类型、是否启用、是否前台可选、排序、计费方式（按量 / 按次）、平台成本、用户扣费积分、并发上限、超时时间
+- 模型配置作为前台模型选择、后台画廊模型标签、历史记录筛选、扣费规则的统一来源，避免在多个组件中硬编码模型列表
+- GPT Image2 前端展示名固定为 `GPT Image2`，真实上游模型 ID 为 `gpt-image-2`
+
+**生图任务管理**
+- 查看任务列表：任务 ID、用户、provider、模型、状态、进度、消耗积分、创建时间、更新时间
+- 支持按状态筛选：pending / processing / completed / failed
+- 失败任务显示失败原因、上游响应摘要、重试次数
+- 支持管理员对失败任务执行重试、标记失败、查看原始参数
+
+**Worker 状态监控**
+- 展示 worker 最近心跳时间、当前处理中任务数、最近失败任务数
+- 标记长时间 stuck 的 `processing` 任务，供管理员手动恢复为 pending 或标记失败
+- 展示各 provider/model 当前并发上限与实际处理情况
+
 **系统设置**
-- 配置中转站 API 地址（base_url）
-- 配置中转站 API Key
+- 配置 VectorEngine / 中转站 API 地址（base_url）
+- 配置 VectorEngine / 中转站 API Key
+- 配置当前启用的 provider 与模型开关
 - 配置阿里云 OSS（AccessKey、Bucket、Region、Endpoint）
-- 配置单次生图积分消耗（默认 0.07）
+- 配置默认单次生图积分消耗（默认 0.07），多模型接入后以模型管理中的用户扣费积分为准
 - 配置注册赠送积分（默认 0.21）
 - 配置 SMTP 邮件服务（Host、Port、用户名、密码、发件人地址）
 - 配置管理员账号（默认 admin）和管理员密码
@@ -140,13 +158,13 @@ CANVAS 是一个 AI 图像生成与展示平台，用户注册账号后通过充
 ### 首页
 
 - **Hero 区域**：全屏高度，左下角内容（eyebrow 标签 + 大标题 + 副标题 + 双按钮），背景渐变 + 噪点纹理。CTA 按钮根据登录状态变化：未登录显示「立即注册」，已登录显示「开始创作」
-- **模型展示区**：2 列网格，模型卡片（渐变色封面 + 模型名 + 描述 + 作品数量）。当前仅 GPT-4o Image 可用；Google Nano Banana Pro 与 Midjourney V7 作为即将支持模型展示（available=false），具体 model id 以中转站文档为准
+- **模型展示区**：2 列网格，模型卡片（渐变色封面 + 模型名 + 描述 + 作品数量）。当前仅 GPT Image2 可用；Google Nano Banana Pro 与 Midjourney V7 作为即将支持模型展示（available=false），具体 model id 以中转站文档为准
 - **今日精选区**：不规则网格（1 大 4 小），hover 显示模型标签和 prompt
 - **底部 CTA**：居中标题 + 描述 + 双按钮
 
 ### 画廊页
 
-- **筛选栏**：sticky 在导航栏下方，三组 chips 自上而下排布：模型 chips（全部 / GPT-4o Image / Nano Banana Pro / Midjourney V7）+ 风格 chips（全部 / 写实 / 动漫 / 油画 等）+ 分类 chips（全部 / 人像 / 风景 / 建筑 / 动漫 / 抽象 / 产品 / 概念艺术 等）
+- **筛选栏**：sticky 在导航栏下方，三组 chips 自上而下排布：模型 chips（全部 / GPT Image2 / Nano Banana Pro / Midjourney V7）+ 风格 chips（全部 / 写实 / 动漫 / 油画 等）+ 分类 chips（全部 / 人像 / 风景 / 建筑 / 动漫 / 抽象 / 产品 / 概念艺术 等）
 - **瀑布流网格**：4 列 masonry 布局，卡片以图片真实宽高比占位（数据库提供 width/height，加载过程不发生 reflow），hover 显示半透明遮罩（顶部 title 可选 + 模型标签 + prompt 摘要 + 操作按钮「复制提示词」「用此生图」）
 
 ### 生图页
@@ -154,7 +172,7 @@ CANVAS 是一个 AI 图像生成与展示平台，用户注册账号后通过充
 三栏布局：左侧 256px / 中间自适应 / 右侧 272px
 
 **左栏 - 模型选择 + 历史记录**：
-- 模型卡片列表（当前只有 GPT-4o Image 可选，高亮选中态）
+- 模型卡片列表（当前只有 GPT Image2 可选，高亮选中态）
 - 分隔线
 - 「最近创作」标题 + 「查看全部」链接（跳 `/history`）
 - 历史记录简版列表：最近 10 条，每条缩略图（48×48）+ 时间，点击复用当时的全部参数到生图面板
@@ -312,7 +330,7 @@ CANVAS 是一个 AI 图像生成与展示平台，用户注册账号后通过充
 
 **画廊数据结构与加载占位**：
 - `gallery_images` 表新增字段：`title`（可选，原模板名）、`category_id`（外键到 categories）、`width` / `height`（图片像素尺寸）
-- `prompt_templates` 表已废弃，原数据全部迁入 `gallery_images`：`name → title`、`prompt → prompt`、`cover_image_url → image_url`、`category_id` 映射保留；迁入记录默认 `model_tag = "GPT-4o Image"`、`style_tag = "通用"`，可在后台手动调整
+- `prompt_templates` 表已废弃，原数据全部迁入 `gallery_images`：`name → title`、`prompt → prompt`、`cover_image_url → image_url`、`category_id` 映射保留；历史 `model_tag = "GPT-4o Image"` 数据迁移为 `GPT Image2`，前端保留旧标签兼容展示兜底，可在后台手动调整
 - 后台上传图片时通过 `image-size` 库 fetch URL 并解析 buffer 取得 `width`/`height` 写库；老数据通过一次性回填接口 `POST /api/admin/gallery/backfill-dimensions` 补齐
 - 前台画廊卡片用 `aspect-ratio: width / height` 占位，避免图片陆续加载时 CSS columns 反复重排
 
@@ -327,13 +345,25 @@ CANVAS 是一个 AI 图像生成与展示平台，用户注册账号后通过充
 - 充值码兑换：每用户每分钟最多 5 次失败尝试（防止暴力破解）
 
 **图像生成接口（第三方中转站）**：
+- 中转站切换方向：后续生图接口从当前已接入的第三方中转站迁移到 VectorEngine 平台，项目仍通过系统设置维护 `baseUrl` 与 API Key，不在代码中硬编码固定域名
+- 后续 GPT Image、Google Gemini/Nano Banana、Midjourney 均按 VectorEngine 接口文档适配；Fal.ai Nano Banana 不在接入范围内
 - 提交任务：`POST {baseUrl}/v1/images/generations?async=true`
 - 当前 OpenAI 生图提交模型 ID 固定为 `gpt-image-2`
+- OpenAI 生图前端展示名统一为 `GPT Image2`；历史 `model_tag = "GPT-4o Image"` 数据迁移为 `GPT Image2`，并保留旧标签兼容展示和筛选
 - 请求体：`{ model: "gpt-image-2", prompt, size, quality, response_format: "url", image?: string[] }`
 - 返回 task_id，异步轮询获取结果
 - 轮询：`GET {baseUrl}/v1/images/tasks/{taskId}`
 - 成功时返回图片 URL（中转站托管，立即转存到自有 OSS）
 - 认证方式：Bearer Token
+
+**VectorEngine 同步接口异步包装预案**：
+- 若 VectorEngine 上游接口为同步返回，项目 Web API 不直接等待上游生图完成；Web API 只负责鉴权、余额预检查、参数校验、创建本地任务并立即返回 taskId
+- 后台 worker 从数据库领取 `pending` 任务，标记为 `processing` 后按 provider/model 维度限制并发调用同步上游接口
+- worker 成功后负责解析图片、转存 OSS、写入历史记录、更新任务为 `completed`；失败则记录 `fail_reason` 和原始响应摘要并更新为 `failed`
+- 禁止在 API Route 中使用 fire-and-forget 方式直接启动长耗时生图任务，避免进程重启、部署、超时或异常导致任务丢失
+- 初期可使用数据库任务队列 + 独立 worker 进程；量级上升后再评估 Redis/BullMQ 等专用队列
+- 建议按通道设置保守并发上限，例如 OpenAI/GPT Image 2-5、Google Gemini Image 1-3、Midjourney 任务提交与轮询独立限流，具体数值以上游限额和服务器资源为准
+- 后台系统需配套提供模型管理、任务管理、worker 状态监控、失败重试和模型成本/用户扣费配置，避免只替换接口调用而漏掉运营和排障能力
 
 **尺寸映射规则**：
 - 画面比例 + 质量档位 → 映射为具体像素尺寸
@@ -341,6 +371,7 @@ CANVAS 是一个 AI 图像生成与展示平台，用户注册账号后通过充
 
 **积分系统**：
 - 每张图固定消耗 0.07 积分（可在系统设置中调整）
+- 多模型接入后，实际扣费优先读取模型管理中的用户扣费积分；默认单次生图积分仅作为兜底
 - 新用户注册赠送 0.21 积分（可在系统设置中调整）
 - 生成前检查账号余额，不足则拒绝并提示
 - 生成成功后扣减积分（事务保证）；生成失败不扣
@@ -376,6 +407,6 @@ CANVAS 是一个 AI 图像生成与展示平台，用户注册账号后通过充
 | 邮件服务商 | 推荐阿里云邮件推送或腾讯云 SES，SMTP 协议 |
 | 密码安全 | bcrypt 哈希（cost factor 10），最小 8 位 |
 | Session 有效期 | 7 天滑动续期 |
-| 模型扩展 | UI 预留多模型位置，当前仅 GPT-4o Image 可用；Google Nano Banana Pro、Midjourney V7 标注「即将支持」，具体 model id 以中转站文档为准 |
+| 模型扩展 | UI 预留多模型位置，当前仅 GPT Image2 可用；Google Nano Banana Pro、Midjourney V7 标注「即将支持」，具体 model id 以中转站文档为准 |
 | 后台默认账号 | admin（首次部署使用，可在系统设置中修改） |
 | 后台登录锁定 | 同 IP 连续 5 次错误锁定 15 分钟（独立于充值码兑换的 5 次/分钟限制） |

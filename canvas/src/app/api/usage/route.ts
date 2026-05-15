@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { GPT_IMAGE_DISPLAY_NAME } from "@/lib/constants";
 import { requireUser, AuthError } from "@/lib/c-auth";
 
 interface ParsedParams {
@@ -161,7 +162,7 @@ function formatItem(r: RawRow) {
     isPersisted: r.isPersisted,
     promptSummary: r.promptSummary,
     prompt: params.prompt,
-    modelTag: "gpt-4o-image",
+    modelTag: GPT_IMAGE_DISPLAY_NAME,
     aspectRatio: params.aspectRatio,
     quality: params.quality,
     count: params.count,

@@ -50,6 +50,7 @@ export const AnyNull = runtime.objectEnumValues.instances.AnyNull
 
 export const ModelName = {
   SystemSetting: 'SystemSetting',
+  ModelConfig: 'ModelConfig',
   ApiKey: 'ApiKey',
   UsageRecord: 'UsageRecord',
   GalleryImage: 'GalleryImage',
@@ -89,6 +90,27 @@ export const SystemSettingScalarFieldEnum = {
 } as const
 
 export type SystemSettingScalarFieldEnum = (typeof SystemSettingScalarFieldEnum)[keyof typeof SystemSettingScalarFieldEnum]
+
+
+export const ModelConfigScalarFieldEnum = {
+  id: 'id',
+  displayName: 'displayName',
+  provider: 'provider',
+  modelId: 'modelId',
+  endpointType: 'endpointType',
+  billingType: 'billingType',
+  platformCost: 'platformCost',
+  userCreditCost: 'userCreditCost',
+  enabled: 'enabled',
+  userSelectable: 'userSelectable',
+  sortOrder: 'sortOrder',
+  concurrencyLimit: 'concurrencyLimit',
+  timeoutSeconds: 'timeoutSeconds',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ModelConfigScalarFieldEnum = (typeof ModelConfigScalarFieldEnum)[keyof typeof ModelConfigScalarFieldEnum]
 
 
 export const ApiKeyScalarFieldEnum = {
@@ -240,6 +262,19 @@ export const ImageTaskScalarFieldEnum = {
   imageUrl: 'imageUrl',
   isPersisted: 'isPersisted',
   usageRecordId: 'usageRecordId',
+  provider: 'provider',
+  model: 'model',
+  paramsJson: 'paramsJson',
+  upstreamRaw: 'upstreamRaw',
+  lockedBy: 'lockedBy',
+  lockExpiresAt: 'lockExpiresAt',
+  attemptCount: 'attemptCount',
+  maxAttempts: 'maxAttempts',
+  nextRunAt: 'nextRunAt',
+  idempotencyKey: 'idempotencyKey',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
+  source: 'source',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -291,6 +326,17 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const ModelConfigOrderByRelevanceFieldEnum = {
+  displayName: 'displayName',
+  provider: 'provider',
+  modelId: 'modelId',
+  endpointType: 'endpointType',
+  billingType: 'billingType'
+} as const
+
+export type ModelConfigOrderByRelevanceFieldEnum = (typeof ModelConfigOrderByRelevanceFieldEnum)[keyof typeof ModelConfigOrderByRelevanceFieldEnum]
 
 
 export const ApiKeyOrderByRelevanceFieldEnum = {
@@ -383,7 +429,14 @@ export const ImageTaskOrderByRelevanceFieldEnum = {
   quality: 'quality',
   size: 'size',
   referenceImagesJson: 'referenceImagesJson',
-  imageUrl: 'imageUrl'
+  imageUrl: 'imageUrl',
+  provider: 'provider',
+  model: 'model',
+  paramsJson: 'paramsJson',
+  upstreamRaw: 'upstreamRaw',
+  lockedBy: 'lockedBy',
+  idempotencyKey: 'idempotencyKey',
+  source: 'source'
 } as const
 
 export type ImageTaskOrderByRelevanceFieldEnum = (typeof ImageTaskOrderByRelevanceFieldEnum)[keyof typeof ImageTaskOrderByRelevanceFieldEnum]

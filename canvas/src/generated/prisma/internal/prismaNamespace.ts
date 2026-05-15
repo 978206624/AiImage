@@ -391,6 +391,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   SystemSetting: 'SystemSetting',
+  ModelConfig: 'ModelConfig',
   ApiKey: 'ApiKey',
   UsageRecord: 'UsageRecord',
   GalleryImage: 'GalleryImage',
@@ -418,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "systemSetting" | "apiKey" | "usageRecord" | "galleryImage" | "category" | "promptTemplate" | "stylePreset" | "user" | "emailToken" | "registrationAttempt" | "imageTask" | "adminUserAuditLog" | "adminLoginAttempt"
+    modelProps: "systemSetting" | "modelConfig" | "apiKey" | "usageRecord" | "galleryImage" | "category" | "promptTemplate" | "stylePreset" | "user" | "emailToken" | "registrationAttempt" | "imageTask" | "adminUserAuditLog" | "adminLoginAttempt"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -485,6 +486,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SystemSettingCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SystemSettingCountAggregateOutputType> | number
+        }
+      }
+    }
+    ModelConfig: {
+      payload: Prisma.$ModelConfigPayload<ExtArgs>
+      fields: Prisma.ModelConfigFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ModelConfigFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModelConfigPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ModelConfigFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModelConfigPayload>
+        }
+        findFirst: {
+          args: Prisma.ModelConfigFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModelConfigPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ModelConfigFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModelConfigPayload>
+        }
+        findMany: {
+          args: Prisma.ModelConfigFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModelConfigPayload>[]
+        }
+        create: {
+          args: Prisma.ModelConfigCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModelConfigPayload>
+        }
+        createMany: {
+          args: Prisma.ModelConfigCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.ModelConfigDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModelConfigPayload>
+        }
+        update: {
+          args: Prisma.ModelConfigUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModelConfigPayload>
+        }
+        deleteMany: {
+          args: Prisma.ModelConfigDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ModelConfigUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.ModelConfigUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ModelConfigPayload>
+        }
+        aggregate: {
+          args: Prisma.ModelConfigAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateModelConfig>
+        }
+        groupBy: {
+          args: Prisma.ModelConfigGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ModelConfigGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ModelConfigCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ModelConfigCountAggregateOutputType> | number
         }
       }
     }
@@ -1330,6 +1397,27 @@ export const SystemSettingScalarFieldEnum = {
 export type SystemSettingScalarFieldEnum = (typeof SystemSettingScalarFieldEnum)[keyof typeof SystemSettingScalarFieldEnum]
 
 
+export const ModelConfigScalarFieldEnum = {
+  id: 'id',
+  displayName: 'displayName',
+  provider: 'provider',
+  modelId: 'modelId',
+  endpointType: 'endpointType',
+  billingType: 'billingType',
+  platformCost: 'platformCost',
+  userCreditCost: 'userCreditCost',
+  enabled: 'enabled',
+  userSelectable: 'userSelectable',
+  sortOrder: 'sortOrder',
+  concurrencyLimit: 'concurrencyLimit',
+  timeoutSeconds: 'timeoutSeconds',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ModelConfigScalarFieldEnum = (typeof ModelConfigScalarFieldEnum)[keyof typeof ModelConfigScalarFieldEnum]
+
+
 export const ApiKeyScalarFieldEnum = {
   id: 'id',
   key: 'key',
@@ -1479,6 +1567,19 @@ export const ImageTaskScalarFieldEnum = {
   imageUrl: 'imageUrl',
   isPersisted: 'isPersisted',
   usageRecordId: 'usageRecordId',
+  provider: 'provider',
+  model: 'model',
+  paramsJson: 'paramsJson',
+  upstreamRaw: 'upstreamRaw',
+  lockedBy: 'lockedBy',
+  lockExpiresAt: 'lockExpiresAt',
+  attemptCount: 'attemptCount',
+  maxAttempts: 'maxAttempts',
+  nextRunAt: 'nextRunAt',
+  idempotencyKey: 'idempotencyKey',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt',
+  source: 'source',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1530,6 +1631,17 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const ModelConfigOrderByRelevanceFieldEnum = {
+  displayName: 'displayName',
+  provider: 'provider',
+  modelId: 'modelId',
+  endpointType: 'endpointType',
+  billingType: 'billingType'
+} as const
+
+export type ModelConfigOrderByRelevanceFieldEnum = (typeof ModelConfigOrderByRelevanceFieldEnum)[keyof typeof ModelConfigOrderByRelevanceFieldEnum]
 
 
 export const ApiKeyOrderByRelevanceFieldEnum = {
@@ -1622,7 +1734,14 @@ export const ImageTaskOrderByRelevanceFieldEnum = {
   quality: 'quality',
   size: 'size',
   referenceImagesJson: 'referenceImagesJson',
-  imageUrl: 'imageUrl'
+  imageUrl: 'imageUrl',
+  provider: 'provider',
+  model: 'model',
+  paramsJson: 'paramsJson',
+  upstreamRaw: 'upstreamRaw',
+  lockedBy: 'lockedBy',
+  idempotencyKey: 'idempotencyKey',
+  source: 'source'
 } as const
 
 export type ImageTaskOrderByRelevanceFieldEnum = (typeof ImageTaskOrderByRelevanceFieldEnum)[keyof typeof ImageTaskOrderByRelevanceFieldEnum]
@@ -1778,6 +1897,7 @@ export interface PrismaClientOptions {
 }
 export type GlobalOmitConfig = {
   systemSetting?: Prisma.SystemSettingOmit
+  modelConfig?: Prisma.ModelConfigOmit
   apiKey?: Prisma.ApiKeyOmit
   usageRecord?: Prisma.UsageRecordOmit
   galleryImage?: Prisma.GalleryImageOmit

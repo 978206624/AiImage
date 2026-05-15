@@ -9,7 +9,7 @@ import { useCurrentUser } from "@/hooks/use-current-user";
 import { Lightbox } from "@/components/ui/lightbox";
 import { Select } from "@/components/ui/select";
 import type { HistoryItem } from "@/components/generate/recent-history";
-import { ASPECT_RATIOS } from "@/lib/constants";
+import { ASPECT_RATIOS, GPT_IMAGE_DISPLAY_NAME } from "@/lib/constants";
 
 const REUSE_KEY = "canvas_reuse_params";
 const PAGE_SIZE = 20;
@@ -247,7 +247,7 @@ export default function HistoryPage() {
             filteredItems[lightboxIdx].promptSummary ||
             undefined
           }
-          model="GPT-4O Image"
+          model={GPT_IMAGE_DISPLAY_NAME}
           onClose={() => setLightboxIdx(null)}
         />
       )}

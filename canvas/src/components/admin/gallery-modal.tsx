@@ -3,8 +3,9 @@
 import { useState, useCallback, useEffect } from "react";
 import ImageUploader from "@/components/admin/image-uploader";
 import { Select } from "@/components/ui/select";
+import { GPT_IMAGE_DISPLAY_NAME, normalizeModelTag } from "@/lib/constants";
 
-const MODEL_TAGS = ["GPT-4o Image", "Google Nano Banana Pro", "Midjourney V7"];
+const MODEL_TAGS = [GPT_IMAGE_DISPLAY_NAME, "Google Nano Banana Pro", "Midjourney V7"];
 const STYLE_TAGS = ["写实", "动漫", "油画", "赛博朋克", "水墨", "极简", "通用"];
 
 interface GalleryFormData {
@@ -63,7 +64,13 @@ export default function GalleryModal({
     if (!open) return;
     let cancelled = false;
     void Promise.resolve().then(() => {
-      if (!cancelled) setForm(initial || EMPTY_FORM);
+      if (!cancelled) {
+        setForm(
+          initial
+            ? { ...initial, modelTag: normalizeModelTag(initial.modelTag) }
+            : EMPTY_FORM
+        );
+      }
     });
     return () => {
       cancelled = true;

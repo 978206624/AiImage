@@ -5,6 +5,7 @@ import Image from "next/image";
 import GalleryModal from "@/components/admin/gallery-modal";
 import { CategoriesTable } from "@/components/admin/categories-table";
 import { PresetsTable } from "@/components/admin/presets-table";
+import { normalizeModelTag } from "@/lib/constants";
 
 interface GalleryImage {
   id: number;
@@ -204,7 +205,9 @@ function GalleryImagesTab() {
                     <td className="px-4 py-3 text-fg max-w-[180px] truncate">
                       {img.prompt || "-"}
                     </td>
-                    <td className="px-4 py-3 text-muted">{img.modelTag}</td>
+                    <td className="px-4 py-3 text-muted">
+                      {normalizeModelTag(img.modelTag)}
+                    </td>
                     <td className="px-4 py-3 text-muted">{img.styleTag}</td>
                     <td className="px-4 py-3 text-muted">
                       {img.category?.name || "-"}
@@ -291,7 +294,7 @@ function GalleryImagesTab() {
             ? {
                 imageUrl: editingImage.imageUrl,
                 prompt: editingImage.prompt || "",
-                modelTag: editingImage.modelTag,
+                modelTag: normalizeModelTag(editingImage.modelTag),
                 styleTag: editingImage.styleTag,
                 title: editingImage.title || "",
                 categoryId: editingImage.categoryId,

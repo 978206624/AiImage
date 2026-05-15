@@ -50,6 +50,11 @@ path.join(process.cwd(), "src/generated/prisma/query_engine-windows.dll.node")
  */
 export type SystemSetting = Prisma.SystemSettingModel
 /**
+ * Model ModelConfig
+ * 
+ */
+export type ModelConfig = Prisma.ModelConfigModel
+/**
  * Model ApiKey
  * 
  */

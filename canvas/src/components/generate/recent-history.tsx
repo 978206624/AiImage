@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Lightbox } from "@/components/ui/lightbox";
+import { normalizeModelTag } from "@/lib/constants";
 
 export interface HistoryItem {
   id: number;
@@ -165,7 +166,7 @@ export function RecentHistory({ onReuse, refreshKey }: RecentHistoryProps) {
         <Lightbox
           src={previewItem.imageUrl}
           prompt={previewItem.prompt || previewItem.promptSummary || undefined}
-          model={previewItem.modelTag}
+          model={normalizeModelTag(previewItem.modelTag)}
           onClose={() => setPreviewItem(null)}
         />
       )}

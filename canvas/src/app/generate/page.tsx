@@ -17,6 +17,7 @@ import { useGeneration } from "@/hooks/use-generation";
 import { useAuthModal } from "@/components/layout/auth-modal-context";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useToast } from "@/components/ui/toast";
+import { GPT_IMAGE_DISPLAY_NAME } from "@/lib/constants";
 import type { AspectRatio, Quality } from "@/lib/size-map";
 
 const CREDITS_PER_IMAGE = 0.07;
@@ -165,7 +166,7 @@ function GenerateContent() {
 
   const modelBadge =
     model === "gpt-4o-image"
-      ? "GPT-4O IMAGE"
+      ? GPT_IMAGE_DISPLAY_NAME.toUpperCase()
       : model === "google-nano-banana-pro"
         ? "GOOGLE NANO BANANA PRO"
         : "MIDJOURNEY V7";

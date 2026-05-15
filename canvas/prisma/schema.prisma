@@ -18,6 +18,26 @@ model SystemSetting {
   @@map("system_settings")
 }
 
+model ModelConfig {
+  id              Int      @id @default(autoincrement())
+  displayName     String   @map("display_name") @db.VarChar(100)
+  provider        String   @db.VarChar(20)
+  modelId         String   @map("model_id") @db.VarChar(100)
+  endpointType    String   @map("endpoint_type") @db.VarChar(50)
+  billingType     String   @map("billing_type") @db.VarChar(20)
+  platformCost    Decimal? @map("platform_cost") @db.Decimal(10, 4)
+  userCreditCost  Decimal  @map("user_credit_cost") @db.Decimal(10, 4)
+  enabled         Boolean  @default(true)
+  userSelectable  Boolean  @default(true) @map("user_selectable")
+  sortOrder       Int      @default(0) @map("sort_order")
+  concurrencyLimit Int     @default(3) @map("concurrency_limit")
+  timeoutSeconds  Int      @default(120) @map("timeout_seconds")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("model_configs")
+}
+
 model ApiKey {
   id           Int           @id @default(autoincrement())
   key          String        @unique @db.VarChar(20)
@@ -178,6 +198,19 @@ model ImageTask {
   imageUrl            String?  @map("image_url") @db.Text
   isPersisted         Boolean  @default(false) @map("is_persisted")
   usageRecordId       Int?     @map("usage_record_id")
+  provider            String?  @map("provider") @db.VarChar(20)
+  model               String?  @db.VarChar(100)
+  paramsJson          String?  @map("params_json") @db.Text
+  upstreamRaw         String?  @map("upstream_raw") @db.Text
+  lockedBy            String?  @map("locked_by") @db.VarChar(100)
+  lockExpiresAt       DateTime? @map("lock_expires_at")
+  attemptCount        Int      @default(0) @map("attempt_count")
+  maxAttempts         Int      @default(2) @map("max_attempts")
+  nextRunAt           DateTime? @map("next_run_at")
+  idempotencyKey      String?  @map("idempotency_key") @db.VarChar(100)
+  startedAt           DateTime? @map("started_at")
+  finishedAt          DateTime? @map("finished_at")
+  source              String   @default("poll") @map("source")
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
   user                User     @relation(fields: [userId], references: [id])
@@ -185,6 +218,7 @@ model ImageTask {
   @@index([userId, createdAt])
   @@index([groupId])
   @@index([status])
+  @@unique([idempotencyKey])
   @@map("image_tasks")
 }
 
