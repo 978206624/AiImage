@@ -42,6 +42,24 @@ interface GeminiResponse {
 
 const DEFAULT_TIMEOUT_MS = 120_000;
 
+async function convertToDataUrl(url: string): Promise<{ mimeType: string; data: string }> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) {
+      throw new Error(`下载参考图失败: ${res.status}`);
+    }
+    const contentType = res.headers.get("content-type") ?? "image/png";
+    const buffer = await res.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+    return { mimeType: contentType, data: base64 };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function getConfig() {
   const baseUrl = await getRequiredSetting(
     "api_base_url",
@@ -83,12 +101,17 @@ export class GeminiImageProvider implements ImageProvider {
             },
           });
         } else {
-          parts.push({
-            inlineData: {
-              mimeType: "image/png",
-              data: refImage,
-            },
-          });
+          try {
+            const converted = await convertToDataUrl(refImage);
+            parts.push({
+              inlineData: {
+                mimeType: converted.mimeType,
+                data: converted.data,
+              },
+            });
+          } catch (error) {
+            throw new Error(`参考图处理失败: ${error instanceof Error ? error.message : "Unknown error"}`);
+          }
         }
       }
     }

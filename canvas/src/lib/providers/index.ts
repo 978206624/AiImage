@@ -44,11 +44,12 @@ export async function getProvider(modelId: string): Promise<ImageProvider | null
   }
 
   let provider: ImageProvider;
+  const timeoutMs = (modelConfig.timeoutSeconds ?? 120) * 1000;
 
   if (modelConfig.provider === "openai") {
-    provider = new OpenAIImageProvider(modelConfig.modelId);
+    provider = new OpenAIImageProvider(modelConfig.modelId, timeoutMs);
   } else if (modelConfig.provider === "google") {
-    provider = new GeminiImageProvider(modelConfig.modelId);
+    provider = new GeminiImageProvider(modelConfig.modelId, timeoutMs);
   } else {
     providerCache.delete(modelId);
     return null;

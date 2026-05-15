@@ -165,8 +165,7 @@ export class ImageWorker {
       providerType = modelId?.startsWith("gemini") ? "google" : "openai";
 
       if (isCircuitOpen(providerType)) {
-        console.log(`[ImageWorker] ${providerType} circuit breaker is open, releasing task ${taskId}`);
-        await releaseTask(taskId, this.workerId);
+        console.log(`[ImageWorker] ${providerType} circuit breaker is open, skipping task ${taskId}`);
         return;
       }
 
