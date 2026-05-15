@@ -1,14 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect } from "react";
 
 interface LoginPromptModalProps {
   open: boolean;
   onClose: () => void;
+  onAuth?: (mode: "login" | "register") => void;
 }
 
-export function LoginPromptModal({ open, onClose }: LoginPromptModalProps) {
+export function LoginPromptModal({ open, onClose, onAuth }: LoginPromptModalProps) {
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
@@ -35,18 +35,18 @@ export function LoginPromptModal({ open, onClose }: LoginPromptModalProps) {
         </p>
 
         <div className="flex gap-2">
-          <Link
-            href="/login?redirect=/generate"
+          <button
+            onClick={() => onAuth?.("login")}
             className="flex-1 py-2 bg-accent text-bg text-sm font-medium rounded text-center hover:opacity-90 transition-opacity"
           >
             去登录
-          </Link>
-          <Link
-            href="/register"
+          </button>
+          <button
+            onClick={() => onAuth?.("register")}
             className="flex-1 py-2 border border-border text-fg text-sm font-medium rounded text-center hover:border-accent transition-colors"
           >
             去注册
-          </Link>
+          </button>
         </div>
 
         <button

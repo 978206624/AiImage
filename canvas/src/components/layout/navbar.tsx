@@ -8,7 +8,11 @@ import { BalanceBadge } from "./balance-badge";
 import { UserMenu } from "./user-menu";
 import { ThemeToggle } from "./theme-toggle";
 
-export function Navbar() {
+interface NavbarProps {
+  onOpenAuthModal?: (tab?: "login" | "register") => void;
+}
+
+export function Navbar({ onOpenAuthModal }: NavbarProps) {
   const pathname = usePathname();
   const { user, loading } = useCurrentUser();
 
@@ -62,20 +66,12 @@ export function Navbar() {
             <UserMenu email={user.email} />
           </>
         ) : (
-          <>
-            <Link
-              href="/login"
-              className="px-3 h-[34px] flex items-center text-sm text-muted hover:text-fg transition-colors"
-            >
-              登录
-            </Link>
-            <Link
-              href="/register"
-              className="px-3 h-[34px] flex items-center text-sm text-fg border border-border rounded-[var(--r)] hover:border-accent transition-colors"
-            >
-              注册
-            </Link>
-          </>
+          <button
+            onClick={() => onOpenAuthModal?.("login")}
+            className="px-3 h-[34px] flex items-center text-sm text-fg border border-border rounded-[var(--r)] hover:border-accent transition-colors"
+          >
+            登录
+          </button>
         )}
 
         <ThemeToggle />

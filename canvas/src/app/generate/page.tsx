@@ -14,6 +14,7 @@ import { StylePickerModal } from "@/components/generate/style-picker-modal";
 import { RecentHistory } from "@/components/generate/recent-history";
 import type { HistoryItem } from "@/components/generate/recent-history";
 import { useGeneration } from "@/hooks/use-generation";
+import { useAuthModal } from "@/components/layout/auth-modal-context";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useToast } from "@/components/ui/toast";
 import type { AspectRatio, Quality } from "@/lib/size-map";
@@ -63,6 +64,7 @@ function GenerateContent() {
   const [balanceModalOpen, setBalanceModalOpen] = useState(false);
   const [stylePickerOpen, setStylePickerOpen] = useState(false);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
+  const authModal = useAuthModal();
 
   const handleReuse = useCallback(
     (item: HistoryItem) => {
@@ -251,6 +253,10 @@ function GenerateContent() {
       <LoginPromptModal
         open={loginModalOpen}
         onClose={() => setLoginModalOpen(false)}
+        onAuth={(mode) => {
+          setLoginModalOpen(false);
+          authModal.openModal(mode);
+        }}
       />
       <InsufficientBalanceModal
         open={balanceModalOpen}

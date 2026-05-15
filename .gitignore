@@ -35,5 +35,8 @@ DEV-PLAN.md
 # Claude framework
 .claude/
 
+# Three Kingdoms session logs
+.tk-meeting/
+
 # Playwright MCP screenshots/snapshots
 .playwright-mcp/
