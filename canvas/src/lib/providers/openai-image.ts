@@ -38,6 +38,24 @@ async function getConfig() {
   return { baseUrl: baseUrl.replace(/\/$/, ""), apiKey };
 }
 
+async function convertToDataUrl(url: string): Promise<string> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) {
+      throw new Error(`下载参考图失败: ${res.status}`);
+    }
+    const contentType = res.headers.get("content-type") ?? "image/png";
+    const buffer = await res.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString("base64");
+    return `data:${contentType};base64,${base64}`;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export class OpenAIImageProvider implements ImageProvider {
   readonly provider = "openai" as const;
   readonly modelId: string;
@@ -63,7 +81,21 @@ export class OpenAIImageProvider implements ImageProvider {
     };
 
     if (params.referenceImages && params.referenceImages.length > 0) {
-      body.image = params.referenceImages;
+      const processedImages: string[] = [];
+      for (const refImage of params.referenceImages) {
+        if (refImage.startsWith("data:")) {
+          processedImages.push(refImage);
+        } else {
+          try {
+            const dataUrl = await convertToDataUrl(refImage);
+            processedImages.push(dataUrl);
+          } catch (error) {
+            console.warn(`[OpenAIImageProvider] 参考图转换失败: ${error}`);
+            throw new Error(`参考图处理失败: ${error instanceof Error ? error.message : "Unknown error"}`);
+          }
+        }
+      }
+      body.image = processedImages;
     }
 
     const controller = new AbortController();
