@@ -4,6 +4,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { isCircuitOpen } from "./circuit-breaker";
 
 const LOCK_TIMEOUT_SECONDS = 60;
+const MAX_CANDIDATE_TASKS = 10;
 
 export async function claimTask(workerId: string): Promise<number | null> {
   try {
@@ -19,7 +20,7 @@ export async function claimTask(workerId: string): Promise<number | null> {
           AND attempt_count < COALESCE(max_attempts, 2)
           AND source = 'worker'
         ORDER BY created_at ASC
-        LIMIT 1
+        LIMIT ${MAX_CANDIDATE_TASKS}
         FOR UPDATE SKIP LOCKED
       `;
 
@@ -27,37 +28,39 @@ export async function claimTask(workerId: string): Promise<number | null> {
         return null;
       }
 
-      const row = result[0];
+      for (const row of result) {
+        const modelId = row.model ?? "gpt-image-2";
+        const providerType = modelId?.startsWith("gemini") ? "google" : "openai";
 
-      const modelId = row.model ?? "gpt-image-2";
-      const providerType = modelId?.startsWith("gemini") ? "google" : "openai";
+        if (isCircuitOpen(providerType)) {
+          console.log(`[claimTask] ${providerType} circuit breaker is open, skipping task ${row.id}`);
+          continue;
+        }
 
-      if (isCircuitOpen(providerType)) {
-        console.log(`[claimTask] ${providerType} circuit breaker is open, skipping task ${row.id}`);
-        return null;
+        const startedAt = row.started_at ?? now;
+
+        const updateResult = await tx.imageTask.updateMany({
+          where: {
+            id: row.id,
+            status: "pending",
+          },
+          data: {
+            status: "processing",
+            lockedBy: workerId,
+            lockExpiresAt: lockExpiresAt,
+            attemptCount: { increment: 1 },
+            startedAt: startedAt,
+          },
+        });
+
+        if (updateResult.count === 0) {
+          continue;
+        }
+
+        return row.id;
       }
 
-      const startedAt = row.started_at ?? now;
-
-      const updateResult = await tx.imageTask.updateMany({
-        where: {
-          id: row.id,
-          status: "pending",
-        },
-        data: {
-          status: "processing",
-          lockedBy: workerId,
-          lockExpiresAt: lockExpiresAt,
-          attemptCount: { increment: 1 },
-          startedAt: startedAt,
-        },
-      });
-
-      if (updateResult.count === 0) {
-        return null;
-      }
-
-      return row.id;
+      return null;
     }, {
       isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
       timeout: 10000,
