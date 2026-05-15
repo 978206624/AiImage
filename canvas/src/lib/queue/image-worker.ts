@@ -83,6 +83,8 @@ export class ImageWorker {
   }
 
   private async processTask(taskId: number): Promise<void> {
+    let modelId: string | undefined;
+
     try {
       const task = await prisma.imageTask.findUnique({
         where: { id: taskId },
@@ -94,7 +96,7 @@ export class ImageWorker {
         return;
       }
 
-      const modelId = task.model ?? "gpt-image-2";
+      modelId = task.model ?? "gpt-image-2";
       const provider = await getProvider(modelId);
 
       if (!provider) {
@@ -126,7 +128,7 @@ export class ImageWorker {
         isPersisted = persistResult.isPersisted;
 
         if (!persistResult.isPersisted) {
-          await this.failTask(taskId, `OSS upload failed: ${persistResult.error}`);
+          await this.failTask(taskId, `OSS upload failed: ${persistResult.error}`, provider.provider);
           return;
         }
       } else {
@@ -139,8 +141,9 @@ export class ImageWorker {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error(`[ImageWorker] Task ${taskId} failed:`, errorMessage);
 
-      recordFailure("openai");
-      await this.failTask(taskId, errorMessage);
+      const providerType = modelId?.startsWith("gemini") ? "google" : "openai";
+      recordFailure(providerType);
+      await this.failTask(taskId, errorMessage, providerType);
     }
   }
 
@@ -196,7 +199,7 @@ export class ImageWorker {
     console.log(`[ImageWorker] Task ${taskId} completed: ${imageUrl}`);
   }
 
-  private async failTask(taskId: number, reason: string): Promise<void> {
+  private async failTask(taskId: number, reason: string, providerType: string = "openai"): Promise<void> {
     const result = await prisma.imageTask.updateMany({
       where: {
         id: taskId,

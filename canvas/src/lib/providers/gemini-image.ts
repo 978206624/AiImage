@@ -163,7 +163,7 @@ export class GeminiImageProvider implements ImageProvider {
         if (inlineData?.data) {
           images.push({
             b64_json: inlineData.data,
-            mimeType: inlineData.mimeType ?? "image/png",
+            mimeType: inlineData.mimeType ?? (inlineData as Record<string, unknown>).mime_type as string ?? "image/png",
             data: inlineData.data,
           });
         }

@@ -48,7 +48,8 @@ function detectMimeType(buffer: Buffer): string | null {
   ];
 
   for (const [magic, mime] of magicBytes) {
-    if (buffer.slice(0, magic.length).equals(Buffer.from(magic))) {
+    const magicBuffer = Buffer.from(magic);
+    if (buffer.slice(0, magic.length).equals(magicBuffer)) {
       return mime;
     }
   }
@@ -72,7 +73,7 @@ async function uploadBufferWithTimeout(
   buffer: Buffer,
   timeoutMs: number
 ): Promise<string> {
-  const uploadPromise = uploadBuffer(key, buffer, "image/png");
+  const uploadPromise = uploadBuffer(key, buffer);
   const timeoutPromise = new Promise<never>((_, reject) => {
     setTimeout(() => reject(new Error(`Upload timeout after ${timeoutMs}ms`)), timeoutMs);
   });

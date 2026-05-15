@@ -24,6 +24,12 @@ export async function claimTask(workerId: string): Promise<number | null> {
 
     const taskId = result[0].id;
 
+    // 查询当前任务状态，用于判断是否首次处理
+    const currentTask = await prisma.imageTask.findUnique({
+      where: { id: taskId },
+      select: { startedAt: true },
+    });
+
     const lockExpiresAt = new Date(Date.now() + LOCK_TIMEOUT_SECONDS * 1000);
 
     await prisma.imageTask.update({
@@ -33,7 +39,7 @@ export async function claimTask(workerId: string): Promise<number | null> {
         lockedBy: workerId,
         lockExpiresAt: lockExpiresAt,
         attemptCount: { increment: 1 },
-        startedAt: new Date(),
+        startedAt: currentTask?.startedAt ?? new Date(),
       },
     });
 
