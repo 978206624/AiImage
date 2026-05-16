@@ -29,7 +29,7 @@ INSERT INTO model_configs (
   true,
   10,
   5,
-  120,
+  600,
   NOW(),
   NOW()
 ) ON DUPLICATE KEY UPDATE
@@ -43,7 +43,7 @@ INSERT INTO model_configs (
   user_selectable = VALUES(user_selectable),
   sort_order = VALUES(sort_order),
   concurrency_limit = VALUES(concurrency_limit),
-  timeout_seconds = VALUES(timeout_seconds),
+  timeout_seconds = 300,
   updated_at = NOW();
 
 -- Google Nano Banana (gemini-2.5-flash-image)

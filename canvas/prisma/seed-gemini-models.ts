@@ -13,7 +13,7 @@ const models = [
     userCreditCost: 0.07,
     sortOrder: 10,
     concurrencyLimit: 5,
-    timeoutSeconds: 120,
+    timeoutSeconds: 600,
   },
   {
     displayName: "Google Nano Banana",

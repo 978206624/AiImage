@@ -3,7 +3,7 @@ import { prisma } from "../prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { isCircuitOpen } from "./circuit-breaker";
 
-const LOCK_TIMEOUT_SECONDS = 60;
+const LOCK_TIMEOUT_SECONDS = 600;
 const MAX_CANDIDATE_TASKS = 10;
 
 export async function claimTask(

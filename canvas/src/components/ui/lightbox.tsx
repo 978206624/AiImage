@@ -94,13 +94,14 @@ export function Lightbox({ src, alt, prompt, model, onClose }: LightboxProps) {
   // 拖拽平移
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
-      if (!dragStart.current) return;
-      const dx = e.clientX - dragStart.current.x;
-      const dy = e.clientY - dragStart.current.y;
+      const start = dragStart.current;
+      if (!start) return;
+      const dx = e.clientX - start.x;
+      const dy = e.clientY - start.y;
       setView((v) => ({
         ...v,
-        tx: dragStart.current!.tx + dx,
-        ty: dragStart.current!.ty + dy,
+        tx: start.tx + dx,
+        ty: start.ty + dy,
       }));
     };
     const onUp = () => {
