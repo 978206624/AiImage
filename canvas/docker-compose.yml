@@ -4,11 +4,14 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     env_file:
       - .env
     environment:
-      - DATABASE_URL=mysql://canvas:canvas@mysql:3306/canvas
+      DATABASE_URL: "${DATABASE_URL:-mysql://canvas:canvas@mysql:3306/canvas}"
+      SESSION_SECRET: "${SESSION_SECRET:?SESSION_SECRET is required}"
+      ADMIN_USERNAME: "${ADMIN_USERNAME:-admin}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}"
     depends_on:
       mysql:
         condition: service_healthy
@@ -23,10 +26,10 @@ services:
   mysql:
     image: mysql:8
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: canvas
-      MYSQL_USER: canvas
-      MYSQL_PASSWORD: canvas
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-rootpassword}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE:-canvas}"
+      MYSQL_USER: "${MYSQL_USER:-canvas}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD:-canvas}"
     ports:
       - "3306:3306"
     volumes:
