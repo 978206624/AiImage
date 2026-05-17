@@ -287,18 +287,41 @@ export class ImageWorker {
 
       const task = await tx.imageTask.findUnique({
         where: { id: taskId },
-        select: { userId: true, creditsLocked: true },
+        select: {
+          userId: true,
+          creditsLocked: true,
+          prompt: true,
+          promptSummary: true,
+          aspectRatio: true,
+          quality: true,
+          model: true,
+          stylePresetId: true,
+          referenceImagesJson: true,
+        },
       });
 
       if (!task) return;
+
+      const paramsJson = JSON.stringify({
+        prompt: task.prompt,
+        aspectRatio: task.aspectRatio,
+        quality: task.quality,
+        count: 1,
+        model: task.model,
+        stylePresetId: task.stylePresetId,
+        referenceImages: task.referenceImagesJson
+          ? safeParseArray(task.referenceImagesJson)
+          : [],
+      });
 
       const usageRecord = await tx.usageRecord.create({
         data: {
           userId: task.userId,
           creditsUsed: task.creditsLocked,
-          promptSummary: "",
+          promptSummary: task.promptSummary,
           imageUrl,
           isPersisted,
+          paramsJson,
         },
       });
 
@@ -379,4 +402,13 @@ export function stopWorker(): void {
 
 export function getWorkerStats(): WorkerStats {
   return imageWorker.getStats();
+}
+
+function safeParseArray(json: string): unknown[] {
+  try {
+    const v = JSON.parse(json);
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
 }

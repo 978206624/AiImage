@@ -121,3 +121,28 @@ export async function uploadBuffer(
   );
   return `${buildHost(config.bucket, config.endpoint)}/${key}`;
 }
+
+export function extractOssKey(url: string, bucket: string): string | null {
+  try {
+    const u = new URL(url);
+    const path = u.pathname.replace(/^\//, "");
+    if (u.host.startsWith(`${bucket}.`)) {
+      return path || null;
+    }
+    if (path.startsWith(`${bucket}/`)) {
+      return path.slice(bucket.length + 1) || null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteObjectByUrl(url: string): Promise<void> {
+  const { client, config } = await buildOssClient();
+  const key = extractOssKey(url, config.bucket);
+  if (!key) {
+    throw new Error(`unable to extract OSS key from URL: ${url}`);
+  }
+  await client.delete(key);
+}

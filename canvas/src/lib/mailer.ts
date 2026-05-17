@@ -73,9 +73,9 @@ export async function sendTestEmail(to: string): Promise<void> {
   await transporter.sendMail({
     from,
     to,
-    subject: "CANVAS — SMTP 测试邮件",
-    text: "这是一封来自 CANVAS 的 SMTP 测试邮件。如果你收到此邮件，说明邮件服务配置正确。",
-    html: `<p>这是一封来自 <strong>CANVAS</strong> 的 SMTP 测试邮件。</p><p>如果你收到此邮件，说明邮件服务配置正确。</p>`,
+    subject: "Mira — SMTP 测试邮件",
+    text: "这是一封来自 Mira 的 SMTP 测试邮件。如果你收到此邮件，说明邮件服务配置正确。",
+    html: `<p>这是一封来自 <strong>Mira</strong> 的 SMTP 测试邮件。</p><p>如果你收到此邮件，说明邮件服务配置正确。</p>`,
   });
 }
 
@@ -89,16 +89,16 @@ export async function sendVerifyEmail(
   await transporter.sendMail({
     from,
     to,
-    subject: "CANVAS — 激活你的账号",
-    text: `欢迎加入 CANVAS。\n\n请点击以下链接激活账号（24 小时内有效）：\n${link}\n\n如果你没有注册过 CANVAS，请忽略此邮件。`,
+    subject: "Mira — 激活你的账号",
+    text: `欢迎加入 Mira。\n\n请点击以下链接激活账号（24 小时内有效）：\n${link}\n\n如果你没有注册过 Mira，请忽略此邮件。`,
     html: `
       <div style="font-family:-apple-system,Segoe UI,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#1a1a1a;">
-        <h1 style="font-size:20px;font-weight:600;margin:0 0 16px;">欢迎加入 CAN&#9670;VAS</h1>
+        <h1 style="font-size:20px;font-weight:600;margin:0 0 16px;">欢迎加入 MI&#9672;RA</h1>
         <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">点击下方按钮激活账号，激活后将自动获得 0.21 积分（3 张免费体验）。</p>
         <p style="margin:24px 0;"><a href="${link}" style="display:inline-block;background:#1a1a1a;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;font-size:14px;">激活账号</a></p>
         <p style="font-size:12px;color:#666;line-height:1.6;margin:0 0 8px;">链接 24 小时内有效。如按钮无法点击，请复制以下地址到浏览器打开：</p>
         <p style="font-size:12px;color:#666;word-break:break-all;margin:0 0 20px;">${link}</p>
-        <p style="font-size:12px;color:#999;margin:0;">如果你没有注册过 CANVAS，请忽略此邮件。</p>
+        <p style="font-size:12px;color:#999;margin:0;">如果你没有注册过 Mira，请忽略此邮件。</p>
       </div>
     `,
   });
@@ -114,11 +114,11 @@ export async function sendResetEmail(
   await transporter.sendMail({
     from,
     to,
-    subject: "CANVAS — 重置密码",
-    text: `你正在重置 CANVAS 账号密码。\n\n请点击以下链接设置新密码（24 小时内有效）：\n${link}\n\n如果你没有发起重置请求，请忽略此邮件，并建议尽快修改密码。`,
+    subject: "Mira — 重置密码",
+    text: `你正在重置 Mira 账号密码。\n\n请点击以下链接设置新密码（24 小时内有效）：\n${link}\n\n如果你没有发起重置请求，请忽略此邮件，并建议尽快修改密码。`,
     html: `
       <div style="font-family:-apple-system,Segoe UI,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#1a1a1a;">
-        <h1 style="font-size:20px;font-weight:600;margin:0 0 16px;">重置 CAN&#9670;VAS 密码</h1>
+        <h1 style="font-size:20px;font-weight:600;margin:0 0 16px;">重置 MI&#9672;RA 密码</h1>
         <p style="font-size:14px;line-height:1.6;margin:0 0 20px;">点击下方按钮设置新密码。</p>
         <p style="margin:24px 0;"><a href="${link}" style="display:inline-block;background:#1a1a1a;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;font-size:14px;">设置新密码</a></p>
         <p style="font-size:12px;color:#666;line-height:1.6;margin:0 0 8px;">链接 24 小时内有效。如按钮无法点击，请复制以下地址到浏览器打开：</p>

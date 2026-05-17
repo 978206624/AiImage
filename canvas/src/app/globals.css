@@ -126,3 +126,9 @@ input[type="range"] {
   80% { transform: translate(3%, 35%); }
   90% { transform: translate(-10%, 10%); }
 }
+
+@keyframes blobDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(6%, -4%) scale(1.08); }
+  66%      { transform: translate(-5%, 5%) scale(0.94); }
+}

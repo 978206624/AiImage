@@ -61,7 +61,12 @@ export default function RegisterPage() {
   return (
     <div className="min-h-[calc(100vh-60px)] flex items-center justify-center bg-bg px-4 py-12">
       <div className="w-full max-w-sm p-8 bg-surface border border-border rounded-lg">
-        <h1 className="text-xl font-medium text-fg mb-1">注册 CANVAS</h1>
+        <h1 className="text-xl font-medium text-fg flex items-baseline gap-2 mb-1">
+          注册 Mira
+          <span className="text-xs text-muted tracking-[.1em] font-normal">
+            拟境
+          </span>
+        </h1>
         <p className="text-sm text-muted mb-6">
           注册即赠送 0.21 积分，可生成 3 张图免费体验
         </p>
@@ -132,7 +137,7 @@ export default function RegisterPage() {
               onChange={(e) => setAgreed(e.target.checked)}
               className="mt-0.5 accent-accent"
             />
-            <span>我已阅读并同意 CANVAS 服务条款及隐私政策</span>
+            <span>我已阅读并同意 Mira 服务条款及隐私政策</span>
           </label>
 
           {error && <p className="text-sm text-red-400">{error}</p>}

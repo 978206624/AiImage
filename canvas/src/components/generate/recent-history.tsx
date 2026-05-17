@@ -4,8 +4,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useDeleteUsage } from "@/hooks/use-delete-usage";
 import { Lightbox } from "@/components/ui/lightbox";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { normalizeModelTag } from "@/lib/constants";
+
+const MAX_ITEMS = 10;
+
+const QUALITY_LABEL: Record<string, string> = {
+  low: "1K",
+  medium: "2K",
+  high: "4K",
+};
 
 export interface HistoryItem {
   id: number;
@@ -46,6 +56,17 @@ export function RecentHistory({ onReuse, refreshKey }: RecentHistoryProps) {
   const [loading, setLoading] = useState(false);
   const [previewItem, setPreviewItem] = useState<HistoryItem | null>(null);
 
+  const handleDeleted = useCallback((id: number) => {
+    setItems((prev) => prev.filter((it) => it.id !== id));
+  }, []);
+  const {
+    pendingDelete,
+    deleting,
+    setPendingDelete,
+    confirm: confirmDelete,
+    cancel: cancelDelete,
+  } = useDeleteUsage<HistoryItem>({ onDeleted: handleDeleted });
+
   const load = useCallback(async () => {
     if (!user) {
       setItems([]);
@@ -53,10 +74,13 @@ export function RecentHistory({ onReuse, refreshKey }: RecentHistoryProps) {
     }
     setLoading(true);
     try {
-      const res = await fetch("/api/usage?limit=10", { cache: "no-store" });
+      const res = await fetch(`/api/usage?limit=${MAX_ITEMS}`, {
+        cache: "no-store",
+      });
       const json = await res.json();
       if (json.success) {
-        setItems(json.data.items as HistoryItem[]);
+        const items = (json.data.items as HistoryItem[]).slice(0, MAX_ITEMS);
+        setItems(items);
       }
     } finally {
       setLoading(false);
@@ -108,7 +132,7 @@ export function RecentHistory({ onReuse, refreshKey }: RecentHistoryProps) {
           {items.map((item) => (
             <div
               key={item.id}
-              className="group flex gap-2.5 items-start p-1.5 rounded hover:bg-surface transition-colors"
+              className="group relative flex gap-2.5 items-start p-1.5 pr-7 rounded hover:bg-surface transition-colors"
               title={item.prompt || item.promptSummary || ""}
             >
               <button
@@ -153,9 +177,45 @@ export function RecentHistory({ onReuse, refreshKey }: RecentHistoryProps) {
                 <div className="text-[11px] text-fg/90 truncate leading-relaxed">
                   {item.promptSummary || "无提示词"}
                 </div>
-                <div className="font-mono text-[10px] text-muted mt-0.5 tracking-[.04em]">
-                  {timeAgo(item.createdAt)} · 复用参数
+                <div className="flex items-center gap-1 mt-0.5 font-mono text-[10px] text-muted tracking-[.04em]">
+                  <span className="truncate">{item.modelTag}</span>
+                  {item.aspectRatio && (
+                    <>
+                      <span className="opacity-30">·</span>
+                      <span>{item.aspectRatio}</span>
+                    </>
+                  )}
+                  {item.quality && QUALITY_LABEL[item.quality] && (
+                    <>
+                      <span className="opacity-30">·</span>
+                      <span>{QUALITY_LABEL[item.quality]}</span>
+                    </>
+                  )}
+                  <span className="opacity-30">·</span>
+                  <span className="shrink-0">{timeAgo(item.createdAt)}</span>
                 </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPendingDelete(item)}
+                className="absolute top-1.5 right-1 w-5 h-5 flex items-center justify-center rounded text-muted hover:text-red-400 hover:bg-bg opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                aria-label="删除"
+                title="删除"
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M3 6h18" />
+                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                </svg>
               </button>
             </div>
           ))}
@@ -170,6 +230,25 @@ export function RecentHistory({ onReuse, refreshKey }: RecentHistoryProps) {
           onClose={() => setPreviewItem(null)}
         />
       )}
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        title="删除创作记录"
+        message={
+          <>
+            确认删除「
+            <span className="text-fg">
+              {pendingDelete?.promptSummary || "无提示词"}
+            </span>
+            」？删除后不可恢复。
+          </>
+        }
+        confirmText="删除"
+        danger
+        loading={deleting}
+        onConfirm={() => void confirmDelete()}
+        onCancel={cancelDelete}
+      />
     </div>
   );
 }

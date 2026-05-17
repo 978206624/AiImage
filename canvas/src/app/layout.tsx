@@ -18,8 +18,8 @@ const fontMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CANVAS — AI 图像画廊",
-  description: "AI 图像生成与展示平台",
+  title: "Mira 拟境 — AI 图像画廊",
+  description: "Mira（拟境）AI 图像生成与展示平台",
 };
 
 export default function RootLayout({

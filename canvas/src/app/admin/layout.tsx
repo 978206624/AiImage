@@ -29,7 +29,7 @@ export default function AdminLayout({
       <aside className="w-56 border-r border-border bg-surface flex flex-col">
         <div className="h-14 flex items-center px-5 border-b border-border">
           <span className="text-fg font-medium tracking-wide text-sm">
-            CANVAS 管理
+            Mira 管理
           </span>
         </div>
         <nav className="flex-1 py-3">

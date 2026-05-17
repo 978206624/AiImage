@@ -45,7 +45,7 @@ export function InsufficientBalanceModal({
         <div className="p-4 bg-bg border border-border rounded mb-5">
           <p className="text-xs text-muted leading-relaxed">
             前往账号中心兑换充值码即可继续创作。如尚未购买，可前往淘宝搜索
-            「CANVAS 充值码」购买。
+            「Mira 充值码」购买。
           </p>
         </div>
 

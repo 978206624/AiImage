@@ -130,6 +130,7 @@ class PollManager {
       aspectRatio: task.aspectRatio,
       quality: task.quality,
       count: 1,
+      model: task.model,
       stylePresetId: task.stylePresetId,
       referenceImages: task.referenceImagesJson
         ? safeParseArray(task.referenceImagesJson)

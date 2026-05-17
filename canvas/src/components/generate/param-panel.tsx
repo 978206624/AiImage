@@ -29,13 +29,9 @@ export function ParamPanel({
   const qualityIndex = quality === "low" ? 1 : quality === "medium" ? 2 : 3;
 
   return (
-    <div>
-      <div className="font-mono text-[10px] tracking-[.1em] uppercase text-muted mb-4">
-        生图参数
-      </div>
-
+    <>
       {/* Aspect Ratio */}
-      <div className="mb-[22px]">
+      <div>
         <div className="font-mono text-[10px] tracking-[.1em] uppercase text-muted mb-2.5">
           画面比例
         </div>
@@ -68,7 +64,7 @@ export function ParamPanel({
       </div>
 
       {/* Quality */}
-      <div className="mb-[22px]">
+      <div>
         <div className="font-mono text-[10px] tracking-[.1em] uppercase text-muted mb-2.5">
           生图质量
         </div>
@@ -93,7 +89,7 @@ export function ParamPanel({
       </div>
 
       {/* Count */}
-      <div className="mb-[22px]">
+      <div>
         <div className="font-mono text-[10px] tracking-[.1em] uppercase text-muted mb-2.5">
           生成数量
         </div>
@@ -113,6 +109,6 @@ export function ParamPanel({
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 }

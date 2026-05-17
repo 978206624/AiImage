@@ -8,6 +8,7 @@ interface ParsedParams {
   aspectRatio: string | null;
   quality: string | null;
   count: number | null;
+  model: string | null;
   stylePresetId: number | null;
   referenceImages: string[];
 }
@@ -19,6 +20,7 @@ function parseParams(json: string | null): ParsedParams {
       aspectRatio: null,
       quality: null,
       count: null,
+      model: null,
       stylePresetId: null,
       referenceImages: [],
     };
@@ -30,6 +32,7 @@ function parseParams(json: string | null): ParsedParams {
       aspectRatio: typeof p.aspectRatio === "string" ? p.aspectRatio : null,
       quality: typeof p.quality === "string" ? p.quality : null,
       count: typeof p.count === "number" ? p.count : null,
+      model: typeof p.model === "string" ? p.model : null,
       stylePresetId:
         typeof p.stylePresetId === "number" ? p.stylePresetId : null,
       referenceImages: Array.isArray(p.referenceImages)
@@ -42,6 +45,7 @@ function parseParams(json: string | null): ParsedParams {
       aspectRatio: null,
       quality: null,
       count: null,
+      model: null,
       stylePresetId: null,
       referenceImages: [],
     };
@@ -105,10 +109,11 @@ export async function GET(request: Request) {
         createdAt: true,
       },
     });
+    const modelMap = await buildModelMap(rows);
     return NextResponse.json({
       success: true,
       data: {
-        items: rows.map((r) => formatItem(r)),
+        items: rows.map((r) => formatItem(r, modelMap)),
         limit,
       },
     });
@@ -133,16 +138,33 @@ export async function GET(request: Request) {
     prisma.usageRecord.count({ where }),
   ]);
 
+  const modelMap = await buildModelMap(rows);
   return NextResponse.json({
     success: true,
     data: {
-      items: rows.map((r) => formatItem(r)),
+      items: rows.map((r) => formatItem(r, modelMap)),
       page,
       pageSize,
       total,
       hasMore: skip + rows.length < total,
     },
   });
+}
+
+async function buildModelMap(
+  rows: { paramsJson: string | null }[]
+): Promise<Map<string, string>> {
+  const ids = new Set<string>();
+  for (const r of rows) {
+    const p = parseParams(r.paramsJson);
+    if (p.model) ids.add(p.model);
+  }
+  if (ids.size === 0) return new Map();
+  const configs = await prisma.modelConfig.findMany({
+    where: { modelId: { in: [...ids] } },
+    select: { modelId: true, displayName: true },
+  });
+  return new Map(configs.map((c) => [c.modelId, c.displayName]));
 }
 
 interface RawRow {
@@ -154,15 +176,18 @@ interface RawRow {
   createdAt: Date;
 }
 
-function formatItem(r: RawRow) {
+function formatItem(r: RawRow, modelMap: Map<string, string>) {
   const params = parseParams(r.paramsJson);
+  const modelTag = params.model
+    ? modelMap.get(params.model) ?? params.model
+    : GPT_IMAGE_DISPLAY_NAME;
   return {
     id: r.id,
     imageUrl: r.imageUrl,
     isPersisted: r.isPersisted,
     promptSummary: r.promptSummary,
     prompt: params.prompt,
-    modelTag: GPT_IMAGE_DISPLAY_NAME,
+    modelTag,
     aspectRatio: params.aspectRatio,
     quality: params.quality,
     count: params.count,

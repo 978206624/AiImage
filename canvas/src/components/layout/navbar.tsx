@@ -32,7 +32,7 @@ export function Navbar({ onOpenAuthModal }: NavbarProps) {
         className="text-[18px] font-normal tracking-[0.12em] uppercase"
         style={{ fontFamily: "var(--font-d)", marginRight: "auto" }}
       >
-        CAN<span className="text-accent not-italic">◈</span>VAS
+        MI<span className="text-accent not-italic">◈</span>RA
       </Link>
 
       <nav className="flex gap-[2px]">

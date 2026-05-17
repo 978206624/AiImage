@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-interface StylePreset {
+export interface StylePreset {
   id: number;
   name: string;
   description: string | null;
@@ -13,52 +13,39 @@ interface StylePreset {
 
 interface StylePickerModalProps {
   open: boolean;
-  selectedIds: number[];
-  onApply: (ids: number[], prefixes: string[]) => void;
+  selectedId: number | null;
+  presets: StylePreset[];
+  onApply: (id: number | null) => void;
   onClose: () => void;
 }
 
 export function StylePickerModal({
   open,
-  selectedIds,
+  selectedId,
+  presets,
   onApply,
   onClose,
 }: StylePickerModalProps) {
-  const [presets, setPresets] = useState<StylePreset[]>([]);
-  const [localSelected, setLocalSelected] = useState<number[]>(selectedIds);
+  const [localSelected, setLocalSelected] = useState<number | null>(selectedId);
 
   useEffect(() => {
     if (!open) return;
     void Promise.resolve().then(() => {
-      setLocalSelected(selectedIds);
+      setLocalSelected(selectedId);
     });
-  }, [open, selectedIds]);
-
-  useEffect(() => {
-    fetch("/api/presets")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.success) setPresets(d.data);
-      })
-      .catch(() => {});
-  }, []);
+  }, [open, selectedId]);
 
   if (!open) return null;
 
   const toggle = (id: number) => {
-    setLocalSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+    setLocalSelected((prev) => (prev === id ? null : id));
   };
 
   const handleApply = () => {
-    const prefixes = localSelected
-      .map((id) => presets.find((p) => p.id === id)?.promptPrefix)
-      .filter((p): p is string => !!p);
-    onApply(localSelected, prefixes);
+    onApply(localSelected);
   };
 
-  const handleClear = () => setLocalSelected([]);
+  const handleClear = () => setLocalSelected(null);
 
   return (
     <div
@@ -83,7 +70,7 @@ export function StylePickerModal({
         <div className="flex-1 overflow-y-auto px-6 py-4">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {presets.map((preset) => {
-              const isSelected = localSelected.includes(preset.id);
+              const isSelected = localSelected === preset.id;
               return (
                 <button
                   key={preset.id}
@@ -127,7 +114,7 @@ export function StylePickerModal({
 
         <div className="px-6 py-3 border-t border-border flex items-center justify-between">
           <span className="text-xs text-muted">
-            已选 {localSelected.length} 个
+            {localSelected != null ? "已选 1 个" : "未选择"}
           </span>
           <div className="flex gap-2">
             <button

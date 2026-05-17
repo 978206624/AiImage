@@ -287,7 +287,7 @@ function RegisterForm({
           onChange={(e) => setAgreed(e.target.checked)}
           className="mt-0.5 accent-accent"
         />
-        <span>我已阅读并同意 CANVAS 服务条款及隐私政策</span>
+        <span>我已阅读并同意 Mira 服务条款及隐私政策</span>
       </label>
 
       {error && <p className="text-sm text-red-400">{error}</p>}

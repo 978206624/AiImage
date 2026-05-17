@@ -121,7 +121,7 @@ const groups: SettingGroup[] = [
         key: "smtp_from",
         label: "发件人",
         type: "text",
-        placeholder: "CANVAS <noreply@example.com>",
+        placeholder: "Mira <noreply@example.com>",
       },
     ],
   },

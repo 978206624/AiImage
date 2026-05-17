@@ -61,7 +61,7 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg">
       <div className="w-full max-w-sm p-8 bg-surface border border-border rounded-lg">
-        <h1 className="text-xl font-medium text-fg mb-1">CANVAS 管理后台</h1>
+        <h1 className="text-xl font-medium text-fg mb-1">Mira 管理后台</h1>
         <p className="text-sm text-muted mb-6">输入账号和密码登录</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">

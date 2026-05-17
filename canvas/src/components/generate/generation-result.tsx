@@ -35,7 +35,7 @@ export function GenerationResult({
       const blob = await res.blob();
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `canvas-${Date.now()}-${index + 1}.png`;
+      a.download = `mira-${Date.now()}-${index + 1}.png`;
       a.click();
       URL.revokeObjectURL(a.href);
     } catch {

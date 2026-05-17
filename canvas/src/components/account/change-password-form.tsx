@@ -56,7 +56,7 @@ export function ChangePasswordForm() {
           type="password"
           value={oldPassword}
           onChange={(e) => setOldPassword(e.target.value)}
-          className="w-full px-3 py-2 bg-bg border border-border rounded text-fg text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
+          className="w-full px-3 py-2 bg-bg border border-fg/20 rounded text-fg text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
           autoComplete="current-password"
           required
         />
@@ -67,7 +67,7 @@ export function ChangePasswordForm() {
           type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
-          className="w-full px-3 py-2 bg-bg border border-border rounded text-fg text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
+          className="w-full px-3 py-2 bg-bg border border-fg/20 rounded text-fg text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
           placeholder="至少 8 位"
           autoComplete="new-password"
           required
@@ -79,7 +79,7 @@ export function ChangePasswordForm() {
           type="password"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          className="w-full px-3 py-2 bg-bg border border-border rounded text-fg text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
+          className="w-full px-3 py-2 bg-bg border border-fg/20 rounded text-fg text-sm placeholder:text-muted focus:outline-none focus:border-accent transition-colors"
           autoComplete="new-password"
           required
         />

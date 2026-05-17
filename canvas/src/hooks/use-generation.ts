@@ -30,6 +30,7 @@ export interface ImageTaskState {
 }
 
 interface GenerationState {
+  submitting: boolean;
   loading: boolean;
   groupId: string | null;
   tasks: ImageTaskState[];
@@ -38,6 +39,7 @@ interface GenerationState {
 }
 
 const initialState: GenerationState = {
+  submitting: false,
   loading: false,
   groupId: null,
   tasks: [],
@@ -152,6 +154,7 @@ export function useGeneration() {
       const allTerminal = tasks.every((t) => isTerminal(t.status));
       pollGroupIdRef.current = savedGroupId;
       setState({
+        submitting: false,
         loading: !allTerminal,
         groupId: savedGroupId,
         tasks,
@@ -195,7 +198,7 @@ export function useGeneration() {
       }
 
       stopPolling();
-      setState({ ...initialState, loading: true });
+      setState({ ...initialState, loading: true, submitting: true });
 
       try {
         let refUrls: string[] | undefined;
@@ -222,6 +225,7 @@ export function useGeneration() {
         if (!data.success) {
           const code = mapErrorCode(res.status, data.code);
           setState({
+            submitting: false,
             loading: false,
             groupId: null,
             tasks: [],
@@ -246,6 +250,7 @@ export function useGeneration() {
         writeActiveGroup(groupId);
         pollGroupIdRef.current = groupId;
         setState({
+          submitting: false,
           loading: true,
           groupId,
           tasks: initialTasks,
@@ -264,6 +269,7 @@ export function useGeneration() {
       } catch (err) {
         stopPolling();
         setState({
+          submitting: false,
           loading: false,
           groupId: null,
           tasks: [],

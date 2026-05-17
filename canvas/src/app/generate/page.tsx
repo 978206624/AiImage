@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState, Suspense } from "react";
+import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
 import { ModelSelector } from "@/components/generate/model-selector";
 import { PromptInput } from "@/components/generate/prompt-input";
 import { ReferenceImages } from "@/components/generate/reference-images";
@@ -11,6 +11,7 @@ import { GenerationResult } from "@/components/generate/generation-result";
 import { LoginPromptModal } from "@/components/generate/login-prompt-modal";
 import { InsufficientBalanceModal } from "@/components/generate/insufficient-balance-modal";
 import { StylePickerModal } from "@/components/generate/style-picker-modal";
+import type { StylePreset } from "@/components/generate/style-picker-modal";
 import { RecentHistory } from "@/components/generate/recent-history";
 import type { HistoryItem } from "@/components/generate/recent-history";
 import { useGeneration } from "@/hooks/use-generation";
@@ -44,6 +45,7 @@ function GenerateContent() {
   const { user } = useCurrentUser();
   const { toast } = useToast();
   const {
+    submitting,
     loading,
     tasks,
     error,
@@ -59,13 +61,36 @@ function GenerateContent() {
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>("2:3");
   const [quality, setQuality] = useState<Quality>("medium");
   const [count, setCount] = useState(1);
-  const [selectedPresetIds, setSelectedPresetIds] = useState<number[]>([]);
+  const [selectedPresetId, setSelectedPresetId] = useState<number | null>(null);
+  const [presets, setPresets] = useState<StylePreset[]>([]);
 
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [balanceModalOpen, setBalanceModalOpen] = useState(false);
   const [stylePickerOpen, setStylePickerOpen] = useState(false);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
   const authModal = useAuthModal();
+
+  const selectedPreset = useMemo(
+    () =>
+      selectedPresetId != null
+        ? presets.find((p) => p.id === selectedPresetId) ?? null
+        : null,
+    [presets, selectedPresetId]
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/presets")
+      .then((r) => r.json())
+      .then((d) => {
+        if (cancelled) return;
+        if (d.success) setPresets(d.data as StylePreset[]);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleReuse = useCallback(
     (item: HistoryItem) => {
@@ -76,11 +101,7 @@ function GenerateContent() {
       if (item.count === 1 || item.count === 2 || item.count === 4) {
         setCount(item.count);
       }
-      if (item.stylePresetId) {
-        setSelectedPresetIds([item.stylePresetId]);
-      } else {
-        setSelectedPresetIds([]);
-      }
+      setSelectedPresetId(item.stylePresetId ?? null);
       setReferenceImages(
         item.referenceImages.map((url, idx) => ({
           id: `reuse-${Date.now()}-${idx}`,
@@ -133,13 +154,8 @@ function GenerateContent() {
     });
   }, [error, errorCode, toast]);
 
-  const handleStyleApply = (ids: number[], prefixes: string[]) => {
-    setSelectedPresetIds(ids);
-    if (prefixes.length > 0) {
-      const prefix = prefixes.join("\n");
-      const cleaned = prompt.trimStart();
-      setPrompt(cleaned ? `${prefix}\n${cleaned}` : prefix);
-    }
+  const handleStyleApply = (id: number | null) => {
+    setSelectedPresetId(id);
     setStylePickerOpen(false);
   };
 
@@ -173,7 +189,7 @@ function GenerateContent() {
       count,
       model,
       referenceImages,
-      presetIds: selectedPresetIds,
+      presetIds: selectedPresetId != null ? [selectedPresetId] : [],
     });
   };
 
@@ -185,23 +201,30 @@ function GenerateContent() {
   return (
     <>
       <div
-        className="grid grid-cols-[256px_1fr_272px]"
+        className="grid grid-cols-[260px_1fr_300px]"
         style={{
           marginTop: "var(--nav)",
           minHeight: "calc(100vh - var(--nav))",
         }}
       >
-        {/* Left Panel - Model Selector + Recent History */}
-        <aside className="border-r border-border overflow-y-auto px-[18px] py-[28px]">
-          <ModelSelector selected={model} onSelect={handleModelSelect} onModelsLoaded={handleModelsLoaded} />
-          <div className="h-px bg-border my-5" />
-          <RecentHistory
-            onReuse={handleReuse}
-            refreshKey={historyRefreshKey}
+        {/* Left - 生图配置 */}
+        <aside className="border-r border-border overflow-y-auto px-[18px] py-[28px] flex flex-col gap-[22px]">
+          <ModelSelector
+            selected={model}
+            onSelect={handleModelSelect}
+            onModelsLoaded={handleModelsLoaded}
+          />
+          <ParamPanel
+            aspectRatio={aspectRatio}
+            quality={quality}
+            count={count}
+            onAspectRatioChange={setAspectRatio}
+            onQualityChange={setQuality}
+            onCountChange={setCount}
           />
         </aside>
 
-        {/* Center - Creation Area */}
+        {/* Center - 创作区（提示词 + 生图按钮） */}
         <main className="overflow-y-auto px-[32px] py-[24px]">
           <div className="flex items-center justify-between mb-4">
             <h2
@@ -218,44 +241,50 @@ function GenerateContent() {
           <PromptInput
             value={prompt}
             onChange={setPrompt}
-            disabled={loading}
-            styleCount={selectedPresetIds.length}
+            disabled={submitting}
+            stylePreset={
+              selectedPreset
+                ? {
+                    id: selectedPreset.id,
+                    name: selectedPreset.name,
+                    coverImageUrl: selectedPreset.coverImageUrl,
+                  }
+                : null
+            }
             onStyleClick={() => setStylePickerOpen(true)}
+            onRemoveStyle={() => setSelectedPresetId(null)}
           />
 
           <ReferenceImages
             images={referenceImages}
             onChange={setReferenceImages}
-            disabled={loading}
+            disabled={submitting}
           />
 
           <button
             onClick={handleGenerate}
-            disabled={loading || !prompt.trim()}
+            disabled={submitting || !prompt.trim()}
             className="w-full py-[15px] mt-1.5 bg-accent text-[oklch(11%_.01_55)] text-base font-medium tracking-[.025em] rounded-[var(--r)] hover:opacity-[.86] transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "◎ 生成中..." : "✦ 开始生图"}
+            {submitting ? "◎ 提交中..." : "✦ 开始生图"}
           </button>
 
           <GenerationResult tasks={tasks} loading={loading} count={count} />
         </main>
 
-        {/* Right Panel - Parameters */}
+        {/* Right Panel - 历史记录 */}
         <aside className="border-l border-border overflow-y-auto px-[18px] py-[28px]">
-          <ParamPanel
-            aspectRatio={aspectRatio}
-            quality={quality}
-            count={count}
-            onAspectRatioChange={setAspectRatio}
-            onQualityChange={setQuality}
-            onCountChange={setCount}
+          <RecentHistory
+            onReuse={handleReuse}
+            refreshKey={historyRefreshKey}
           />
         </aside>
       </div>
 
       <StylePickerModal
         open={stylePickerOpen}
-        selectedIds={selectedPresetIds}
+        selectedId={selectedPresetId}
+        presets={presets}
         onApply={handleStyleApply}
         onClose={() => setStylePickerOpen(false)}
       />
