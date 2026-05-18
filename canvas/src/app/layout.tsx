@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
-import { Crimson_Pro, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ClientProviders } from "@/components/layout/client-providers";
 
-const fontDisplay = Crimson_Pro({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
+const fontDisplay = localFont({
+  src: "../../public/fonts/CrimsonPro-wght.ttf",
+  weight: "200 900",
   variable: "--font-display",
   display: "swap",
 });
 
-const fontMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const fontMono = localFont({
+  src: "../../public/fonts/JetBrainsMono-wght.ttf",
+  weight: "100 800",
   variable: "--font-mono",
   display: "swap",
 });
