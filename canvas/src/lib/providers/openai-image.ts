@@ -3,22 +3,33 @@ import { getRequiredSetting } from "../system-settings";
 import type { ImageProvider, SubmitParams, SubmitResult } from "./base";
 
 const SIZE_MAP: Record<string, string> = {
-  "1:1": "1024x1024",
+  "512x512": "512x512",
+  "512x768": "512x768",
+  "432x768": "432x768",
+  "640x480": "640x480",
+  "480x640": "480x640",
+  "768x432": "768x432",
   "1024x1024": "1024x1024",
-  "16:9": "1792x1024",
-  "1536x864": "1792x1024",
-  "1920x1080": "1792x1024",
-  "9:16": "1024x1792",
-  "864x1536": "1024x1792",
-  "1080x1920": "1024x1792",
-  "4:3": "1024x1024",
-  "1024x768": "1024x1024",
-  "3:4": "1024x1024",
-  "768x1024": "1024x1024",
-  "2:3": "1024x1024",
+  "768x1152": "768x1152",
+  "648x1152": "648x1152",
+  "1024x768": "1024x768",
+  "768x1024": "768x1024",
+  "1152x648": "1152x648",
+  "1024x1536": "1024x1536",
+  "1536x1536": "1536x1536",
+  "864x1536": "864x1536",
+  "1536x864": "1536x864",
+  "1536x1152": "1536x1152",
+  "1152x1536": "1152x1536",
 };
 
 const DEFAULT_TIMEOUT_MS = 120_000;
+const REFERENCE_DOWNLOAD_TIMEOUT_MS = 30_000;
+
+interface ReferenceImageUpload {
+  blob: Blob;
+  filename: string;
+}
 
 function mapToOpenAISize(projectSize: string): string {
   return SIZE_MAP[projectSize] ?? "1024x1024";
@@ -38,19 +49,58 @@ async function getConfig() {
   return { baseUrl: baseUrl.replace(/\/$/, ""), apiKey };
 }
 
-async function convertToDataUrl(url: string): Promise<string> {
+function extensionFromContentType(contentType: string): string {
+  const map: Record<string, string> = {
+    "image/png": "png",
+    "image/jpeg": "jpg",
+    "image/webp": "webp",
+    "image/gif": "gif",
+  };
+  return map[contentType] ?? "png";
+}
+
+function filenameFromUrl(url: string, contentType: string, index: number): string {
+  try {
+    const pathname = new URL(url).pathname;
+    const filename = decodeURIComponent(pathname.split("/").pop() ?? "");
+    if (filename && /\.[a-z0-9]+$/i.test(filename)) return filename;
+  } catch {
+    // fall through
+  }
+  return `reference-${index + 1}.${extensionFromContentType(contentType)}`;
+}
+
+async function downloadReferenceImage(
+  url: string,
+  index: number
+): Promise<ReferenceImageUpload> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000);
+  const timeout = setTimeout(
+    () => controller.abort(),
+    REFERENCE_DOWNLOAD_TIMEOUT_MS
+  );
 
   try {
     const res = await fetch(url, { signal: controller.signal });
     if (!res.ok) {
       throw new Error(`下载参考图失败: ${res.status}`);
     }
-    const contentType = res.headers.get("content-type") ?? "image/png";
+
+    const contentType =
+      res.headers.get("content-type")?.split(";")[0]?.trim() || "image/png";
+    if (!contentType.startsWith("image/")) {
+      throw new Error(`参考图不是图片: ${contentType}`);
+    }
+
     const buffer = await res.arrayBuffer();
-    const base64 = Buffer.from(buffer).toString("base64");
-    return `data:${contentType};base64,${base64}`;
+    if (buffer.byteLength === 0) {
+      throw new Error("参考图为空");
+    }
+
+    return {
+      blob: new Blob([buffer], { type: contentType }),
+      filename: filenameFromUrl(url, contentType, index),
+    };
   } finally {
     clearTimeout(timeout);
   }
@@ -69,33 +119,46 @@ export class OpenAIImageProvider implements ImageProvider {
 
   async submitTask(params: SubmitParams): Promise<SubmitResult> {
     const { baseUrl, apiKey } = await getConfig();
-    const openAiSize = mapToOpenAISize(params.size);
+    const size = mapToOpenAISize(params.size);
+    const referenceImages = params.referenceImages
+      ?.map((refImage) => refImage.trim())
+      .filter(Boolean);
+    const hasReferenceImages = referenceImages && referenceImages.length > 0;
 
-    const body: Record<string, unknown> = {
-      model: this.modelId,
-      prompt: params.prompt,
-      size: openAiSize,
-      response_format: "url",
-      quality: params.quality ?? "auto",
-      n: 1,
+    let url = `${baseUrl}/v1/images/generations`;
+    let body: BodyInit;
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${apiKey}`,
     };
 
-    if (params.referenceImages && params.referenceImages.length > 0) {
-      const processedImages: string[] = [];
-      for (const refImage of params.referenceImages) {
-        if (refImage.startsWith("data:")) {
-          processedImages.push(refImage);
-        } else {
-          try {
-            const dataUrl = await convertToDataUrl(refImage);
-            processedImages.push(dataUrl);
-          } catch (error) {
-            console.warn(`[OpenAIImageProvider] 参考图转换失败: ${error}`);
-            throw new Error(`参考图处理失败: ${error instanceof Error ? error.message : "Unknown error"}`);
-          }
-        }
+    if (hasReferenceImages) {
+      url = `${baseUrl}/v1/images/edits`;
+      const formData = new FormData();
+      formData.append("model", this.modelId);
+      formData.append("prompt", params.prompt);
+      formData.append("size", size);
+      formData.append("response_format", "url");
+      formData.append("n", "1");
+
+      const files = await Promise.all(
+        referenceImages.map((refImage, index) =>
+          downloadReferenceImage(refImage, index)
+        )
+      );
+      for (const file of files) {
+        formData.append("image", file.blob, file.filename);
       }
-      body.image = processedImages;
+
+      body = formData;
+    } else {
+      headers["Content-Type"] = "application/json";
+      body = JSON.stringify({
+        model: this.modelId,
+        prompt: params.prompt,
+        size: size,
+        response_format: "url",
+        n: 1,
+      });
     }
 
     const controller = new AbortController();
@@ -103,13 +166,10 @@ export class OpenAIImageProvider implements ImageProvider {
 
     let res: Response;
     try {
-      res = await fetch(`${baseUrl}/v1/images/generations`, {
+      res = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify(body),
+        headers,
+        body,
         signal: controller.signal,
       });
     } catch (error) {
