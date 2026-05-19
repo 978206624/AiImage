@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifySession } from "@/lib/auth";
+import type { AdminUserAuditLog } from "@/generated/prisma/client";
 
 async function parseId(params: Promise<{ id: string }>) {
   const { id } = await params;
@@ -75,7 +76,7 @@ export async function GET(
         createdAt: user.createdAt,
         lastLoginAt: user.lastLoginAt,
       },
-      auditLogs: auditLogs.map((a) => ({
+      auditLogs: auditLogs.map((a: AdminUserAuditLog) => ({
         id: a.id,
         action: a.action,
         payload: a.payload,

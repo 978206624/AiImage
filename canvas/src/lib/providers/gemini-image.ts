@@ -57,14 +57,14 @@ async function convertToDataUrl(url: string): Promise<{ mimeType: string; data: 
 
 async function getConfig() {
   const baseUrl = await getRequiredSetting(
-    "api_base_url",
-    "GPT_IMAGE_BASE_URL",
-    "Gemini API 配置不完整，请在系统设置中配置中转站 API 地址"
+    "gemini_api_base_url",
+    "GEMINI_API_BASE_URL",
+    "Gemini API 配置不完整，请在系统设置中配置 Gemini 中转站 API 地址"
   );
   const apiKey = await getRequiredSetting(
-    "api_key",
-    "GPT_IMAGE_API_KEY",
-    "Gemini API 配置不完整，请在系统设置中配置中转站 API Key"
+    "gemini_api_key",
+    "GEMINI_API_KEY",
+    "Gemini API 配置不完整，请在系统设置中配置 Gemini 中转站 API Key"
   );
   return { baseUrl: baseUrl.replace(/\/$/, ""), apiKey };
 }

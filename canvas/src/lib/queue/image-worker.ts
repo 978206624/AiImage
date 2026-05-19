@@ -216,6 +216,7 @@ export class ImageWorker {
       const submitResult = await provider.submitTask({
         prompt: task.prompt,
         size: task.size,
+        aspectRatio: task.aspectRatio,
         quality: task.quality,
         referenceImages: task.referenceImagesJson
           ? JSON.parse(task.referenceImagesJson)
@@ -224,6 +225,9 @@ export class ImageWorker {
       });
 
       const imageData = submitResult.imageData;
+
+      let finalUrl: string;
+      let finalPersisted: boolean;
 
       if (imageData.b64_json) {
         const persistResult = await persistOutput(
@@ -236,10 +240,24 @@ export class ImageWorker {
           return;
         }
 
-        await this.completeTask(taskId, persistResult.url, true, submitResult.raw);
+        finalUrl = persistResult.url;
+        finalPersisted = true;
       } else {
-        await this.completeTask(taskId, imageData.data, false, submitResult.raw);
+        const persistResult = await persistOutput(
+          { kind: "url", data: imageData.data },
+          task.userId
+        );
+
+        if (!persistResult.isPersisted) {
+          await this.failTask(taskId, `OSS upload failed: ${persistResult.error}`);
+          return;
+        }
+
+        finalUrl = persistResult.url;
+        finalPersisted = true;
       }
+
+      await this.completeTask(taskId, finalUrl, finalPersisted, submitResult.raw);
 
       recordSuccess(providerType);
     } catch (error) {

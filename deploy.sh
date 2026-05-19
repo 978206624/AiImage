@@ -74,6 +74,21 @@ cleanup() {
   fi
 }
 
+prepare_standalone_assets() {
+  if [ ! -d "$APP_DIR/.next/standalone" ]; then
+    return
+  fi
+
+  mkdir -p "$APP_DIR/.next/standalone/.next"
+  rm -rf "$APP_DIR/.next/standalone/.next/static"
+  cp -a "$APP_DIR/.next/static" "$APP_DIR/.next/standalone/.next/static"
+
+  if [ -d "$APP_DIR/public" ]; then
+    rm -rf "$APP_DIR/.next/standalone/public"
+    cp -a "$APP_DIR/public" "$APP_DIR/.next/standalone/public"
+  fi
+}
+
 on_exit() {
   local status=$?
   if [ "$status" -ne 0 ]; then
@@ -134,9 +149,10 @@ trap on_exit EXIT
     mv "$APP_DIR/.next" "$PREVIOUS_NEXT"
   fi
   mv "$NEXT_NEW" "$APP_DIR/.next"
+  prepare_standalone_assets
 
   log "8. 重启服务"
-  pm2 restart "$PM2_APP_NAME" --update-env
+  pm2 startOrReload ecosystem.config.cjs --only "$PM2_APP_NAME" --update-env
   rm -f "$ROLLBACK_MARKER"
   rm -rf "$PREVIOUS_NEXT"
 

@@ -5,6 +5,7 @@ export type BillingType = "metered" | "per_request";
 export interface SubmitParams {
   prompt: string;
   size: string;
+  aspectRatio: string;
   quality?: string;
   referenceImages?: string[];
   userId?: number;

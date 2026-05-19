@@ -3,11 +3,11 @@ module.exports = {
     {
       name: "canvas",
       script: ".next/standalone/server.js",
-      cwd: "/www/wwwroot/canvas",
+      cwd: "/www/wwwroot/aiImage/AiImage/canvas",
       env: {
         NODE_ENV: "production",
         PORT: "3000",
-        HOSTNAME: "127.0.0.1"
+        HOSTNAME: "0.0.0.0"
       },
       instances: 1,
       exec_mode: "fork",

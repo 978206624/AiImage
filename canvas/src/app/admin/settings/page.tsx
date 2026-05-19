@@ -23,13 +23,25 @@ const groups: SettingGroup[] = [
     fields: [
       {
         key: "api_base_url",
-        label: "中转站 API 地址",
+        label: "GPT Image 中转站 API 地址",
         type: "text",
         placeholder: "https://your-proxy.com",
       },
       {
         key: "api_key",
-        label: "中转站 API Key",
+        label: "GPT Image 中转站 API Key",
+        type: "password",
+        placeholder: "sk-xxx",
+      },
+      {
+        key: "gemini_api_base_url",
+        label: "Gemini 中转站 API 地址",
+        type: "text",
+        placeholder: "https://your-proxy.com",
+      },
+      {
+        key: "gemini_api_key",
+        label: "Gemini 中转站 API Key",
         type: "password",
         placeholder: "sk-xxx",
       },
